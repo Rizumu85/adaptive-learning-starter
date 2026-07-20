@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adaptive Course Teacher"
+  short_description: "Personalized course maps, notes, and visual lessons"
+  default_prompt: "Use $adaptive-course-teacher to give me a viewing map first, then adapt notes and visual explanations to my needs."

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+  <title id="title">Adaptive Learning Starter</title>
+  <desc id="desc">A course moves through a focused path from viewing map to understanding, notes, and visual explanations.</desc>
+  <rect width="1200" height="430" rx="18" fill="#f6f2e9"/>
+  <path d="M0 350 C250 322 390 390 620 344 C840 300 1000 326 1200 286 L1200 430 L0 430Z" fill="#ece6d9"/>
+  <g transform="translate(64 58)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <text x="0" y="0" dominant-baseline="hanging" font-size="17" font-weight="700" fill="#167f88">CODEX · ADAPTIVE COURSE WORKFLOW</text>
+    <text x="0" y="58" dominant-baseline="hanging" font-size="53" font-weight="760" fill="#172027">Adaptive Learning</text>
+    <text x="0" y="118" dominant-baseline="hanging" font-size="53" font-weight="760" fill="#172027">Starter</text>
+    <text x="0" y="202" dominant-baseline="hanging" font-size="23" font-weight="500" fill="#53616b">先找到真正卡住的地方，再决定怎样讲清楚。</text>
+    <g transform="translate(0 272)" font-size="17" font-weight="650">
+      <rect width="118" height="38" rx="8" fill="#fffdf8" stroke="#d5d0c5"/>
+      <text x="59" y="25" text-anchor="middle" fill="#344149">观看前地图</text>
+      <rect x="130" width="118" height="38" rx="8" fill="#fffdf8" stroke="#d5d0c5"/>
+      <text x="189" y="25" text-anchor="middle" fill="#344149">重点重建</text>
+      <rect x="260" width="118" height="38" rx="8" fill="#fffdf8" stroke="#d5d0c5"/>
+      <text x="319" y="25" text-anchor="middle" fill="#344149">按需成稿</text>
+    </g>
+  </g>
+  <g transform="translate(678 52)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <path d="M64 56 C162 26 248 74 284 150 C320 227 380 238 448 220" fill="none" stroke="#bcc5c2" stroke-width="3" stroke-dasharray="7 9"/>
+    <g transform="translate(20 30)">
+      <circle cx="42" cy="42" r="42" fill="#167f88"/>
+      <text x="42" y="37" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">BEFORE</text>
+      <text x="42" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">看前</text>
+    </g>
+    <g transform="translate(240 112)">
+      <circle cx="42" cy="42" r="42" fill="#d19a2a"/>
+      <text x="42" y="37" text-anchor="middle" font-size="14" font-weight="700" fill="#172027">REBUILD</text>
+      <text x="42" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="#172027">重建</text>
+    </g>
+    <g transform="translate(414 184)">
+      <circle cx="42" cy="42" r="42" fill="#c85f46"/>
+      <text x="42" y="37" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">CHOOSE</text>
+      <text x="42" y="57" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">选择</text>
+    </g>
+    <g transform="translate(42 248)">
+      <rect width="390" height="104" rx="12" fill="#fffdf8" stroke="#d5d0c5"/>
+      <text x="22" y="31" font-size="15" font-weight="700" fill="#167f88">OUTPUT / 只制作有用的形式</text>
+      <g transform="translate(22 50)" font-size="16" font-weight="650" fill="#344149">
+        <text x="0" y="18">笔记</text><circle cx="55" cy="12" r="3" fill="#d19a2a"/>
+        <text x="72" y="18">静图</text><circle cx="127" cy="12" r="3" fill="#d19a2a"/>
+        <text x="144" y="18">WebP</text><circle cx="202" cy="12" r="3" fill="#d19a2a"/>
+        <text x="219" y="18">交互 HTML</text>
+      </g>
+      <text x="22" y="89" font-size="14" fill="#6b747a">理解反馈会成为下一节课的新起点</text>
+    </g>
+  </g>
+</svg>
+

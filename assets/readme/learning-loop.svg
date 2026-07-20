@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Adaptive learning loop</title>
+  <desc id="desc">Four stages: map attention before viewing, rebuild understanding after viewing, choose a useful output format, and feed the learner response into the next lesson.</desc>
+  <rect width="1200" height="360" rx="14" fill="#f6f2e9"/>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+    <text x="56" y="54" font-size="17" font-weight="700" fill="#167f88">LEARNING LOOP</text>
+    <text x="56" y="94" font-size="31" font-weight="760" fill="#172027">每次只解决当前最重要的理解阻力</text>
+    <path d="M140 205 H1012" fill="none" stroke="#c9c5bb" stroke-width="3"/>
+    <path d="M998 194 L1018 205 L998 216" fill="none" stroke="#c9c5bb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(72 152)">
+      <circle cx="68" cy="53" r="43" fill="#167f88"/>
+      <text x="68" y="60" text-anchor="middle" font-size="25" font-weight="750" fill="#ffffff">1</text>
+      <text x="68" y="121" text-anchor="middle" font-size="20" font-weight="720" fill="#172027">看前地图</text>
+      <text x="68" y="148" text-anchor="middle" font-size="15" fill="#657078">少量注意目标</text>
+    </g>
+    <g transform="translate(342 152)">
+      <circle cx="68" cy="53" r="43" fill="#d19a2a"/>
+      <text x="68" y="60" text-anchor="middle" font-size="25" font-weight="750" fill="#172027">2</text>
+      <text x="68" y="121" text-anchor="middle" font-size="20" font-weight="720" fill="#172027">重点重建</text>
+      <text x="68" y="148" text-anchor="middle" font-size="15" fill="#657078">概念 · 经验 · 操作</text>
+    </g>
+    <g transform="translate(612 152)">
+      <circle cx="68" cy="53" r="43" fill="#c85f46"/>
+      <text x="68" y="60" text-anchor="middle" font-size="25" font-weight="750" fill="#ffffff">3</text>
+      <text x="68" y="121" text-anchor="middle" font-size="20" font-weight="720" fill="#172027">选择媒介</text>
+      <text x="68" y="148" text-anchor="middle" font-size="15" fill="#657078">笔记 · 图 · WebP · HTML</text>
+    </g>
+    <g transform="translate(882 152)">
+      <circle cx="68" cy="53" r="43" fill="#536f62"/>
+      <text x="68" y="60" text-anchor="middle" font-size="25" font-weight="750" fill="#ffffff">4</text>
+      <text x="68" y="121" text-anchor="middle" font-size="20" font-weight="720" fill="#172027">写回反馈</text>
+      <text x="68" y="148" text-anchor="middle" font-size="15" fill="#657078">已会 · 仍卡住</text>
+    </g>
+    <path d="M950 311 C950 342 140 342 140 311" fill="none" stroke="#167f88" stroke-width="2" stroke-dasharray="6 7"/>
+    <path d="M151 301 L139 312 L151 322" fill="none" stroke="#167f88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

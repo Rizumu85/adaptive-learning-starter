@@ -9,5 +9,8 @@ The AI should ask these in small groups, not as one questionnaire:
 5. Which tools are available: transcript, logged-in browser, note app, local files, image/video tools?
 6. What has helped before: concise notes, diagrams, practice, repetition, or interactive demonstrations?
 7. What should the AI stop repeating because you already know it?
+8. What should count as mastery: recognition, explanation, guided execution, independent recall, or independent production?
+9. Which devices and input methods will you actually use, and must lessons work offline or by opening a local file directly?
+10. Are there licensed local assets, privacy constraints, or external reviewers/models that the project must handle in a specific way?
 
 Use the answers to update `MISSION.md` and `NOTES.md`. Begin with one small lesson and revise the system after feedback.

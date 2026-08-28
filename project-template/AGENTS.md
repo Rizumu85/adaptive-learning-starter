@@ -12,4 +12,11 @@
 - When an interactive lesson needs custom code, write its editable source in TypeScript and compile or bundle it into local JavaScript for browser use. Keep direct local-file opening working; treat emitted JavaScript as generated output and do not hand-edit it. Vendored libraries and unavoidable tool configuration are exempt.
 - Read `DESIGN.md` before producing courseware.
 - Keep learner-facing text short and factual without omitting the reasoning needed for recall.
+- Before publishing AI-written lesson copy, review the whole artifact in two passes: first delete, retain, or shorten each block; then rewrite only what remains. Preserve source quotations and verify every suggestion against the source and rendered lesson.
+- Remove empty reassurance, template transitions, product language, setup announcements, and text that only restates headings, buttons, visible order, or task rules. Keep concrete instructions, necessary empty-state guidance, observable feedback, and real constraints.
+- Keep discussion rationale, rejected alternatives, temporary experiments, reviewer prompts, and implementation history in working notes. Do not copy them into the lesson unless the learner needs them to act or avoid a real error.
+- A copy review may remove redundant text and newly empty containers, but it must not silently redesign the UI or change interaction, state, assessment, algorithms, or source material. Use the reviewer and reasoning mode the learner requested and report the actual model and mode. Browser-based reviewers receive only rendered screenshots and learner-visible plain text, never source code or repository files.
+- Separate teaching from assessment. Show prerequisites before practice, hide answer-bearing prompts during independent recall, and record recognition, guided performance, independent performance, correctness, fluency, and presentation separately when they can diverge.
+- Keep licensed course sources and locally authorized assets in ignored local paths unless redistribution is explicitly permitted. Preserve provenance and never substitute a similar asset as though it were the requested original.
+- Build future lessons from observed learner work and feedback. Do not prebuild a complete permanent curriculum before the method has been tested.
 - Record stable learning preferences and rejected repetitions in `NOTES.md`.

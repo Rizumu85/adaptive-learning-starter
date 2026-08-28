@@ -32,6 +32,7 @@ Read `references/media-workflow.md` before capturing screenshots, producing anim
 - Prefer interactive HTML when changing one variable, coordinate space, causal order, or spatial relation is the obstacle.
 - Do not add interaction when a short explanation or image teaches the point better.
 - Never use GIF as the final animated-note format unless the learner explicitly requests it.
+- When interactive courseware needs custom code, author the editable source in TypeScript and compile or bundle it into local JavaScript for the browser. Preserve direct local-file opening when the project requires it, and do not hand-edit generated JavaScript. Vendored libraries and unavoidable tool configuration are exempt.
 
 Read `references/courseware-design.md` before creating HTML. Treat it as a starting theme, then adapt it to the learner, subject, and existing project style.
 

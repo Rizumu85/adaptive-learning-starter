@@ -26,7 +26,7 @@
 5. 询问我的学习项目要保存在哪里。
 6. 创建学习项目目录，并把 project-template 中的全部内容复制到项目根目录。
 7. 验证 SKILL.md、AGENTS.md、DESIGN.md、ONBOARDING.md、
-   MISSION.md 和 NOTES.md 都已正确放置。
+   MISSION.md、NOTES.md 和项目模板中的 .gitignore 都已正确放置。
 8. 告诉我最终的 skill 安装路径和学习项目路径。
 ```
 

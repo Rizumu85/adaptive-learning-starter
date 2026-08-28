@@ -9,6 +9,8 @@ Use this as an initial visual language, not an identity that every learner must 
 - Introduce one new distinction at a time.
 - Put the explanation beside the state it describes.
 - Keep ordinary reading content unframed. Use panels only for controls, comparisons, figures, and feedback.
+- Keep source quotations visually distinct from added teaching copy without turning the page into nested cards.
+- Bind pronunciation, glossary, or translation annotations to the exact token they describe so annotation and source wrap together.
 
 ## Visual Tokens
 
@@ -43,6 +45,7 @@ Use this as an initial visual language, not an identity that every learner must 
 - Visual stage appears before controls on mobile.
 - Use the tallest step as the shared desktop height. Do not create a nested scrollbar to force equality.
 - Move long explanations into a reading section below the workspace.
+- Align paired source pages, before/after images, or neighboring illustrations to a shared visual baseline when they are meant to be compared as one unit.
 
 ## Color and Feedback
 
@@ -50,6 +53,7 @@ Use this as an initial visual language, not an identity that every learner must 
 - Use one consistent primary accent.
 - Never rely on color alone; repeat meaning with labels, position, or shape.
 - Each meaningful interaction changes the visual and produces one short factual sentence.
+- Feedback states what changed or what needs correction; it does not praise the interface, explain implementation, or repeat the control label.
 - Avoid gradients, decorative blobs, nested cards, and dashboard-like color noise.
 
 ## Motion
@@ -68,3 +72,5 @@ Use this as an initial visual language, not an identity that every learner must 
 - Direct local-file opening works without a server.
 - Desktop and mobile screenshots pass.
 - Interactive canvases are nonblank and controls visibly respond.
+- Saved learner work survives reload, and any clear action has the intended recovery behavior.
+- Learner-facing copy still matches the final rendered controls and state.

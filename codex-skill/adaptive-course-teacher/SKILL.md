@@ -12,6 +12,7 @@ Treat learning as an iterative collaboration. Do not assume the learner needs th
 1. Read the project `AGENTS.md`, `MISSION.md`, `NOTES.md`, and `DESIGN.md` when present.
 2. If the learner profile is missing, use `references/onboarding.md`. Ask only one to three questions at a time.
 3. Record stable preferences in the project `NOTES.md`; keep subject-specific knowledge in notes or reference files rather than this skill.
+4. Begin with one small lesson and revise from observed work. Do not prebuild a complete curriculum before the learner has produced evidence.
 
 ## Per-Lesson Workflow
 
@@ -22,6 +23,7 @@ Read `references/teaching-workflow.md` before handling a course episode.
 3. After viewing, reconstruct the load-bearing reasoning. Do not merely summarize the timeline.
 4. Separate verified course actions from added advice, version adaptations, and diagnostics.
 5. Let the learner choose what becomes a durable note, mind map, screenshot, animated WebP, or interactive lesson.
+6. When practice is part of the lesson, define what counts as independent performance and record each meaningful capability separately.
 
 ## Visual Material
 
@@ -35,6 +37,11 @@ Read `references/media-workflow.md` before capturing screenshots, producing anim
 - When interactive courseware needs custom code, author the editable source in TypeScript and compile or bundle it into local JavaScript for the browser. Preserve direct local-file opening when the project requires it, and do not hand-edit generated JavaScript. Vendored libraries and unavoidable tool configuration are exempt.
 
 Read `references/courseware-design.md` before creating HTML. Treat it as a starting theme, then adapt it to the learner, subject, and existing project style.
+Read `references/interactive-courseware.md` before implementing custom interaction, persistence, narration synchronization, canvas input, or local browser delivery.
+
+## Learner-Facing Copy
+
+Read `references/learner-facing-copy.md` before publishing AI-written or externally reviewed lesson copy. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
 
 ## Accuracy Rules
 
@@ -43,6 +50,7 @@ Read `references/courseware-design.md` before creating HTML. Treat it as a start
 - A follow-along procedure contains only verified source actions. Put additions in a clearly labeled diagnostic or optional section.
 - When comments contain a claim, distinguish instructor confirmation from learner speculation and verify behavior when possible.
 - Respect course licensing. Do not redistribute source videos, PDFs, paid downloads, or login-protected media.
+- Keep licensed source files and locally authorized assets outside version control unless redistribution is explicitly permitted. Preserve provenance for every derived crop, transcription, narration, or model.
 
 ## Bundled Examples
 

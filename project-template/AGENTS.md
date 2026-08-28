@@ -9,6 +9,7 @@
 - Distinguish verified course actions from AI additions, version adaptations, and diagnostics.
 - Name full UI context when controls can be confused: version, mode, editor, properties tab, object/data level, and keymap.
 - Prefer static images for fixed locations, Animated WebP for short procedures, and interactive HTML for variable, causal, or spatial relationships.
+- When an interactive lesson needs custom code, write its editable source in TypeScript and compile or bundle it into local JavaScript for browser use. Keep direct local-file opening working; treat emitted JavaScript as generated output and do not hand-edit it. Vendored libraries and unavoidable tool configuration are exempt.
 - Read `DESIGN.md` before producing courseware.
 - Keep learner-facing text short and factual without omitting the reasoning needed for recall.
 - Record stable learning preferences and rejected repetitions in `NOTES.md`.

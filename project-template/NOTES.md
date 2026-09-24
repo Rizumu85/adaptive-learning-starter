@@ -59,6 +59,17 @@ Also record:
 
 ## Per-Lesson Record
 
+### Current Scope and Checkpoint
+
+- Current unit and verified source location:
+- Authorized outputs and scope (including any explicit batch request):
+- Source inspected by the agent:
+- Learner reading/viewing and evidence:
+- Learner practice/understanding and evidence:
+- Feedback awaited and next action:
+
+An artifact's completion is not evidence that the learner has read or learned its contents. Permission for one artifact type is not permission to produce it for every unit.
+
 Append source IDs, verified timestamps, intended outcome, independent result, recurring error, next review, learner decisions, and created artifacts here.
 
 For software learning and follow-alongs, use this checkpoint format when relevant. Leave unknown fields explicitly unknown; do not infer completion from a conversation or generated artifact.

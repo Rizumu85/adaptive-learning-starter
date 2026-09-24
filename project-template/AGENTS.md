@@ -2,6 +2,8 @@
 
 - Spend time thinking. Do not send optional progress commentary.
 - Treat the learner as a collaborator. Revise the method from observed feedback rather than personality labels.
+- For broad book/course learning requests, do necessary setup and one small unit, then wait for feedback. Repository setup and previous HTML examples do not authorize batch content production. Honor explicitly requested batch deliverables without counting them as learning progress.
+- For books, use `references/book-learning.md` in the skill. Verify printed/PDF page pairs and keep agent reading separate from learner reading.
 - Before each new lesson, provide a short viewing map: the problem, final recognizable result, load-bearing sections, and safe-to-skim sections.
 - When available and authorized, inspect transcripts, source materials, and the original lesson discussion area before teaching.
 - After casual viewing, reconstruct the reasoning. Separate must-understand ideas, instructor experience, reusable operations, and lookup-only detail.

@@ -68,6 +68,12 @@ adaptive-learning-starter/
 
 HTML 样本包括长文阅读型、分步骤交互型和多状态对比型。它们是设计起点，不是每门课都必须套用的固定模板。
 
+## 软件概念与操作跟练
+
+学习软件概念或跟随视频操作时，可启用 [软件学习专用指南](./codex-skill/adaptive-course-teacher/references/software-learning.md)：核对版本与操作环境、区分试错和最终流程、应用学习者自己的命名规范，并分别记录观看、理解与实操进度。它不要求其他学科套用软件跟练的方法。
+
+解释从适合当前主题的具象现象出发，再引入概念，不预设固定比喻。纸感样式、HTML 样例、截图和 Animated WebP 流程都是可选资源，按学习者项目的需要选用和调整。
+
 ## 手动安装
 
 把 `codex-skill\adaptive-course-teacher` 复制到 `%USERPROFILE%\.agents\skills\adaptive-course-teacher`。
@@ -77,4 +83,3 @@ HTML 样本包括长文阅读型、分步骤交互型和多状态对比型。它
 ## 隐私与课程授权
 
 仓库不包含付费课程视频、PDF、登录信息、个人笔记或平台卡片 ID。学习者需要自行提供有权使用的课程来源，并明确授权 AI 访问登录后的页面或评论区。
-

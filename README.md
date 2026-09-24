@@ -83,12 +83,20 @@
 adaptive-learning-starter/
 ├── codex-skill/adaptive-course-teacher/   # 可安装的 Codex skill
 │   ├── references/                        # 教学与媒体制作流程
-│   └── assets/examples/                   # 三类 HTML 课件样本
+│   └── assets/examples/                   # 阅读、交互、对比与读写练习样本
 ├── project-template/                      # 新学习项目模板
 └── adaptive-learning的安装与使用说明.md     # 可直接转发的完整说明
 ```
 
-HTML 样本包括长文阅读型、分步骤交互型和多状态对比型。它们是设计起点，不是每门课都必须套用的固定模板。
+HTML 样本包括长文阅读型、分步骤交互型、多状态对比型和[读写练习](./codex-skill/adaptive-course-teacher/assets/examples/practice/index.html)。下载后可直接打开；读写样例包含目录、打字参考、手写稿纸、整页隐藏参考答案和本机记录恢复。它使用原创短句与系统字体，不包含教材扫描图或个人授权字体。这些是设计起点，不是每门课都必须套用的固定模板。
+
+## 课本学习与项目续接
+
+[课本学习指南](./codex-skill/adaptive-course-teacher/references/textbook-learning.md)按阅读、示范、练习、纠错和迁移安排课程。认识、打字、独立手写分别观察；复习间隔根据实际作业调整，不预设每个人每天必须练几个字。
+
+[工作目录规则](./codex-skill/adaptive-course-teacher/references/workspace-management.md)适用于任何网盘，也适用于不使用网盘的项目。普通项目沿用原目录；大量下载、解压或提取前才检查同步位置。确认过的路径保存在被 Git 忽略的可选本机配置中，新对话沿用，换电脑时验证。笔记和作业不能把临时缓存当唯一存放位置；该规则不会自动移动项目或替你修改网盘设置。
+
+[私有部署指南](./codex-skill/adaptive-course-teacher/references/private-delivery.md)分别管理 Git 收录、构建包含和站点访问。个人授权素材是否能用于托管要按具体授权判断；默认构建不带私有素材，获准的私有部署显式加入所需资源，并验证未登录访问受到限制。
 [learner-facing-copy.md](./codex-skill/adaptive-course-teacher/references/learner-facing-copy.md) 与 [interactive-courseware.md](./codex-skill/adaptive-course-teacher/references/interactive-courseware.md) 分别保存文案审核和交互课件的完整制作规范。
 
 ## 软件概念与操作跟练

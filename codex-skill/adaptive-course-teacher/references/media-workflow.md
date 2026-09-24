@@ -18,6 +18,8 @@ Capture only the interface context needed to locate the control. Include enough 
 
 Work from a source the learner is authorized to use.
 
+Use these settings as starting points for suitable projects. Keep temporary material in a topic-specific scratch folder. Reuse or obtain a local source before repeated extraction; confirm the start, end, and crop with still frames first. Choose the crop and output location for each operation, not from a previous lesson. Keep licensed source footage and captures out of public contributions.
+
 1. Identify the shortest interval that shows one operation.
 2. Crop for that clip's content. Keep the cursor, target control, and visible result.
 3. Export directly to animated WebP. Do not create a GIF intermediate.

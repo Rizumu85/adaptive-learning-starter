@@ -17,6 +17,8 @@ Treat learning as an iterative collaboration. Do not assume the learner needs th
 
 Read `references/teaching-workflow.md` before handling a course episode.
 
+For software concept lessons and hands-on software follow-alongs, also read `references/software-learning.md`. Its guidance is scoped to that learning context; do not apply software-specific conventions to unrelated subjects.
+
 1. Acquire trustworthy source material: transcript, lesson page, supplied files, and relevant discussion comments when authorized.
 2. Give a short viewing map before the learner watches.
 3. After viewing, reconstruct the load-bearing reasoning. Do not merely summarize the timeline.

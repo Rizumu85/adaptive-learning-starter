@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>读一句，写一句</title>
+  <link rel="stylesheet" href="practice.css">
+</head>
+<body>
+  <main>
+    <nav><a href="index.html">返回目录</a></nav>
+    <h1>读一句，写一句</h1>
+    <p>读下面的句子，记住谁在做什么，再合上原句写一遍。</p>
+    <div id="reference">
+      <p class="model">小鸟停在树枝上。</p>
+      <p>这句话先写“小鸟”，再写它在哪里做什么。</p>
+    </div>
+    <button id="recall" type="button" aria-pressed="false">合上原句</button>
+    <p id="phase" role="status">阅读原句</p>
+    <div class="workspace">
+      <section id="typed-panel">
+        <h2><label for="typed">打字参考</label></h2>
+        <textarea id="typed" rows="3" spellcheck="false"></textarea>
+      </section>
+      <section class="writing">
+        <h2>手写</h2>
+        <canvas id="paper" aria-label="手写稿纸。使用触控笔或鼠标书写；键盘作答可使用打字参考区。"></canvas>
+        <div class="tools">
+          <button id="undo" type="button">撤销一笔</button>
+          <button id="add" type="button">加两行</button>
+        </div>
+      </section>
+    </div>
+    <p id="save-status" class="note" role="status"></p>
+    <p>对照原句，检查有没有漏字。再换一个主语，写一句自己的话。</p>
+    <p class="note">记录只说明做过哪些练习，不自动判断是否掌握。</p>
+    <noscript>请启用浏览器脚本以保存输入和使用手写稿纸。</noscript>
+  </main>
+  <script src="practice.js"></script>
+</body>
+</html>

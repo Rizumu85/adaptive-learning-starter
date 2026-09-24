@@ -12,3 +12,5 @@
 - Read `DESIGN.md` before producing courseware.
 - Keep learner-facing text short and factual without omitting the reasoning needed for recall.
 - Record stable learning preferences and rejected repetitions in `NOTES.md`.
+- For software concept learning and software follow-alongs, use the skill's `references/software-learning.md`. Apply this project's confirmed conventions, record viewing and hands-on progress separately, and introduce concepts through concrete observations suited to the current topic. Do not inherit another course's analogies or naming rules.
+- Treat bundled visual styles, HTML examples, and media recipes as optional resources. Choose and adapt them to the learner's project rather than making them mandatory for every lesson.

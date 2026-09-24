@@ -47,7 +47,7 @@ Read `references/interactive-courseware.md` before implementing custom interacti
 
 ## Learner-Facing Copy
 
-Read `references/learner-facing-copy.md` before publishing AI-written or externally reviewed lesson copy. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
+Read `references/learner-facing-copy.md` before publishing AI-written lesson copy. The current agent first removes unnecessary text, then rewrites retained teaching copy and checks the whole rendered lesson; no external reviewer is required. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
 
 ## Accuracy Rules
 

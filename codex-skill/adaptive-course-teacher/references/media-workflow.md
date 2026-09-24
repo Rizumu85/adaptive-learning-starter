@@ -2,6 +2,8 @@
 
 ## Source and Rights
 
+When hosting lessons with local assets, read `private-delivery.md` for build inclusion, access checks, and deployment verification.
+
 - Confirm that the learner may use the source before downloading, transforming, or extracting it.
 - Keep paid, login-protected, copyrighted, or personally licensed source files in ignored local paths unless redistribution is explicitly allowed.
 - Record enough provenance to identify the source page, timestamp, or file without exposing private paths or credentials.

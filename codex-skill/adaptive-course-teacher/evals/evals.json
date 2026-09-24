@@ -1,0 +1,21 @@
+{
+  "skill_name": "adaptive-course-teacher",
+  "evals": [
+    {
+      "id": 1,
+      "name": "resume-synced-project",
+      "prompt": "A learner opens a new conversation in an existing textbook project. Project notes record the last exercise and an already approved non-synchronized scratch location in .learning-local.json. The project is synchronized by a cloud provider other than OneDrive. Explain your next actions before extracting a large source archive. Do not execute filesystem or network mutations.",
+      "expected_output": "Reuse the checkpoint and approved local configuration; validate paths without repeating onboarding or moving learner work.",
+      "files": [],
+      "expectations": ["Reads and reuses the recorded checkpoint and machine-local scratch configuration.", "Does not ask again for the already authorized location.", "Distinguishes Git ignore from cloud synchronization and protects durable work."]
+    },
+    {
+      "id": 2,
+      "name": "textbook-recall",
+      "prompt": "Prepare a brief plan, not a completed lesson, for an adult who recognizes words but cannot handwrite them from memory. The input is a textbook page, not a video. The current exercise hides the main answer but still shows it in the sidebar and typed-reference panel. No graded work has been submitted. State how you would teach, assess, and choose the next lesson. Do not browse or change files.",
+      "expected_output": "Reading-led workflow, whole-page recall concealment, separate capability evidence and provisional next steps.",
+      "files": [],
+      "expectations": ["Uses reading and source-page context rather than requiring video timestamps.", "Hides answer-bearing sidebar and typed references as well as the main answer during recall.", "Does not infer mastery or impose a fixed repetition count without evidence."]
+    }
+  ]
+}

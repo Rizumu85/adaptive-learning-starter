@@ -9,6 +9,12 @@ Read this reference when a lesson needs custom browser interaction rather than a
 - Show prerequisite information before independent practice, then remove answer-bearing prompts during recall.
 - Record distinct capabilities separately. Recognition, guided execution, independent recall, correctness, fluency, and presentation must not silently substitute for one another.
 
+## Recall Across the Whole Page
+
+Use one recall state for every answer-bearing view. Check the main model, side lists, headings, examples, typed reference, captions, accessible names, and collapsible source panels. Blur or color changes alone do not conceal answers from selection or assistive technology. Hide the relevant views semantically, and check both visual and accessible output.
+
+Provide a prompt that still identifies the task without giving away the answer. If a learner reveals a reference, retain their work but record that attempt as assisted. This is a learning aid, not an anti-cheating security boundary: local source code can still contain answers.
+
 ## Local-First Delivery
 
 - Author editable application code in TypeScript.
@@ -18,6 +24,8 @@ Read this reference when a lesson needs custom browser interaction rather than a
 - If a feature requires an HTTP origin, provide the smallest local launcher and explain that browser storage is scoped to the exact origin and URL.
 
 ## State and Compatibility
+
+For multiple lessons, use stable lesson IDs and separate storage keys. A catalog may summarize saved drafts, attempts, or reviews; label the evidence it actually has. Never equate opening a lesson, counting strokes, or entering text with mastery. Corrupt or inaccessible storage should not block opening other lessons. Explain that local browser records do not automatically synchronize between devices or origins.
 
 - Use a versioned storage key and a documented serializable schema.
 - Persist learner work after meaningful input without interrupting practice.

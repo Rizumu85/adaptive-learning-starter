@@ -4,3 +4,5 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
+# External skill evaluation snapshots and outputs.
+codex-skill/*-workspace/

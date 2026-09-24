@@ -82,7 +82,7 @@ HTML 样本包括长文阅读型、分步骤交互型、多状态对比型和[�
 
 [课本图片复用流程](./codex-skill/adaptive-course-teacher/references/media-workflow.md#source-crops-and-transparent-cutouts)覆盖原页取图、照片去白边、插画留白转透明、边缘检查和 HTML 排版。保留原画内容，按适当大小展示；相邻两页按画面关系对齐，透明插画的外层容器也避免留下白色矩形背景。
 
-[课本学习指南](./codex-skill/adaptive-course-teacher/references/textbook-learning.md)按阅读、示范、练习、纠错和迁移安排课程。认识、打字、独立手写分别观察；复习间隔根据实际作业调整，不预设每个人每天必须练几个字。
+[课本学习指南](./codex-skill/adaptive-course-teacher/references/textbook-learning.md)提供可选的阅读、示范、练习、纠错和迁移流程。新项目先根据学科、学习目标和实际能力选择、调整或省略步骤，并说明为什么适用。默写、手写、注音和造句属于读写学习的示例，不是所有课本课程的默认要求；资料分析和开卷解题等任务也不必隐藏参考资料。
 
 [工作目录规则](./codex-skill/adaptive-course-teacher/references/workspace-management.md)适用于任何网盘，也适用于不使用网盘的项目。普通项目沿用原目录；大量下载、解压或提取前才检查同步位置。确认过的路径保存在被 Git 忽略的可选本机配置中，新对话沿用，换电脑时验证。笔记和作业不能把临时缓存当唯一存放位置；该规则不会自动移动项目或替你修改网盘设置。
 

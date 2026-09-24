@@ -1,5 +1,7 @@
 # Reading and Writing Example
 
+This is an optional literacy-specific example, not the default structure for textbook courses. Reuse individual interactions only when they support the new learner's subject and goals. Other subjects may need explanations, calculations, source comparisons, experiments, or tool use instead of handwriting and sentence recall.
+
 Open `index.html` directly in a browser. The original sentence is a demonstration, not a textbook quotation. No licensed font, source scan, or personal learner record is included.
 
 The catalog reports drafts and attempts, not mastery. Typed reference and handwriting are saved separately within one versioned lesson record. Recall hides the source and typed reference together, including them from the accessibility tree; revealing the model is counted separately. Handwriting uses a locally bundled perfect-freehand outline. Undo removes the last stroke; add-lines expands the paper without scaling earlier writing.

@@ -1,12 +1,22 @@
 # Textbook and Exercise-Led Learning
 
+## Choose What Fits the Subject
+
+This is a suggested workflow, not a required lesson sequence. A textbook is a source format, not a teaching method. Before adopting these steps, use the project's subject, learner goals, current ability, and intended performance to decide which parts to keep, adapt, reorder, or omit. Reuse information already recorded; ask only about a missing choice that would materially change the lesson.
+
+Tell a new project's learner briefly which approach is being proposed and why it fits. Record the chosen approach in project notes and revise it from actual work. Do not silently copy another project's routine into a new subject.
+
+Character formation, dictation, typing-versus-handwriting comparisons, pronunciation, and sentence construction are literacy examples. Use them only when those capabilities are learning goals. A mathematics lesson might instead examine a worked example and ask for a solution with reasoning; history might compare evidence and interpretations; a science lesson might involve prediction and observation. These examples are possibilities, not subject-wide prescriptions.
+
+Hide references only when unaided recall is the intended assessment. Keep sources or tools available when the goal is interpretation, research, open-book problem solving, or tool-assisted execution. Assess that intended capability rather than forcing every task into memorization or handwriting.
+
 ## Establish the Source
 
 Identify the edition, lesson, and printed page numbers. Record PDF page indices separately when they differ. Inspect the supplied text and relevant images before preparing an exercise. Keep original quotations distinct from added teaching material; state when a source page is unavailable rather than inventing it.
 
 Choose one observable outcome from the learner's current work. Age, textbook grade, recognition, or fluent typing do not establish independent production ability.
 
-## Read, Demonstrate, Practice, Correct
+## Candidate Sequence: Read, Demonstrate, Practice, Correct
 
 1. Give a short reading map: what to notice and what the learner will do afterward. Use pages or exercise identifiers instead of fabricated video timestamps.
 2. Let the learner read or listen to the selected passage. Check one central relationship or meaning before adding explanation.

@@ -21,7 +21,7 @@ Read `references/teaching-workflow.md` before handling a course episode.
 
 For software concept lessons and hands-on software follow-alongs, also read `references/software-learning.md`. Its guidance is scoped to that learning context; do not apply software-specific conventions to unrelated subjects.
 
-For textbooks, reading courses, and exercise-led lessons, use `references/textbook-learning.md` to adapt the viewing sequence to reading, demonstration, practice, and correction.
+For textbooks, reading courses, and exercise-led lessons, consult `references/textbook-learning.md` as an optional starting workflow. Choose, adapt, or omit steps according to the subject and intended capability; a textbook format does not make literacy exercises or a fixed teaching sequence appropriate.
 
 1. Acquire trustworthy source material: transcript, lesson page, supplied files, and relevant discussion comments when authorized.
 2. Give a short learning map before viewing or reading, using the chosen source workflow.

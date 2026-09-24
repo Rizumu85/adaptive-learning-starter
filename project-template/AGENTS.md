@@ -2,7 +2,7 @@
 
 - Spend time thinking. Do not send optional progress commentary.
 - Treat the learner as a collaborator. Revise the method from observed feedback rather than personality labels.
-- Before each new lesson, provide a short viewing map: the problem, final recognizable result, load-bearing sections, and safe-to-skim sections.
+- Before each new lesson, provide a short learning map suited to the source: the problem, final recognizable result, load-bearing sections, and safe-to-skim sections.
 - When available and authorized, inspect transcripts, source materials, and the original lesson discussion area before teaching.
 - After casual viewing, reconstruct the reasoning. Separate must-understand ideas, instructor experience, reusable operations, and lookup-only detail.
 - Do not create permanent notes or visual assets until the learner chooses what deserves retention.
@@ -20,5 +20,7 @@
 - Keep licensed course sources and locally authorized assets in ignored local paths unless redistribution is explicitly permitted. Preserve provenance and never substitute a similar asset as though it were the requested original.
 - Build future lessons from observed learner work and feedback. Do not prebuild a complete permanent curriculum before the method has been tested.
 - Record stable learning preferences and rejected repetitions in `NOTES.md`.
+- Resume from the project's recorded lesson checkpoint and optional ignored `.learning-local.json` in new conversations. Use the skill's `references/workspace-management.md` before selecting scratch paths or extracting large packages; do not repeat location questions already answered.
+- For textbook and exercise-led courses, use `references/textbook-learning.md` from the teaching skill. Adapt the lesson map to reading and practice instead of forcing a video workflow.
 - For software concept learning and software follow-alongs, use the skill's `references/software-learning.md`. Apply this project's confirmed conventions, record viewing and hands-on progress separately, and introduce concepts through concrete observations suited to the current topic. Do not inherit another course's analogies or naming rules.
 - Treat bundled visual styles, HTML examples, and media recipes as optional resources. Choose and adapt them to the learner's project rather than making them mandatory for every lesson.

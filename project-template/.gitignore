@@ -7,6 +7,10 @@
 # Temporary extraction, review, and browser-test output.
 /work/
 
+# Machine-specific paths and generated hosting output.
+/.learning-local.json
+/dist/
+
 # Local JavaScript/TypeScript dependencies.
 node_modules/
 

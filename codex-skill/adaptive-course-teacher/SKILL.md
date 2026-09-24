@@ -1,6 +1,6 @@
 ---
 name: adaptive-course-teacher
-description: Turn video courses and other learning materials into personalized viewing maps, post-view reconstructions, durable notes, screenshots, animated WebP clips, and focused interactive HTML lessons. Use when a learner wants to study a course with AI, reduce listening or working-memory load, follow along accurately, diagnose confusing steps, or iteratively discover a learning and note-taking method that fits them.
+description: Turn video courses and other learning materials into personalized viewing maps, post-view reconstructions, durable notes, screenshots, animated WebP clips, and focused interactive HTML lessons. Use when a learner wants to study a course with AI, reduce listening or working-memory load, follow along accurately, diagnose confusing steps, or iteratively discover a learning and note-taking method that fits them. Do not use for unrelated application development or one-off translation without a learning goal.
 ---
 
 # Adaptive Course Teacher
@@ -15,6 +15,7 @@ Treat learning as an iterative collaboration. Do not assume the learner needs th
 4. A broad request to help study a book or course authorizes necessary setup and one small learning unit, not autonomous completion of the whole source. Inspect the contents and the selected unit; deliver its reading/viewing map, then wait for the learner. Do not continue across units as background preparation.
 5. Keep repository setup, source indexing, teaching, and artifact production as separate scopes. A repository request or a long-term learning goal is not authorization for bulk reading, notes, or HTML. An explicit batch deliverable is allowed within its requested scope, but does not establish learner progress.
 6. Previous projects provide evidence of preferences, not transferable subject mastery, fixed analogies, or permission to reproduce their artifacts. Record the current unit, authorized outputs, confirmed learner progress, and feedback awaited separately.
+7. When creating or resuming a project, read `references/workspace-management.md` before choosing work paths or extracting large source packages. Reuse the recorded machine-local configuration across conversations.
 
 ## Per-Lesson Workflow
 
@@ -24,9 +25,11 @@ For a book or other long reading source, read `references/book-learning.md` inst
 
 For software concept lessons and hands-on software follow-alongs, also read `references/software-learning.md`. Its guidance is scoped to that learning context; do not apply software-specific conventions to unrelated subjects.
 
+For textbooks, reading courses, and exercise-led lessons, consult `references/textbook-learning.md` as an optional starting workflow. Choose, adapt, or omit steps according to the subject and intended capability; a textbook format does not make literacy exercises or a fixed teaching sequence appropriate.
+
 1. Acquire trustworthy source material: transcript, lesson page, supplied files, and relevant discussion comments when authorized.
-2. Give a short viewing map before the learner watches.
-3. After viewing, reconstruct the load-bearing reasoning. Do not merely summarize the timeline.
+2. Give a short learning map before viewing or reading, using the chosen source workflow.
+3. After viewing or reading, reconstruct the load-bearing reasoning. Do not merely summarize the source order.
 4. Separate verified course actions from added advice, version adaptations, and diagnostics.
 5. Let the learner choose what becomes a durable note, mind map, screenshot, animated WebP, or interactive lesson.
 6. When practice is part of the lesson, define what counts as independent performance and record each meaningful capability separately.
@@ -34,6 +37,7 @@ For software concept lessons and hands-on software follow-alongs, also read `ref
 ## Visual Material
 
 Read `references/media-workflow.md` before capturing screenshots, producing animation, or building HTML.
+Read `references/private-delivery.md` before hosting lessons that include local or licensed assets.
 
 - Prefer a static image for a fixed UI location or comparison.
 - Prefer animated WebP for a short visible procedure or state change.
@@ -48,7 +52,7 @@ Read `references/interactive-courseware.md` before implementing custom interacti
 
 ## Learner-Facing Copy
 
-Read `references/learner-facing-copy.md` before publishing AI-written or externally reviewed lesson copy. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
+Read `references/learner-facing-copy.md` before publishing AI-written lesson copy. The current agent first removes unnecessary text, then rewrites retained teaching copy and checks the whole rendered lesson; no external reviewer is required. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
 
 ## Accuracy Rules
 
@@ -64,5 +68,6 @@ Read `references/learner-facing-copy.md` before publishing AI-written or externa
 Use `assets/examples/lessons/0001-reading-sample.html` for calm long-form reading structure.
 Use `assets/examples/lessons/0002-stepped-interactive.html` for a focused 3D stepped lab.
 Use `assets/examples/lessons/0003-comparison-lab.html` for side-by-side state comparison.
+Use `assets/examples/practice/index.html` for an original reading-and-writing exercise with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. See its `README.md` before adapting it.
 
 Examples are patterns, not templates to copy blindly. Remove topic-specific language and preserve only the teaching structure that fits the new lesson.

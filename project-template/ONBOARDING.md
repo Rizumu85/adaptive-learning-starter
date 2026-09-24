@@ -11,6 +11,6 @@ The AI should ask these in small groups, not as one questionnaire:
 7. What should the AI stop repeating because you already know it?
 8. What should count as mastery: recognition, explanation, guided execution, independent recall, or independent production?
 9. Which devices and input methods will you actually use, and must lessons work offline or by opening a local file directly?
-10. Are there licensed local assets, privacy constraints, or external reviewers/models that the project must handle in a specific way?
+10. Are there licensed local assets or privacy constraints that the project must handle in a specific way?
 
 Use the answers to update `MISSION.md` and `NOTES.md`. Begin with one small lesson and revise the system after feedback.

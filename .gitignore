@@ -5,3 +5,5 @@ desktop.ini
 .DS_Store
 codex-skill/*-workspace/
 
+# External skill evaluation snapshots and outputs.
+codex-skill/*-workspace/

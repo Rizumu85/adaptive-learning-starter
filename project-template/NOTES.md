@@ -11,7 +11,7 @@
 
 ## Teaching Preferences
 
-- Start every new lesson with a viewing map.
+- Start every new lesson with a short learning map suited to viewing, reading, or practice.
 - Assume casual viewing may not preserve the reasoning.
 - Ask before creating permanent artifacts.
 - Record what must be done independently before a topic counts as learned.
@@ -38,6 +38,15 @@ Record only the dimensions that matter for this subject. Keep results separate w
 
 Record concepts and shortcuts that should not be repeatedly re-taught.
 
+## Workspace and Continuity
+
+- Durable source and submission locations (portable references):
+- Scratch policy (personal absolute paths belong in ignored `.learning-local.json`):
+- Last confirmed lesson checkpoint and next action:
+- Recovery or device-transfer requirements:
+
+New conversations reuse these decisions; they do not restart onboarding. Temporary caches are not a backup of learner work.
+
 ## Media Decisions
 
 Record what works well as Markdown, static images, Animated WebP, or interactive HTML.
@@ -54,8 +63,7 @@ Also record:
 
 - Desired teacher or authorial voice:
 - Copy patterns to remove or stop repeating:
-- Requested external reviewer, model, and reasoning mode:
-- Review privacy boundary:
+- Source teaching style to follow for added explanations:
 
 ## Per-Lesson Record
 

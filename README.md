@@ -78,7 +78,7 @@
 
 - **先教学，再独立作答**：演示和提示在练习前出现；需要检验回忆时隐藏答案。识别、跟做、独立完成、正确性和呈现质量分别记录。
 - **文案先删后改**：先决定哪些文字删除、保留或缩短，再重写留下的内容。教材或课程原文保持锁定，聊天过程和 AI 自我说明不进入课件。
-- **外部审核不越权**：文案审核不会顺带重做 UI 或算法；浏览器里的外部模型只接收渲染截图和学习者看得见的文字。
+- **文案由当前 Agent 完成**：先删无意义、重复和聊天残留，再参考教材的教学语气改写，最后通读实际页面。不需要另一个 AI、额外账号或付费服务；文案修改不会顺带重做 UI 或算法。
 - **素材保留来源与授权边界**：付费、登录后或个人授权的文件只放本地忽略目录；裁切和透明抠图保留原始像素，不用相似素材冒充原件。
 - **交互课件本地优先**：可编辑代码使用 TypeScript，本地打包浏览器需要的 JavaScript；需要双击学习时不依赖 CDN 或开发服务器。
 - **按真实设备验收**：除桌面和手机布局外，还检查进度恢复、旧记录、撤销与恢复、高清画布、笔压、抬笔、朗读同步和无障碍反馈。
@@ -89,12 +89,22 @@
 adaptive-learning-starter/
 ├── codex-skill/adaptive-course-teacher/   # 可安装的 Codex skill
 │   ├── references/                        # 教学与媒体制作流程
-│   └── assets/examples/                   # 三类 HTML 课件样本
+│   └── assets/examples/                   # 阅读、交互、对比与读写练习样本
 ├── project-template/                      # 新学习项目模板
 └── adaptive-learning的安装与使用说明.md     # 可直接转发的完整说明
 ```
 
-HTML 样本包括长文阅读型、分步骤交互型和多状态对比型。它们是设计起点，不是每门课都必须套用的固定模板。
+HTML 样本包括长文阅读型、分步骤交互型、多状态对比型和[读写练习](./codex-skill/adaptive-course-teacher/assets/examples/practice/index.html)。下载后可直接打开；读写样例包含目录、打字参考、手写稿纸、整页隐藏参考答案和本机记录恢复。它使用原创短句与系统字体，不包含教材扫描图或个人授权字体。这些是设计起点，不是每门课都必须套用的固定模板。
+
+## 课本学习与项目续接
+
+[课本图片复用流程](./codex-skill/adaptive-course-teacher/references/media-workflow.md#source-crops-and-transparent-cutouts)覆盖原页取图、照片去白边、插画留白转透明、边缘检查和 HTML 排版。保留原画内容，按适当大小展示；相邻两页按画面关系对齐，透明插画的外层容器也避免留下白色矩形背景。
+
+[课本学习指南](./codex-skill/adaptive-course-teacher/references/textbook-learning.md)提供可选的阅读、示范、练习、纠错和迁移流程。新项目先根据学科、学习目标和实际能力选择、调整或省略步骤，并说明为什么适用。默写、手写、注音和造句属于读写学习的示例，不是所有课本课程的默认要求；资料分析和开卷解题等任务也不必隐藏参考资料。
+
+[工作目录规则](./codex-skill/adaptive-course-teacher/references/workspace-management.md)适用于任何网盘，也适用于不使用网盘的项目。普通项目沿用原目录；大量下载、解压或提取前才检查同步位置。确认过的路径保存在被 Git 忽略的可选本机配置中，新对话沿用，换电脑时验证。笔记和作业不能把临时缓存当唯一存放位置；该规则不会自动移动项目或替你修改网盘设置。
+
+[私有部署指南](./codex-skill/adaptive-course-teacher/references/private-delivery.md)分别管理 Git 收录、构建包含和站点访问。个人授权素材是否能用于托管要按具体授权判断；默认构建不带私有素材，获准的私有部署显式加入所需资源，并验证未登录访问受到限制。
 [learner-facing-copy.md](./codex-skill/adaptive-course-teacher/references/learner-facing-copy.md) 与 [interactive-courseware.md](./codex-skill/adaptive-course-teacher/references/interactive-courseware.md) 分别保存文案审核和交互课件的完整制作规范。
 
 ## 软件概念与操作跟练

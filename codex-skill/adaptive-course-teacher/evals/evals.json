@@ -1,0 +1,18 @@
+{"skill_name": "adaptive-course-teacher", "evals": [
+  {
+    "id": 1,
+    "name": "broad-book-onboarding",
+    "prompt": "Use this skill and my software-course and language-study projects to understand my preferences, help me study this drawing book, and create a repository using my notes naming convention.",
+    "expected_output": "Necessary setup and one bounded reading unit, or requests for missing sources, followed by a feedback stop.",
+    "files": [],
+    "expectations": ["Does not prebuild whole-book notes or HTML", "Does not transfer subject mastery from previous projects", "Keeps artifact completion separate from learner progress", "States a feedback stopping point"]
+  },
+  {
+    "id": 2,
+    "name": "explicit-whole-book-outline",
+    "prompt": "Create a brief chapter-level guide for the whole book in one batch today. Do not make HTML. This does not mean I have read the book.",
+    "expected_output": "Completes the requested outline once sources are available, without adding lessons or changing learner progress.",
+    "files": [],
+    "expectations": ["Honors explicitly requested batch scope", "Does not generate HTML", "Does not mark chapters as learned", "Does not invent unavailable source contents"]
+  }
+]}

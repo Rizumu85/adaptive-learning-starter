@@ -11,6 +11,9 @@ Discover:
 - Desired note home and available tools.
 - Preferred review style: concise notes, diagrams, practice checklists, retrieval questions, or demonstrations.
 - Whether browser login, transcripts, course comments, or local files are available.
+- What evidence should count as mastery: recognition, explanation, guided execution, independent recall, independent production, or another observable result.
+- Which devices and input methods the learner will actually use, including touch, pen, keyboard, audio, or a local/offline browser workflow.
+- Any licensed local assets, privacy constraints, requested external reviewers, or model-specific copy preferences.
 
 Do not diagnose the learner from a personality type or attention preference. Treat these only as tentative design signals and revise from observed feedback.
 

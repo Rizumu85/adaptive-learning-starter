@@ -1,0 +1,15 @@
+# Private or licensed learning sources stay local.
+/sources/private/
+
+# Locally authorized fonts, narration, models, and derived assets stay local.
+/assets/local/
+
+# Temporary extraction, review, and browser-test output.
+/work/
+
+# Local JavaScript/TypeScript dependencies.
+node_modules/
+
+Thumbs.db
+desktop.ini
+.DS_Store

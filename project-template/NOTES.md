@@ -63,8 +63,7 @@ Also record:
 
 - Desired teacher or authorial voice:
 - Copy patterns to remove or stop repeating:
-- Requested external reviewer, model, and reasoning mode:
-- Review privacy boundary:
+- Source teaching style to follow for added explanations:
 
 ## Per-Lesson Record
 

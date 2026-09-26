@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"ESNext","moduleResolution":"Bundler","lib":["ES2022","DOM","DOM.Iterable"],"typeRoots":["./node_modules/@types"],"strict":false,"skipLibCheck":true},"include":["viewer.ts","../../scripts/install-image-preview.ts"]}

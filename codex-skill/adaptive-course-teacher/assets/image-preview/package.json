@@ -1,0 +1,7 @@
+{
+  "name": "adaptive-learning-image-preview",
+  "private": true,
+  "scripts": {"build":"node build.mjs", "check":"tsc --noEmit"},
+  "dependencies": {"@panzoom/panzoom":"4.6.2","lucide-react":"1.48.0","react":"19.2.0","react-dom":"19.2.0"},
+  "devDependencies": {"esbuild":"0.28.2","typescript":"5.9.3","@types/node":"22.19.0"}
+}

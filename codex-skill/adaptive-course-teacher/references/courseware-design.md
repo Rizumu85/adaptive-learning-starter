@@ -39,6 +39,8 @@ Use this as an initial visual language, not an identity that every learner must 
 
 ## Layout
 
+- For inspectable illustrations, diagrams, scans, or screenshots, reuse the offline image preview bundle via `image-preview.md`. Keep image links as fallbacks, preserve reading position on return, and match project colors without changing its typography. Do not duplicate an existing equivalent viewer.
+
 - Maximum usable width: 1120px; mobile side margins: 16px.
 - Reading pages use natural document scrolling.
 - Interactive desktop grid: `minmax(0, 1fr) 330px`, 18px gap.

@@ -21,6 +21,21 @@ Keep source claims, paraphrases, and supplemental explanations distinguishable. 
 5. Choose what is worth retaining with the learner. Start with the lightest sufficient medium; build an interactive artifact only for a specific obstacle or an explicit request.
 6. Record the learner's confirmed reading position, attempt, unresolved question, and next action. Source inspected by the agent, artifact completed, learner read, and learner demonstrated understanding are different states.
 
+## Book Reading Typography Preferences
+
+Before styling a book reader, reuse the learner's selected reading preferences from project notes or a local learner profile. Keep reading typography separate from software follow-along interfaces. A font preference does not authorize creating HTML or processing more source material.
+
+An optional Chinese book-reading pairing is **朝華標題B for Chinese headings + 京华老宋 for Chinese body text**. Use it only when selected by the learner; it is not the starter's universal default.
+
+- Headings: 朝華標題B, internal family `ZhaohuaMinB`, full name `ZhaohuaMinB Black`, PostScript name `ZhaohuaMinB-Black`; native weight 900. Apply to the page, chapter, and step headings, not navigation or every emphasized phrase.
+- Chinese body: 京华老宋, with installed aliases such as `KingHwaOldSong`, `KingHwa_OldSong`, `京華老宋體`, or `京華老宋体`. Verify the actual installed family rather than assuming a filename or version label works in CSS.
+- Japanese original text, Japanese comparison subheadings, and furigana retain appropriate Japanese fonts. Do not force Chinese glyph forms onto Japanese text.
+- When trying a new font, preserve the existing type sizes and layout so the learner can judge the font change independently. For a new reader, inherit confirmed project sizes; this pairing does not prescribe universal sizes.
+- Prefer local font lookup and a legible system fallback. Check actual font loading and narrow-screen wrapping, not merely the declared CSS family.
+- Do not bundle, upload, or redistribute licensed fonts without authorization. Machine-specific file fallbacks belong in ignored local configuration, never in shared skill examples. A local installation or file path does not make a font available on other devices.
+
+Record the selected pairing and its scope in the project's notes and design file. A learner's later change takes precedence; do not retrofit existing projects without a request.
+
 ## Existing Projects
 
 Keep existing materials. If their accuracy or authorization is unclear, label them as drafts or historical records rather than silently deleting them or counting them as learned. Do not overwrite a claimed learning history with invented certainty in either direction. Resume from the learner's last confirmed checkpoint.

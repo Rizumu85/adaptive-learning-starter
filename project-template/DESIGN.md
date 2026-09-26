@@ -39,6 +39,8 @@ Use this as an initial visual language, not an identity that every learner must 
 
 ## Layout
 
+- Images that need close inspection use the adaptive-course-teacher bundled image preview (`references/image-preview.md`), or an existing equivalent viewer. Include zoom, pan, fit/reset, return to the same reading position, keyboard access, and touch support. Keep styling consistent with this project, preserve full-resolution links and image licenses, and exclude decorative images. Reuse the compiled bundle instead of rebuilding the controls for every project.
+
 - Maximum usable width: 1120px; mobile side margins: 16px.
 - Reading pages use natural document scrolling.
 - Interactive desktop grid: `minmax(0, 1fr) 330px`, 18px gap.

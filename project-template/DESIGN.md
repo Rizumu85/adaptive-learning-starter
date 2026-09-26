@@ -47,6 +47,13 @@ Use this as an initial visual language, not an identity that every learner must 
 - Move long explanations into a reading section below the workspace.
 - Align paired source pages, before/after images, or neighboring illustrations to a shared visual baseline when they are meant to be compared as one unit.
 
+## Long-Form Reading Navigation
+
+- For continuous chapter readers with many section links, prefer a chapter contents control collapsed by default on both desktop and mobile. Keep the trigger visible without a permanently expanded directory competing with the text; adapt if the learner explicitly prefers a persistent outline.
+- Open a bounded, scrollable dropdown on request without shifting the reading layout. Close it after section selection, Escape, or an outside click. Keep keyboard access and expanded-state semantics; return focus to the trigger on Escape and place the selected heading below any sticky header.
+- This is navigation disclosure, not a new teaching hierarchy. Preserve continuous reading and source order; do not invent nested topics or substeps to populate a menu. Keep necessary step progress visible in interactive lessons. A short page may need no contents menu.
+- Check collapsed/open states, long labels, keyboard use, and anchor positioning on desktop and mobile.
+
 ## Color and Feedback
 
 - Structural UI stays neutral. Color represents meaning or interaction.

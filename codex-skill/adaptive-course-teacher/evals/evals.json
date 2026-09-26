@@ -7,7 +7,11 @@
       "prompt": "A learner opens a new conversation in an existing textbook project. Project notes record the last exercise and an already approved non-synchronized scratch location in .learning-local.json. The project is synchronized by a cloud provider other than OneDrive. Explain your next actions before extracting a large source archive. Do not execute filesystem or network mutations.",
       "expected_output": "Reuse the checkpoint and approved local configuration; validate paths without repeating onboarding or moving learner work.",
       "files": [],
-      "expectations": ["Reads and reuses the recorded checkpoint and machine-local scratch configuration.", "Does not ask again for the already authorized location.", "Distinguishes Git ignore from cloud synchronization and protects durable work."]
+      "expectations": [
+        "Reads and reuses the recorded checkpoint and machine-local scratch configuration.",
+        "Does not ask again for the already authorized location.",
+        "Distinguishes Git ignore from cloud synchronization and protects durable work."
+      ]
     },
     {
       "id": 2,
@@ -15,7 +19,37 @@
       "prompt": "Prepare a brief plan, not a completed lesson, for an adult who recognizes words but cannot handwrite them from memory. The input is a textbook page, not a video. The current exercise hides the main answer but still shows it in the sidebar and typed-reference panel. No graded work has been submitted. State how you would teach, assess, and choose the next lesson. Do not browse or change files.",
       "expected_output": "Reading-led workflow, whole-page recall concealment, separate capability evidence and provisional next steps.",
       "files": [],
-      "expectations": ["Uses reading and source-page context rather than requiring video timestamps.", "Hides answer-bearing sidebar and typed references as well as the main answer during recall.", "Does not infer mastery or impose a fixed repetition count without evidence."]
+      "expectations": [
+        "Uses reading and source-page context rather than requiring video timestamps.",
+        "Hides answer-bearing sidebar and typed references as well as the main answer during recall.",
+        "Does not infer mastery or impose a fixed repetition count without evidence."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "broad-book-onboarding",
+      "prompt": "Use this skill and my software-course and language-study projects to understand my preferences, help me study this drawing book, and create a repository using my notes naming convention.",
+      "expected_output": "Necessary setup and one bounded reading unit, or requests for missing sources, followed by a feedback stop.",
+      "files": [],
+      "expectations": [
+        "Does not prebuild whole-book notes or HTML",
+        "Does not transfer subject mastery from previous projects",
+        "Keeps artifact completion separate from learner progress",
+        "States a feedback stopping point"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "explicit-whole-book-outline",
+      "prompt": "Create a brief chapter-level guide for the whole book in one batch today. Do not make HTML. This does not mean I have read the book.",
+      "expected_output": "Completes the requested outline once sources are available, without adding lessons or changing learner progress.",
+      "files": [],
+      "expectations": [
+        "Honors explicitly requested batch scope",
+        "Does not generate HTML",
+        "Does not mark chapters as learned",
+        "Does not invent unavailable source contents"
+      ]
     }
   ]
 }

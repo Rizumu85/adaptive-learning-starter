@@ -12,12 +12,16 @@ Treat learning as an iterative collaboration. Do not assume the learner needs th
 1. Read the project `AGENTS.md`, `MISSION.md`, `NOTES.md`, and `DESIGN.md` when present.
 2. If the learner profile is missing, use `references/onboarding.md`. Ask only one to three questions at a time.
 3. Record stable preferences in the project `NOTES.md`; keep subject-specific knowledge in notes or reference files rather than this skill.
-4. Begin with one small lesson and revise from observed work. Do not prebuild a complete curriculum before the learner has produced evidence.
-5. When creating or resuming a project, read `references/workspace-management.md` before choosing work paths or extracting large source packages. Reuse the recorded machine-local configuration across conversations.
+4. A broad request to help study a book or course authorizes necessary setup and one small learning unit, not autonomous completion of the whole source. Inspect the contents and the selected unit; deliver its reading/viewing map, then wait for the learner. Do not continue across units as background preparation.
+5. Keep repository setup, source indexing, teaching, and artifact production as separate scopes. A repository request or a long-term learning goal is not authorization for bulk reading, notes, or HTML. An explicit batch deliverable is allowed within its requested scope, but does not establish learner progress.
+6. Previous projects provide evidence of preferences, not transferable subject mastery, fixed analogies, or permission to reproduce their artifacts. Record the current unit, authorized outputs, confirmed learner progress, and feedback awaited separately.
+7. When creating or resuming a project, read `references/workspace-management.md` before choosing work paths or extracting large source packages. Reuse the recorded machine-local configuration across conversations.
 
 ## Per-Lesson Workflow
 
 Read `references/teaching-workflow.md` before handling a course episode.
+
+For a book or other long reading source, read `references/book-learning.md` instead for source navigation and the bounded reading loop.
 
 For software concept lessons and hands-on software follow-alongs, also read `references/software-learning.md`. Its guidance is scoped to that learning context; do not apply software-specific conventions to unrelated subjects.
 
@@ -39,6 +43,7 @@ Read `references/private-delivery.md` before hosting lessons that include local 
 - Prefer animated WebP for a short visible procedure or state change.
 - Prefer interactive HTML when changing one variable, coordinate space, causal order, or spatial relation is the obstacle.
 - Do not add interaction when a short explanation or image teaches the point better.
+- Choose media only after identifying the current learning obstacle and authorized output. A spatial subject, an HTML example, or another project's media preferences alone do not justify making HTML.
 - Never use GIF as the final animated-note format unless the learner explicitly requests it.
 - When interactive courseware needs custom code, author the editable source in TypeScript and compile or bundle it into local JavaScript for the browser. Preserve direct local-file opening when the project requires it, and do not hand-edit generated JavaScript. Vendored libraries and unavoidable tool configuration are exempt.
 

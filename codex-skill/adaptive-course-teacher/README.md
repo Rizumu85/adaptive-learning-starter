@@ -18,3 +18,9 @@ Keep personal learning records and licensed sources in the learner's project. Ex
 See `references/textbook-learning.md` for reading-led lessons and `references/workspace-management.md` for storage and resume behavior. The optional `assets/examples/practice/index.html` demonstrates a catalog and separately saved typed/handwritten work. Its README provides TypeScript build commands and verification limits.
 
 Automated skill-format validation does not establish teaching effectiveness. Windows example build checks and browser checks can be run locally; macOS/Linux device behavior and actual stylus feel need verification on those devices.
+
+## Bounded Book Study
+
+A broad learning request starts necessary setup and one small unit, followed by learner feedback. Repository setup does not authorize whole-book notes or HTML. Explicit batch deliverables remain supported within their stated scope. Generated artifacts are not learner progress.
+
+Use `references/book-learning.md` for source location checks and the bounded reading loop. The optional textbook workflow supplements it where relevant; previous projects supply preferences, not transferable mastery or a fixed lesson format.

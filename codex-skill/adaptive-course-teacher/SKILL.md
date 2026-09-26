@@ -38,6 +38,8 @@ For textbooks, reading courses, and exercise-led lessons, consult `references/te
 
 When an HTML artifact needs inspectable images, read `references/image-preview.md` and reuse its ready-built offline viewer. Do not rebuild a lightbox or load its implementation source for routine integration.
 
+For a preview-only addition to an existing HTML page, that reference is the complete component workflow: skip the other media/design/interaction references below unless changing lesson content, layout, or delivery. Existing project rules still apply.
+
 Read `references/media-workflow.md` before capturing screenshots, producing animation, or building HTML.
 Read `references/private-delivery.md` before hosting lessons that include local or licensed assets.
 

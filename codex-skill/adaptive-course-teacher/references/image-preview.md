@@ -4,7 +4,7 @@ Use when an authorized HTML artifact contains illustrations, screenshots, scans,
 
 ## Fast Path
 
-Read this file only. Do not inspect the minified bundle, rebuild it, install npm packages, or redesign the viewer for ordinary integration.
+For preview-only integration into an existing page, this is the only additional skill reference needed; keep obeying project rules. Creating or redesigning the reading page still uses the usual media/design workflow. Do not inspect the minified bundle, rebuild it, install npm packages, or redesign the viewer for ordinary integration.
 
 1. Run the bundled installer (replace both paths):
 

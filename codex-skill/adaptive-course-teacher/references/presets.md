@@ -28,7 +28,13 @@ Summary: a step 0 baseline, one changed variable per step, continuous transition
 
 Scope: multi-page reading editions and a library of books.
 Where: `reader-chrome.md` and `assets/reader-chrome/`.
-Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, print-like controls, and in-text figure references with previews.
+Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, and print-like controls. Usually paired with In-Text References below.
+
+## In-Text References
+
+Scope: any long page where the text points at a figure or another passage ("如上图所示", "参考第198页") that may be out of view: book readers, reading lessons, reference sheets.
+Where: "References" in `reader-chrome.md`; the same two runtime files in `assets/reader-chrome/`. It works without the top bar and footer.
+Summary: the phrase becomes a dotted accent link; hovering shows a floating paper card with the figure and caption or the passage's first lines; clicking jumps there with a brief highlight and a `↩ 回到原文` chip. Links are generated only when the target is certain.
 
 ## Offline Image Preview
 

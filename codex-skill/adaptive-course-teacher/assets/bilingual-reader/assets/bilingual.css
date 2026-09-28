@@ -1,0 +1,19 @@
+/* 对照阅读：原文（.source）与译文（.target）逐段对应。字体用变量，按书设置。 */
+:root{--bilingual-source-font:serif;--bilingual-target-font:serif;--bilingual-rule:#b1c6bf}
+.bilingual{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.bilingual>p,.bilingual>div{margin:0;overflow-wrap:anywhere}
+.source{font-family:var(--bilingual-source-font);font-size:20px;line-height:2.25;line-break:strict}
+.target{font-family:var(--bilingual-target-font);font-size:22px;line-height:1.95}
+ruby{ruby-align:center}
+rt{font-size:.52em;font-weight:400}
+.hide-ruby rt{visibility:hidden}
+body[data-view=target] .source,body[data-view=target] .source-heading{display:none}
+body[data-view=source] .target,body[data-view=source] .target-heading{display:none}
+body:not([data-view=parallel]) .bilingual{grid-template-columns:minmax(0,1fr);max-width:760px}
+@media(max-width:720px){
+  .bilingual{grid-template-columns:minmax(0,1fr);gap:20px}
+  .bilingual .target{border-left:2px solid var(--bilingual-rule);padding-left:16px}
+  body[data-view=target] .bilingual .target{border-left:0;padding-left:0}
+  .source{font-size:19px;line-height:2.2}
+  .target{font-size:21px;line-height:1.95}
+}

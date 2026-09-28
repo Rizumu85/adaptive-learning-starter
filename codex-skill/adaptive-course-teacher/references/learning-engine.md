@@ -82,13 +82,13 @@ Knowledge acquisition wants low friction; skill practice wants effort. Do not ma
 
 ## Reference Sheets and Glossary
 
-Lessons are rarely revisited; reference sheets are. After a unit, when the learner wants something to keep, compress it into a quick-reference sheet in `reference/`: a rule, a decision table, a procedure with checkpoints, a shortcut registry, or a landmark map.
+Lessons are rarely revisited; reference sheets are. After a unit, when the learner wants something to keep, compress it into a quick-reference sheet in `reference/` that scans quickly and prints cleanly: a rule, a decision table, a procedure with checkpoints, a shortcut registry, or a landmark map.
 
 - Integrate adopted advice from the source directly into the rule where it belongs. Do not keep a separate "the source says / we do" comparison unless the contrast prevents a likely mistake.
 - Keep one canonical home per note. When notes live in an external note app, do not keep a stale local duplicate.
 
-`GLOSSARY.md` holds terms the learner can already use correctly, one or two sentences each, with the preferred term and aliases to avoid. Add a term after the learner uses it correctly, not when it is first introduced. Once a term is in the glossary, use it consistently in lessons and notes.
+`GLOSSARY.md` holds terms the learner can already use correctly, one or two sentences each, with the preferred term and aliases to avoid. Add a term after the learner uses it correctly, not when it is first introduced. Once a term is in the glossary, use it consistently in lessons and notes. When the field uses a word loosely, state how this project uses it. Revise a definition in place when understanding deepens instead of keeping stale entries; group terms under subheadings once clusters appear.
 
 ## Lessons
 
-A lesson is one self-contained artifact that gives the learner one clear win tied to the mission. Keep it short enough to finish in one sitting. Link it to related lessons and reference sheets, recommend the primary source to go back to, and end with an invitation to ask follow-up questions. Build lessons from the project's shared `assets/` (stylesheet, components) instead of copying code between lessons.
+A lesson is one self-contained artifact that gives the learner one clear win tied to the mission. Save lessons as `lessons/0001-short-name.html`, numbered upward. Keep it short enough to finish in one sitting. Link it to related lessons and reference sheets, recommend the primary source to go back to, and end with an invitation to ask follow-up questions. Build lessons from the project's shared `assets/` (stylesheet, components) instead of copying code between lessons.

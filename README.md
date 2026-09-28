@@ -55,7 +55,7 @@
 ```text
 请使用 $adaptive-course-teacher。
 
-先读取 AGENTS.md、ONBOARDING.md、MISSION.md、NOTES.md 和 DESIGN.md。
+先读取我的个人学习档案（如果有），以及 AGENTS.md、MISSION.md、NOTES.md 和 DESIGN.md。
 不要立刻制作笔记或课件。先分批了解我的目标、基础、学习阻力、
 笔记习惯和可用工具，然后更新 MISSION.md 与 NOTES.md。
 ```
@@ -90,9 +90,10 @@
 ```text
 adaptive-learning-starter/
 ├── codex-skill/adaptive-course-teacher/   # 可安装的 Codex skill
-│   ├── references/                        # 教学与媒体制作流程
+│   ├── references/                        # 教学流程、学习引擎与可选预设
+│   ├── assets/project-template/           # 新学习项目模板（随 skill 安装）
+│   ├── assets/learner-profile-template.md # 个人学习档案空白模板
 │   └── assets/examples/                   # 阅读、交互、对比与读写练习样本
-├── project-template/                      # 新学习项目模板
 └── adaptive-learning的安装与使用说明.md     # 可直接转发的完整说明
 ```
 
@@ -108,6 +109,12 @@ HTML 样本包括长文阅读型、分步骤交互型、多状态对比型和[�
 
 [私有部署指南](./codex-skill/adaptive-course-teacher/references/private-delivery.md)分别管理 Git 收录、构建包含和站点访问。个人授权素材是否能用于托管要按具体授权判断；默认构建不带私有素材，获准的私有部署显式加入所需资源，并验证未登录访问受到限制。
 [learner-facing-copy.md](./codex-skill/adaptive-course-teacher/references/learner-facing-copy.md) 与 [interactive-courseware.md](./codex-skill/adaptive-course-teacher/references/interactive-courseware.md) 分别保存文案审核和交互课件的完整制作规范。
+
+## 学习引擎与个人档案
+
+每个项目保存学习目标（MISSION）、可信资料（RESOURCES）、学习记录（learning-records）和当前进度。学习记录只在学习者真正解释或完成之后才写，下一课根据记录选择；复习采用先回忆再看答案、隔一段时间再练的方式。[学习引擎](./codex-skill/adaptive-course-teacher/references/learning-engine.md)还包括术语表、速查页，以及内容过密时按学习目标筛出重点。
+
+跨项目的个人偏好放在[个人学习档案](./codex-skill/adaptive-course-teacher/references/learner-profile.md)里，保存在学习者自己的文件中，不进入这个公开仓库。新项目先读档案，已经回答过的问题不再重复问。纸感课件、书籍阅读导航、图片查看器和中文阅读字体组合是[可选预设](./codex-skill/adaptive-course-teacher/references/presets.md)，可以直接分享给别人使用。
 
 ## 软件概念与操作跟练
 
@@ -129,7 +136,7 @@ codex-skill\adaptive-course-teacher
 %USERPROFILE%\.agents\skills\adaptive-course-teacher
 ```
 
-重新打开 Codex，再把 `project-template` 的内容复制到学习项目根目录。
+重新打开 Codex 或新建对话。开始新学科时对 AI 说“用 adaptive-course-teacher 在这个文件夹开一个学习项目”，它会从 skill 自带的项目模板建立文件。
 
 ## 无障碍与翻译
 

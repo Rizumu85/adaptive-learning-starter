@@ -24,9 +24,9 @@
    %USERPROFILE%\.agents\skills\adaptive-course-teacher
 4. 如果目标位置已经存在同名 skill，不要直接覆盖，先告诉我差异。
 5. 询问我的学习项目要保存在哪里。
-6. 创建学习项目目录，并把 project-template 中的全部内容复制到项目根目录。
-7. 验证 SKILL.md、AGENTS.md、DESIGN.md、ONBOARDING.md、
-   MISSION.md、NOTES.md 和项目模板中的 .gitignore 都已正确放置。
+6. 创建学习项目目录，并把 skill 内 assets/project-template 中的全部内容复制到项目根目录。
+7. 验证 SKILL.md，以及项目中的 AGENTS.md、DESIGN.md、MISSION.md、
+   NOTES.md、RESOURCES.md 和 .gitignore 都已正确放置。
 8. 告诉我最终的 skill 安装路径和学习项目路径。
 ```
 
@@ -39,7 +39,7 @@
 ```text
 请使用 $adaptive-course-teacher。
 
-先读取 AGENTS.md、ONBOARDING.md、MISSION.md、NOTES.md 和 DESIGN.md。
+先读取我的个人学习档案（如果有），以及 AGENTS.md、MISSION.md、NOTES.md 和 DESIGN.md。
 不要立刻制作笔记或课件。
 
 先分批问我必要的问题，了解我的学习目标、已有基础、理解阻力、

@@ -201,6 +201,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 
 // 文中引用（a.rc-ref）：指向一张图或别处一段文字。描述和图隔得远时不必来回滚动——
 // 鼠标悬停或键盘聚焦时就地浮出预览卡片（图显示小图和图注，文字显示标题和开头几行）；触屏第一次轻点预览、再点跳转。
+// 一个引用也可以指向几处（data-refs 按文中顺序列出）：卡片里依次列出每一处，各自可以跳过去；点引用本身只是打开卡片。
 // 跳过去后目标闪一下，左下角留“回到原文”，点它回到刚才读的位置。跨页引用在能读取同站页面时同样预览。
 (() => {
   if (!document.querySelector('a.rc-ref')) return;
@@ -217,13 +218,16 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   document.body.append(card, back);
 
   const pageOf = (href) => href.split('#')[0];
-  const parse = (link) => {
-    const url = new URL(link.getAttribute('href'), location.href);
+  // href 是第一处（没有脚本时照常跳转）；data-refs 用空格分隔列出全部目标
+  const targetsOf = (link) => (link.dataset.refs || link.getAttribute('href') || '').trim().split(/\s+/).filter(Boolean);
+  const parse = (href) => {
+    const url = new URL(href, location.href);
     return { url, id: decodeURIComponent(url.hash.slice(1)), samePage: pageOf(url.href) === pageOf(location.href) };
   };
   // 同页目标同步取得（点击时要立刻决定是否拦下默认跳转）；跨页目标读取那一页再找
-  const local = (link) => {
-    const { id, samePage } = parse(link);
+  const local = (href) => {
+    if (!href) return null;
+    const { id, samePage } = parse(href);
     return samePage && id ? document.getElementById(id) : null;
   };
   const docs = new Map();
@@ -234,12 +238,12 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     }
     return docs.get(url);
   };
-  async function resolve(link) {
-    const { url, id, samePage } = parse(link);
+  async function resolve(href) {
+    const { url, id, samePage } = parse(href);
     if (!id) return null;
     const doc = samePage ? document : await load(pageOf(url.href));
     const el = doc && doc.getElementById(id);
-    return el ? { el, samePage, url } : null;
+    return el ? { el, samePage, url, href } : null;
   }
   const plain = (node) => {
     const copy = node.cloneNode(true);
@@ -265,30 +269,41 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     clearTimeout(hideTimer);
     if (current === link && !card.hidden) return;
     const mine = ++token;
-    const target = await resolve(link);
-    if (mine !== token || !target) return;
-    const { el, samePage, url } = target;
-    // 指向图（figure 或 img）时预览图；指向一页或一段文字时预览标题和开头，即使那一页里有图
-    const img = el.matches('img') ? el : el.matches('figure') ? el.querySelector('img') : null;
-    const parts = [];
-    if (img) {
-      const pic = document.createElement('img');
-      pic.className = 'rc-peek-img';
-      pic.src = samePage ? (img.currentSrc || img.src) : new URL(img.getAttribute('src'), url).href;
-      pic.alt = img.alt;
-      pic.addEventListener('load', () => { if (current === link) place(link); }, { once: true });
-      parts.push(pic);
-      const caption = el.querySelector('figcaption');
-      const text = caption ? plain(caption) : img.alt;
-      if (text) parts.push(line('rc-peek-caption', text));
-    } else {
-      const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4');
-      const para = el.matches('p') ? el : [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);
-      if (heading) parts.push(line('rc-peek-title', plain(heading)));
-      if (para) parts.push(line('rc-peek-text', plain(para)));
-    }
-    parts.push(Object.assign(document.createElement('a'), { className: 'rc-peek-go', href: link.href, textContent: img ? '在文中看这张图 →' : '跳到这里 →' }));
-    card.replaceChildren(...parts);
+    const found = (await Promise.all(targetsOf(link).map(resolve))).filter(Boolean);
+    if (mine !== token || !found.length) return;
+    const many = found.length > 1;
+    const blocks = found.map(({ el, samePage, url, href }) => {
+      // 指向图（figure 或 img）时预览图；指向一页或一段文字时预览标题和开头，即使那一页里有图
+      const img = el.matches('img') ? el : el.matches('figure') ? el.querySelector('img') : null;
+      const parts = [];
+      if (img) {
+        const pic = document.createElement('img');
+        pic.className = 'rc-peek-img';
+        pic.src = samePage ? (img.currentSrc || img.src) : new URL(img.getAttribute('src'), url).href;
+        pic.alt = img.alt;
+        pic.dataset.target = href;
+        pic.addEventListener('load', () => { if (current === link) place(link); }, { once: true });
+        parts.push(pic);
+        const caption = el.querySelector('figcaption');
+        const text = caption ? plain(caption) : img.alt;
+        if (text) parts.push(line('rc-peek-caption', text));
+      } else {
+        const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4');
+        const para = el.matches('p') ? el : [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);
+        if (heading) parts.push(line('rc-peek-title', plain(heading)));
+        if (para) parts.push(line('rc-peek-text', plain(para)));
+      }
+      const go = Object.assign(document.createElement('a'), { className: 'rc-peek-go', href: url.href, textContent: img ? '在文中看这张图 →' : '跳到这里 →' });
+      go.dataset.target = href;
+      parts.push(go);
+      if (!many) return parts;
+      const item = document.createElement('div');
+      item.className = 'rc-peek-item';
+      item.append(...parts);
+      return [item];
+    });
+    card.classList.toggle('is-many', many);
+    card.replaceChildren(...blocks.flat());
     current?.removeAttribute('aria-describedby');
     current = link;
     link.setAttribute('aria-describedby', 'rc-peek');
@@ -356,9 +371,10 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   });
   addEventListener('scroll', () => { if (!card.hidden && !card.matches(':hover')) close(); }, { passive: true });
   document.addEventListener('click', (event) => {
-    if (event.target.closest('.rc-peek-img') && current) {
+    const pic = event.target.closest('.rc-peek-img');
+    if (pic && current) {
       // 卡片里的小图直接打开图片预览（同页且那张图可预览时），否则跳过去看
-      const el = local(current);
+      const el = local(pic.dataset.target);
       const viewer = el && el.querySelector('a[data-image-preview]');
       const link = current;
       close();
@@ -371,14 +387,20 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       if (!event.target.closest('.rc-peek')) close();
       return;
     }
-    const ref = link.matches('.rc-peek-go') ? current : link;
-    // 触屏：第一次轻点只预览，再点才跳
-    if (link.matches('a.rc-ref') && event.pointerType && event.pointerType !== 'mouse' && current !== link) {
+    if (link.matches('.rc-peek-go')) {
+      const from = current;
+      const el = local(link.dataset.target);
+      if (el && from) { event.preventDefault(); jump(from, el); }
+      return;
+    }
+    // 指向几处时没有唯一的去处，点引用只打开卡片；触屏第一次轻点也只预览，再点才跳
+    const touch = event.pointerType && event.pointerType !== 'mouse' && current !== link;
+    if (targetsOf(link).length > 1 || touch) {
       event.preventDefault();
       open(link);
       return;
     }
-    const el = ref && local(ref);
-    if (el) { event.preventDefault(); jump(ref, el); }
+    const el = local(link.getAttribute('href'));
+    if (el) { event.preventDefault(); jump(link, el); }
   });
 })();

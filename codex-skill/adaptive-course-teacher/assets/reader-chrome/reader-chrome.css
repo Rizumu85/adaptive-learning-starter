@@ -112,6 +112,10 @@ a.rc-ref:hover{text-decoration-style:solid}
 .rc-peek-caption{margin:8px 0 0;font:400 13px/1.6 var(--rc-font);color:var(--rc-muted)}
 .rc-peek-text{margin:0;font-size:15px;line-height:1.75;text-indent:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .rc-peek-go{display:inline-flex;align-items:center;min-height:32px;margin-top:4px;font:600 14px/1.4 var(--rc-font);color:var(--rc-accent);text-decoration:none}
+/* 要学的名称（rc-key）：学习提示选出的少数名称，在正文里像一道淡淡的马克笔；悬停照样预览原书定义 */
+a.rc-ref.rc-key{color:inherit;text-decoration:none;padding:0 1px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone;background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 30%,transparent) 52% 94%,transparent 94%)}
+a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 45%,transparent) 52% 94%,transparent 94%)}
+@media print{a.rc-ref.rc-key{background-image:none}}
 /* 指向几处的引用：卡片里按文中顺序列出每一处，细线分隔；太长时卡片内滚动 */
 .rc-peek.is-many{max-height:min(72vh,560px);overflow-y:auto;overscroll-behavior:contain}
 .rc-peek-item+.rc-peek-item{margin-top:10px;padding-top:10px;border-top:1px solid var(--rc-line)}

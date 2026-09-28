@@ -53,10 +53,14 @@ Books and courses often list far more names, parameters, or variations than the 
 
 ## Practice Inside Reading
 
-When the learner studies from a reading edition or a long page, put practice where the material was just read instead of on a separate page.
+When the learner studies from a reading edition or a long page, put practice where the material was just read instead of on a separate page. The recognize-then-recall pattern below fits items the learner must locate or name on a figure (landmarks, parts, regions of an interface); other goals need their own kind of check.
 
-- Place a check right after the passage it tests; a mixed review goes at the end of the section. Label every added block as not part of the source, and leave the source text around it unchanged.
-- Recognize first, then recall: a guided round shows where each item is, then a blind round asks in random order and shows the correction after a miss. Aim for a few clean blind runs in a row.
+- Place a check at the end of the page that defines what it tests; a hint that ties items together goes after the last page that introduces them; a mixed review goes at the end of the section. Label every added block as not part of the source, and leave the source text around it unchanged.
+- Use only what the learner has already read: explanations cite earlier pages, later pages may be linked for a glance but not relied on, and a hint before a dense passage only names what to learn first.
+- Delay a check whose answer is printed right above it (a caption naming the answers); ask it in the section review instead.
+- Recognize first, then recall: in the guided round a faint ring marks each target and a tap shows its explanation; the blind round asks in random order without rings, and a miss stops to show the target and why. Aim for two clean blind rounds in a row.
+- Keep the figure and its targets usable: fit the figure in one screen while tapping, give rings a thin paper halo, and draw line-shaped targets as a pale band so they read on painted plates as well as line drawings.
+- When a review pool grows large, draw a fixed number of items at random each round so one round stays one sitting.
 - Before drilling, give one image that holds the items together, using only facts the source supports.
 - Show the mission filter as a short hint above the dense passage. Do not turn filtering into a sorting task, and do not ask the learner to memorize mnemonics.
 - Mix earlier items into later reviews, repeat first-attempt misses once, and let a quick real-world attempt (a sketch, an operation, a sentence) close the review with a self-check.

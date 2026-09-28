@@ -52,7 +52,7 @@ Keep these states apart in every record: agent inspected the source, material pr
 - Before building HTML, read `references/courseware-design.md`; for custom interaction, saved state, narration, or pen input also read `references/interactive-courseware.md`.
 - Before publishing AI-written lesson copy, follow `references/learner-facing-copy.md`.
 - For inspectable images in any HTML page, install the offline viewer from `references/image-preview.md`. For a preview-only change, that reference is the whole workflow.
-- For multi-page book readers, reuse the navigation in `references/reader-chrome.md`.
+- For multi-page book readers, reuse the navigation in `references/reader-chrome.md`; for original-and-translation pages add `references/bilingual-reader.md`; for one entry point to several books use `references/bookshelf.md`.
 - Before hosting lessons that contain local or licensed assets, read `references/private-delivery.md`.
 - Optional visual and typographic presets the learner may have selected are listed in `references/presets.md`.
 - Open finished lessons in the learner's default browser. Use an automated browser only for inspection and checks.
@@ -74,6 +74,6 @@ Keep these states apart in every record: agent inspected the source, material pr
 - `assets/learner-profile-template.md`: an empty learner profile.
 - `assets/examples/lessons/`: `0001` calm long-form reading, `0002` focused stepped 3D lab, `0003` side-by-side comparison lab.
 - `assets/examples/practice/`: reading-and-writing practice with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. Read its `README.md` before adapting it.
-- `assets/image-preview/` and `assets/reader-chrome/`: ready-built runtime components; integrate them through their references.
+- `assets/image-preview/`, `assets/reader-chrome/`, `assets/bilingual-reader/`, and `assets/bookshelf/`: ready-built components; integrate them through their references.
 
 Examples are patterns. Remove their topic-specific content and keep only the structure that fits the new lesson.

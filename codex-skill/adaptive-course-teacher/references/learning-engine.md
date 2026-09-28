@@ -51,6 +51,18 @@ Books and courses often list far more names, parameters, or variations than the 
 - Say briefly why an item is in a tier. Keep the source text complete; filtering changes emphasis, not the text.
 - Turn the must-have tier into a short check (identify it on an image, predict a result, sketch or perform it), not a list to reread.
 
+## Practice Inside Reading
+
+When the learner studies from a reading edition or a long page, put practice where the material was just read instead of on a separate page.
+
+- Place a check right after the passage it tests; a mixed review goes at the end of the section. Label every added block as not part of the source, and leave the source text around it unchanged.
+- Recognize first, then recall: a guided round shows where each item is, then a blind round asks in random order and shows the correction after a miss. Aim for a few clean blind runs in a row.
+- Before drilling, give one image that holds the items together, using only facts the source supports.
+- Show the mission filter as a short hint above the dense passage. Do not turn filtering into a sorting task, and do not ask the learner to memorize mnemonics.
+- Mix earlier items into later reviews, repeat first-attempt misses once, and let a quick real-world attempt (a sketch, an operation, a sentence) close the review with a self-check.
+- Hide answers semantically: crops without neighbouring labels, alt text that does not name the answer, options of similar length.
+- Keep checks data-driven when a project will need many of them, so a new section needs only new data.
+
 ## Fluency and Durable Memory
 
 Feeling fluent right after a lesson is not the same as remembering it later.

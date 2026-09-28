@@ -36,6 +36,23 @@ Scope: any long page where the text points at a figure or another passage ("如�
 Where: "References" in `reader-chrome.md`; the same two runtime files in `assets/reader-chrome/`. It works without the top bar and footer.
 Summary: the phrase becomes a dotted accent link; hovering shows a floating paper card with the figure and caption or the passage's first lines; clicking jumps there with a brief highlight and a `↩ 回到原文` chip. Links are generated only when the target is certain.
 
+## Bilingual Reading Edition
+
+Scope: reading editions that show an original text beside its translation.
+Where: `bilingual-reader.md` and `assets/bilingual-reader/`; controls come from the reader chrome.
+Summary: parallel, translation-only, and original-only views plus a furigana or other reading-aid toggle, remembered per book; paragraph pairs side by side on desktop and stacked on phones.
+
+## Bookshelf Homepage
+
+Scope: one entry point for several reading editions.
+Where: `bookshelf.md` and `assets/bookshelf/`.
+Summary: a row of real covers built as flat-colored 3D books, the centered one raised; clicking it opens the book's contents; the last opened book is remembered on the device; configured entirely by `books.json`.
+
+## In-Reading Practice (guidance only)
+
+Scope: checks placed inside a reading edition or long lesson.
+Where: "Practice Inside Reading" in `learning-engine.md`. No reusable component is bundled yet; build checks for the project from those principles.
+
 ## Offline Image Preview
 
 Scope: any HTML page with images worth inspecting.

@@ -9,6 +9,8 @@ Review the whole artifact, not isolated sentences.
 1. **Editorial pass:** mark each block `delete`, `retain`, or `shorten` in working notes. Ask whether it teaches something necessary or enables the current action. Delete unnecessary material rather than polishing it into a more pleasant distraction. Check headings, button labels, captions, and nearby instructions for repetition.
 2. **Writing pass:** rewrite the retained content as a teacher addressing this learner. Reorder or combine the added explanation when that makes the teaching clearer; do not merely preserve every original sentence and replace its vocabulary. Keep the authorized learning objective and factual meaning intact.
 
+If the learner's profile names a model for drafting copy, send it short, self-contained briefs that include the needed source facts, keep its raw output separately, and use it as a tone reference for the writing pass. The agent still checks every line against the source and owns the final text.
+
 Read the result as a continuous lesson. A locally polished sentence can still repeat the title, adjacent control, or previous paragraph.
 
 ## Write Like Teaching Material

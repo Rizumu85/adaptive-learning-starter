@@ -45,7 +45,10 @@ html{scroll-padding-top:72px}
 .rc-bar .rc-trail .rc-shelf:hover{color:var(--rc-ink)}
 .rc-bar .rc-sep{color:var(--rc-line);font:400 15px/1 var(--rc-font)}
 .rc-bar .rc-here{font:600 15px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rc-bar .rc-book{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rc-bar .rc-trail .rc-shelf,.rc-bar .rc-sep{flex:none}
+/* 书名太长时末尾显示省略号：弹性盒里的文字不会省略，所以书名用普通块 */
+.rc-bar .rc-trail .rc-book{display:block;min-width:0;line-height:44px;overflow:hidden;text-overflow:ellipsis}
+.rc-bar .rc-here{min-width:0}
 
 /* 右侧：本书工具 + 本章目录 */
 .rc-bar .rc-tools{display:flex;align-items:center;gap:18px;flex:none}
@@ -140,6 +143,25 @@ a.rc-ref:hover{text-decoration-style:solid}
 .rc-rail:hover .rc-rail-marker{opacity:.35}
 .rc-rail .rc-tick-label{position:absolute;right:40px;top:50%;max-width:min(320px,60vw);padding:4px 10px;border:1px solid var(--rc-line);border-radius:6px;background:var(--rc-paper);box-shadow:0 4px 14px rgb(0 0 0 / .06);font:600 13px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transform:translate(4px,-50%);transition:opacity 140ms ease-out,transform 140ms ease-out}
 .rc-rail .rc-tick:hover .rc-tick-label,.rc-rail .rc-tick:focus-visible .rc-tick-label{opacity:1;transform:translate(0,-50%)}
-@media (max-width:1100px),(hover:none){.rc-rail{display:none}}
+.rc-rail.is-cramped{display:none}
+@media (hover:none){.rc-rail{display:none}}
+/* 触屏拖动条：快速滚动时显出本章各节的淡横刻度（不用竖条，免得像第二条滚动条）；把手是页边伸出的纸质索引标签，
+   两道短横线表示可以抓着拖，旁边纸签写当前小节；拖动时标签和横线变成强调色 */
+.rc-scrub{position:fixed;z-index:15;top:72px;bottom:28px;right:0;width:44px;pointer-events:none}
+.rc-scrub-handle{position:absolute;top:0;right:0;width:44px;height:56px;opacity:0;pointer-events:none;touch-action:none;transition:opacity 200ms ease-out}
+.rc-scrub.is-active .rc-scrub-handle{opacity:1;pointer-events:auto}
+.rc-scrub-grip{position:absolute;right:6px;top:50%;width:22px;height:26px;margin-top:-13px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid var(--rc-line);border-radius:6px;background:var(--rc-paper);box-shadow:0 1px 2px rgb(0 0 0 / .06),0 3px 10px rgb(0 0 0 / .05);transition:border-color 140ms ease-out}
+.rc-scrub-grip::before,.rc-scrub-grip::after{content:"";width:10px;height:1.5px;border-radius:1px;background:var(--rc-ink);opacity:.55;transition:background-color 140ms ease-out,opacity 140ms ease-out}
+.rc-scrub.is-dragging .rc-scrub-grip{border-color:var(--rc-accent)}
+.rc-scrub.is-dragging .rc-scrub-grip::before,.rc-scrub.is-dragging .rc-scrub-grip::after{background:var(--rc-accent);opacity:1}
+.rc-scrub-label{position:absolute;right:34px;top:50%;max-width:min(240px,64vw);padding:4px 10px;border:1px solid var(--rc-line);border-radius:6px;background:var(--rc-paper);box-shadow:0 4px 14px rgb(0 0 0 / .06);font:600 13px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translate(4px,-50%);transition:opacity 140ms ease-out,transform 140ms ease-out}
+.rc-scrub.is-active .rc-scrub-label{opacity:.92;transform:translate(0,-50%)}
+.rc-scrub.is-dragging .rc-scrub-label{opacity:1}
+.rc-scrub-ticks{position:absolute;inset:0;opacity:0;transition:opacity 200ms ease-out}
+.rc-scrub.is-active .rc-scrub-ticks{opacity:.6}
+.rc-scrub.is-dragging .rc-scrub-ticks{opacity:1}
+.rc-scrub-tick{position:absolute;right:10px;width:5px;height:1px;margin-top:-.5px;border-radius:1px;background:var(--rc-ink);opacity:.25}
+.rc-scrub-tick.rc-major{width:10px;height:1.5px;margin-top:-.75px;opacity:.45}
+@media print{.rc-scrub{display:none}}
 @media print{.rc-rail{display:none}}
-@media (prefers-reduced-motion:reduce){.rc-rail-marker,.rc-rail .rc-tick::before,.rc-rail .rc-tick-label{transition:none}.rc-flash{animation:none}.rc-peek{transition:none}.rc-bar,.rc-bar .rc-toc>summary svg,.rc-bar .rc-segmented button::after,.rc-bar .rc-toggle::after{transition:none}}
+@media (prefers-reduced-motion:reduce){.rc-rail-marker,.rc-rail .rc-tick::before,.rc-rail .rc-tick-label,.rc-scrub-handle,.rc-scrub-label,.rc-scrub-ticks,.rc-scrub-grip,.rc-scrub-grip::before,.rc-scrub-grip::after{transition:none}.rc-flash{animation:none}.rc-peek{transition:none}.rc-bar,.rc-bar .rc-toc>summary svg,.rc-bar .rc-segmented button::after,.rc-bar .rc-toggle::after{transition:none}}

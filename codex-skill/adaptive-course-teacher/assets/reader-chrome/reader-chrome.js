@@ -105,7 +105,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 
   // 章节速览：页面右侧一列细刻度，展示本章结构。本章目录里的节是长刻度，节里的小标题是短刻度；
   // 平时很淡，指过去变清楚，悬停显示标题，点击跳过去；正在读的地方加深。
-  // 窄屏和触屏由样式隐藏。重新打开页面时浏览器自己会回到上次的滚动位置，这里不另记“上次读到”。
+  // 刻度放在正文右侧的空白里，空白不够时隐藏；触屏改用下面的拖动条。重新打开页面时浏览器自己会回到上次的滚动位置，这里不另记“上次读到”。
   const main = document.querySelector('main');
   const headingText = (node) => {
     const copy = node.cloneNode(true);
@@ -170,6 +170,124 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       });
     });
     rail.addEventListener('pointerleave', () => ticks.forEach((tick) => tick.style.removeProperty('--rc-mag')));
+
+    // 正文右边实际剩下的空白够放刻度（约 60px）才显示；按内容量，不按固定窗口宽度
+    const fit = () => {
+      let right = 0;
+      for (const el of [main, ...main.querySelectorAll(':scope > *, :scope > * > *')].slice(0, 400)) {
+        const r = el.getBoundingClientRect();
+        if (!r.width || (r.left <= 1 && r.right >= innerWidth - 1)) continue;
+        right = Math.max(right, r.right);
+      }
+      rail.classList.toggle('is-cramped', innerWidth - right < 60);
+    };
+    let fitTimer = 0;
+    addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fit, 100); });
+    addEventListener('load', fit);
+    fit();
+  }
+
+  // 触屏的拖动条：平时看不见；快速滚动（短时间滚过将近一屏）时，右侧淡淡显出本章各节的横刻度，当前位置是一根横向墨线，停下约一秒淡出。
+  // 用横线而不是竖条，免得和浏览器自己的滚动条重复。按住墨线上下拖时逐节跳到小节开头，并显示小节名；
+  // 不连续滚动，长章节里也不会上窜下跳。刚出现的一小会儿不接受按压，免得正常滑动时手指碰上去。离屏幕边缘留出距离，避免和系统返回手势冲突。
+  let scrub = null;
+  let scrubLabel = null;
+  if (spots.length > 1 && matchMedia('(hover: none)').matches) {
+    scrub = document.createElement('div');
+    scrub.className = 'rc-scrub';
+    scrub.setAttribute('aria-hidden', 'true');
+    const marks = document.createElement('span');
+    marks.className = 'rc-scrub-ticks';
+    const handle = document.createElement('span');
+    handle.className = 'rc-scrub-handle';
+    // 把手是页边伸出的一块纸质索引标签，两道短横线表示可以抓着拖；旁边的纸签写着当前小节
+    const grip = document.createElement('span');
+    grip.className = 'rc-scrub-grip';
+    scrubLabel = document.createElement('span');
+    scrubLabel.className = 'rc-scrub-label';
+    handle.append(grip, scrubLabel);
+    scrub.append(marks, handle);
+    document.body.append(scrub);
+
+    const HANDLE = 56;
+    const room = () => Math.max(1, scrub.clientHeight - HANDLE);
+    const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    const long = () => document.documentElement.scrollHeight > innerHeight * 4;
+    const moveHandle = (f) => { handle.style.transform = `translateY(${(Math.min(1, Math.max(0, f)) * room()).toFixed(1)}px)`; };
+    let fadeTimer = 0;
+    let dragging = false;
+    let armedAt = 0;
+    let stops = [];
+    const fade = () => { clearTimeout(fadeTimer); fadeTimer = setTimeout(() => { if (!dragging) scrub.classList.remove('is-active'); }, 1200); };
+    // 每个小节在轨道上的位置：按跳到那一节后页面实际停下的位置计算，和把手的换算一致，停靠时正好落在刻度上。
+    // 每一节都有刻度，大节长、小标题短而淡
+    const measureStops = () => {
+      stops = spots.map((spot) => {
+        const margin = parseFloat(getComputedStyle(spot).scrollMarginTop) || 0;
+        return { spot, f: Math.min(1, Math.max(0, (spot.getBoundingClientRect().top + scrollY - margin) / maxScroll())) };
+      });
+      marks.replaceChildren(...stops.map(({ spot, f }) => {
+        const tick = document.createElement('span');
+        tick.className = majors.has(spot) || !majors.size ? 'rc-scrub-tick rc-major' : 'rc-scrub-tick';
+        tick.style.top = `${(f * room() + HANDLE / 2).toFixed(1)}px`;
+        return tick;
+      }));
+    };
+
+    // 快速滚动才出现：最近 300ms 内滚过的距离超过八成屏高
+    const recent = [];
+    addEventListener('scroll', () => {
+      if (dragging) return;
+      if (!long() || (toc && toc.open)) { scrub.classList.remove('is-active'); return; }
+      const now = performance.now();
+      recent.push([now, scrollY]);
+      while (recent.length && now - recent[0][0] > 300) recent.shift();
+      const active = scrub.classList.contains('is-active');
+      if (!active) {
+        if (Math.abs(scrollY - recent[0][1]) < innerHeight * 0.8) return;
+        measureStops();
+        armedAt = now;
+        scrub.classList.add('is-active');
+      }
+      moveHandle(scrollY / maxScroll());
+      fade();
+    }, { passive: true });
+
+    let grab = 0;
+    let at = -1;
+    handle.addEventListener('pointerdown', (event) => {
+      if (!scrub.classList.contains('is-active') || performance.now() - armedAt < 250) return;
+      event.preventDefault();
+      dragging = true;
+      try { handle.setPointerCapture(event.pointerId); } catch { /* 拿不到捕获时仍按普通移动处理 */ }
+      grab = event.clientY - handle.getBoundingClientRect().top;
+      at = -1;
+      measureStops();
+      scrub.classList.add('is-dragging');
+      clearTimeout(fadeTimer);
+    });
+    handle.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      const f = Math.min(1, Math.max(0, (event.clientY - scrub.getBoundingClientRect().top - grab) / room()));
+      let nearest = 0;
+      stops.forEach((stop, i) => { if (Math.abs(stop.f - f) < Math.abs(stops[nearest].f - f)) nearest = i; });
+      if (nearest === at) return;
+      at = nearest;
+      const { spot } = stops[nearest];
+      moveHandle(stops[nearest].f);
+      scrubLabel.textContent = majors.get(spot) || headingText(spot);
+      spot.scrollIntoView({ block: 'start', behavior: 'instant' });
+    });
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      scrub.classList.remove('is-dragging');
+      // 松手后留在停靠的刻度上；之后再滚动才按页面位置移动
+      moveHandle(at >= 0 ? stops[at].f : scrollY / maxScroll());
+      fade();
+    };
+    handle.addEventListener('pointerup', release);
+    handle.addEventListener('pointercancel', release);
   }
 
   const mark = () => {
@@ -181,6 +299,10 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     let here = -1;
     spots.forEach((spot, i) => { if (spot.getBoundingClientRect().top <= line) here = i; });
     ticks.forEach((tick, i) => tick.toggleAttribute('aria-current', i === here));
+    if (scrubLabel) {
+      const spot = spots[Math.max(0, here)];
+      scrubLabel.textContent = majors.get(spot) || headingText(spot);
+    }
     if (marker) {
       const tick = ticks[Math.max(0, here)];
       marker.style.transform = `translateY(${tick.offsetTop + tick.offsetHeight / 2 - 1}px)`;

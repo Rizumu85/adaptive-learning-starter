@@ -68,6 +68,7 @@ Keep these states apart in every record: agent inspected the source, material pr
 - Distinguish instructor confirmation from learner speculation in course discussions, and say when a discussion could not be inspected.
 - Keep source text, translations, and added teaching visibly distinct. Mark AI explanations as additions.
 - Respect licensing. Keep paid, scanned, or login-protected sources and derived assets out of version control and public hosting unless redistribution is explicitly permitted, and record their provenance.
+- Private hosting for an invited audience is a separate case. Before telling the learner that material cannot be shared, read their profile and `references/private-delivery.md`: crops and reading editions made for study may go to a private, access-controlled site the learner has authorized, while full source files still stay local.
 
 ## 6. Bundled Resources
 

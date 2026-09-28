@@ -16,7 +16,7 @@ A preset never authorizes producing more material; it only decides how material 
 
 Scope: lessons, reference pages, interactive labs.
 Where: `courseware-design.md` for tokens, layout, feedback, and motion; the bundled examples under `assets/examples/lessons/`.
-Summary: warm paper canvas, dark ink, one teal accent, unframed reading text, panels only for controls and comparisons, calm motion.
+Summary: warm paper canvas, dark ink, one teal accent, unframed reading text, panels only for controls and comparisons, calm motion. Every new control follows its "Controls" section: print-like text options, hairlines, no pills, switches, glass, or heavy shadows.
 
 ## Stepped Interactive Lab
 

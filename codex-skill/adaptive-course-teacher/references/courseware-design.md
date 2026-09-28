@@ -65,9 +65,21 @@ Use this as an initial visual language, not an identity that every learner must 
 - Feedback states what changed or what needs correction; it does not praise the interface, explain implementation, or repeat the control label.
 - Avoid gradients, decorative blobs, nested cards, and dashboard-like color noise.
 
+## Controls
+
+This section belongs to the paper courseware preset: it applies when the learner has chosen that preset. Paper first, app second. Every control and component looks like print on the page's paper, including new ones that no reference describes: a practice block, a quiz, a slider for a 3D lab, a filter, a card.
+
+- Before inventing a control, reuse one that exists: the segmented choice and toggle from `reader-chrome.md` ("Book tools"), the reference card, the image preview, or a control already in the project.
+- Choice between a few options: plain text options; the chosen one is ink with a thin accent underline, the others muted. On/off: the same text treatment.
+- Buttons and actions: accent text, or text with a hairline border when it must read as a button. Continuous values: a hairline track, a small ink handle, and the value printed as text beside it, with a reset to the baseline.
+- Surfaces: paper color, hairline borders, at most a faint contact shadow. Group with spacing and hairlines before adding a panel.
+- Do not use filled pills, sliding switch thumbs, checkboxes, native `<select>` menus, frosted glass or blur, glowing or heavy shadows, gradients, or outlined hover states. Hover changes ink or underline, not the box.
+- Keyboard focus shows a thin accent ring; keep 44px touch targets even when the visible mark is small.
+- Where a bundled example or older project page conflicts with this section (the glass panels and glowing slider handles in `0002-stepped-interactive.html`), follow this section.
+
 ## Motion
 
-- Keep transitions under 420ms.
+- Keep transitions under 420ms. When motion follows a gesture or moves an object, use a critically damped spring (no bounce) that starts from the current position; elsewhere prefer a short fade.
 - Animate the relationship that changed, not the entire page.
 - Avoid continuous decoration.
 - Respect `prefers-reduced-motion`.

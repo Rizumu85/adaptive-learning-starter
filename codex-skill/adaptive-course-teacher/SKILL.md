@@ -50,6 +50,7 @@ Keep these states apart in every record: agent inspected the source, material pr
 
 - Choose the medium from the learning obstacle, not from the subject or from a previous project: `references/media-workflow.md`.
 - Before building HTML, read `references/courseware-design.md`; for custom interaction, saved state, narration, or pen input also read `references/interactive-courseware.md`.
+- New controls and components, including ones no reference covers, follow the design system the learner chose. With the paper courseware preset, that is "Controls" in `references/courseware-design.md`; otherwise follow the project's `DESIGN.md` consistently instead of inventing a new style.
 - Before publishing AI-written lesson copy, follow `references/learner-facing-copy.md`.
 - For inspectable images in any HTML page, install the offline viewer from `references/image-preview.md`. For a preview-only change, that reference is the whole workflow.
 - For multi-page book readers, reuse the navigation in `references/reader-chrome.md`; for original-and-translation pages add `references/bilingual-reader.md`; for one entry point to several books use `references/bookshelf.md`.

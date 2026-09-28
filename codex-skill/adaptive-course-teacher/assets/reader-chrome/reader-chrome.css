@@ -1,0 +1,140 @@
+/* 阅读页统一控件：顶栏（书架 / 书名 · 本书工具 · 本章目录 ▾）与页脚（上一章 · 本书目录 · 下一章）。
+   只管操作层；正文版式、字体和配图仍由各书自己的样式决定。
+   各书原有样式对 nav、footer、.toc 有通用规则，这里的选择器都多加一层 .rc-bar / .rc-foot 压过它们。 */
+@font-face{font-family:UIOption;src:local("MiSans Demibold"),local("MiSans-Demibold");font-weight:600;font-display:swap}
+
+:root{
+  --rc-accent:#147d8f;
+  --rc-paper:#f7f5ef;
+  --rc-ink:#18181b;
+  --rc-muted:#6b6f72;
+  --rc-line:#d7dbe2;
+  --rc-width:1120px;
+  --rc-gutter:24px;        /* 与正文列左右留白一致；书自己的列留白不同就在配置 vars 里改 */
+  --rc-gutter-narrow:16px;
+  /* 临界阻尼弹簧（response 0.3s），与书架动效同一手感 */
+  --rc-spring:linear(0,0.067,0.205,0.358,0.499,0.619,0.715,0.79,0.848,0.89,0.921,0.944,0.96,0.972,0.981,0.986,0.991,0.993,0.995,0.997,0.998,0.999,1);
+  --rc-spring-time:480ms;
+  --rc-font:UIOption,Inter,system-ui,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+html{scroll-padding-top:72px}
+/* 书架、目录页和各章之间安静地淡入淡出（跨页面视图过渡，两页都要声明）；减少动态效果时直接切换 */
+@view-transition{navigation:auto}
+/* 旧页快速淡出；新页淡入的同时从下方 8px 按弹簧落定，比平淡的溶解更像翻到下一页 */
+@keyframes rc-page-out{to{opacity:0}}
+@keyframes rc-page-fade{from{opacity:0}}
+@keyframes rc-page-rise{from{transform:translateY(8px)}}
+::view-transition-old(root){animation:160ms ease-out both rc-page-out}
+::view-transition-new(root){animation:240ms ease-out 40ms both rc-page-fade,480ms linear(0,0.067,0.205,0.358,0.499,0.619,0.715,0.79,0.848,0.89,0.921,0.944,0.96,0.972,0.981,0.986,0.991,0.993,0.995,0.997,0.998,0.999,1) both rc-page-rise}
+@media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+
+.rc-bar nav,.rc-foot nav{position:static;border:0;margin:0;padding:0;background:none}
+.rc-bar{position:sticky;top:0;z-index:20;background:var(--rc-paper);border-bottom:1px solid var(--rc-line);transition:transform 280ms cubic-bezier(.2,.8,.2,1)}
+/* 读的时候让开：往下滚收起，往上滚、回到顶部或要用时出现（由 reader-chrome.js 切换） */
+.rc-bar.is-hidden{transform:translateY(calc(-100% - 1px))}
+.rc-bar .rc-bar-inner{position:relative;max-width:var(--rc-width);margin:0 auto;padding:0 var(--rc-gutter);min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+/* 顶栏以墨色为主，青色只标“你在这里”（当前小节）和可操作的强调（页脚章节）；层级靠墨色深浅区分 */
+.rc-bar a,.rc-bar summary,.rc-foot a{font:600 15px/1.4 var(--rc-font);color:var(--rc-ink);letter-spacing:0}
+.rc-foot a{color:var(--rc-accent)}
+
+/* 左侧：书架 / 书名。当前页就是这本书的目录时，书名是普通文字 */
+.rc-bar .rc-trail{display:flex;align-items:center;gap:8px;min-width:0}
+.rc-bar .rc-trail a{display:inline-flex;align-items:center;min-height:44px;padding:0;text-decoration:none;white-space:nowrap}
+.rc-bar .rc-trail a:hover{text-decoration:underline;text-underline-offset:4px}
+.rc-bar .rc-trail .rc-shelf{color:var(--rc-muted)}
+.rc-bar .rc-trail .rc-shelf:hover{color:var(--rc-ink)}
+.rc-bar .rc-sep{color:var(--rc-line);font:400 15px/1 var(--rc-font)}
+.rc-bar .rc-here{font:600 15px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-bar .rc-book{overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* 右侧：本书工具 + 本章目录 */
+.rc-bar .rc-tools{display:flex;align-items:center;gap:18px;flex:none}
+.rc-bar .rc-book-tools{display:flex;align-items:center;gap:18px}
+.rc-bar :is(a,summary,button):focus-visible,.rc-foot a:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:6px}
+
+/* 本书工具只用这两种控件：分段选择（几个互斥的选项）和开关（一个开/关），状态写在 aria-checked 上。
+   延续纸面排印：都是文字，没有底色块、阴影或方框；选中/打开是墨色文字加一道青色下划线，未选/关闭是灰字。 */
+.rc-bar .rc-segmented{display:flex;align-items:center;gap:2px}
+.rc-bar .rc-segmented button,.rc-bar .rc-toggle{position:relative;appearance:none;margin:0;border:0;background:none;min-height:44px;padding:0 8px;font:600 15px/1.4 var(--rc-font);color:var(--rc-muted);white-space:nowrap;cursor:pointer;transition:color 200ms ease-out}
+.rc-bar .rc-segmented button::after,.rc-bar .rc-toggle::after{content:"";position:absolute;left:8px;right:8px;bottom:9px;height:2px;border-radius:1px;background:var(--rc-accent);transform:scaleX(0);transition:transform var(--rc-spring-time) var(--rc-spring)}
+.rc-bar .rc-segmented button:hover,.rc-bar .rc-segmented button[aria-checked=true],.rc-bar .rc-toggle:hover,.rc-bar .rc-toggle[aria-checked=true]{color:var(--rc-ink)}
+.rc-bar .rc-segmented button[aria-checked=true]::after,.rc-bar .rc-toggle[aria-checked=true]::after{transform:scaleX(1)}
+.rc-bar .rc-toggle[aria-disabled=true]{opacity:.4;cursor:default}
+/* 开关和前面的分段选择之间有一道细竖线，免得看成第四个选项 */
+.rc-bar .rc-segmented+.rc-toggle{margin-left:10px}
+.rc-bar .rc-segmented+.rc-toggle::before{content:"";position:absolute;left:-10px;top:15px;bottom:15px;width:1px;background:var(--rc-line)}
+.rc-bar .rc-toggle[aria-disabled=true]:hover{color:var(--rc-muted)}
+
+.rc-bar .rc-toc{position:static;min-width:0}
+.rc-bar .rc-toc>summary{display:inline-flex;align-items:center;gap:6px;min-height:44px;list-style:none;cursor:pointer;user-select:none;justify-content:flex-start}
+.rc-bar .rc-toc>summary::-webkit-details-marker{display:none}
+.rc-bar .rc-toc>summary svg{width:20px;height:20px;flex:none;transition:transform 160ms ease-out}
+.rc-bar .rc-toc[open]>summary svg{transform:rotate(180deg)}
+.rc-bar .rc-toc-panel{position:absolute;top:100%;left:auto;right:var(--rc-gutter);width:380px;max-width:calc(100% - 2 * var(--rc-gutter));max-height:min(62dvh,460px);overflow-y:auto;overscroll-behavior:contain;
+  display:grid;gap:0;background:var(--rc-paper);border:1px solid var(--rc-line);border-top:0;border-radius:0 0 8px 8px;padding:6px 20px 10px;box-shadow:0 10px 24px rgb(0 0 0 / .06)}
+.rc-bar .rc-toc-panel a{display:flex;align-items:center;gap:10px;min-height:44px;margin:0;padding:8px 0 8px 8px;border:0;border-bottom:1px solid var(--rc-line);border-left:3px solid transparent;border-radius:0;background:none;text-decoration:none;font-size:15px;line-height:1.45}
+.rc-bar .rc-toc-panel a:last-child{border-bottom:0}
+.rc-bar .rc-toc-panel a:hover{color:var(--rc-accent);background:none}
+/* 正在读的小节：青色文字，左侧青色竖条 */
+.rc-bar .rc-toc-panel a[aria-current]{color:var(--rc-accent);border-left-color:var(--rc-accent);background:none}
+.rc-bar .rc-toc-panel a span{margin:0;color:var(--rc-muted);font-variant-numeric:tabular-nums}
+
+/* 页脚：← 上一章 · 下一章 →，下面是署名。回本书目录用顶栏的书名 */
+.rc-foot{display:block;max-width:var(--rc-width);margin:64px auto 0;padding:0 var(--rc-gutter) 48px;border:0;font-size:15px}
+.rc-foot .rc-pager{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:16px;border-top:1px solid var(--rc-line);padding-top:16px}
+.rc-foot .rc-pager a{display:flex;flex-direction:column;justify-content:flex-start;min-height:56px;padding:0;text-decoration:none}
+.rc-foot .rc-pager a small{font:400 13px/1.5 var(--rc-font);color:var(--rc-muted)}
+.rc-foot .rc-pager a:hover span{text-decoration:underline;text-underline-offset:4px}
+.rc-foot .rc-prev{text-align:left;align-items:flex-start}
+.rc-foot .rc-next{text-align:right;align-items:flex-end}
+.rc-foot .rc-none{min-height:56px}
+.rc-foot .rc-credit{margin:28px 0 0;text-align:center;font:400 13px/1.7 var(--rc-font);color:var(--rc-muted)}
+
+/* 窄屏时本书工具收进下拉面板顶部，顶栏保持一行 */
+.rc-bar .rc-toc-panel .rc-book-tools{gap:20px;padding:4px 0 8px;border-bottom:1px solid var(--rc-line)}
+@media (max-width:740px){
+  .rc-bar .rc-bar-inner{padding:0 var(--rc-gutter-narrow);gap:10px}
+  .rc-bar .rc-tools{gap:12px}
+  .rc-bar .rc-toc-panel{left:0;right:0;width:auto;max-width:none;border-left:0;border-right:0;border-radius:0}
+  .rc-foot{padding:0 var(--rc-gutter-narrow) 40px}
+}
+/* 文中引用：指向图或别处文字的链接用青色点状下划线，像页边的批注记号；悬停、聚焦或轻点时浮出纸片预览 */
+a.rc-ref{color:var(--rc-accent);text-decoration:underline dotted;text-decoration-thickness:1px;text-underline-offset:4px;cursor:pointer}
+a.rc-ref:hover{text-decoration-style:solid}
+.rc-peek{position:fixed;z-index:30;box-sizing:border-box;width:min(340px,calc(100vw - 16px));padding:12px 14px 10px;background:var(--rc-paper);border:1px solid var(--rc-line);border-radius:8px;box-shadow:0 1px 2px rgb(0 0 0 / .05),0 10px 28px rgb(0 0 0 / .08);color:var(--rc-ink);text-align:left;opacity:0;transform:translateY(4px);transition:opacity 160ms ease-out,transform var(--rc-spring-time) var(--rc-spring)}
+.rc-peek[data-side=above]{transform:translateY(-4px)}
+.rc-peek.is-open{opacity:1;transform:none}
+.rc-peek-img{display:block;max-width:100%;max-height:220px;margin:0 auto;border-radius:2px;cursor:zoom-in}
+.rc-peek-title{margin:0 0 4px;font:600 14px/1.5 var(--rc-font);color:var(--rc-ink)}
+.rc-peek-caption{margin:8px 0 0;font:400 13px/1.6 var(--rc-font);color:var(--rc-muted)}
+.rc-peek-text{margin:0;font-size:15px;line-height:1.75;text-indent:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.rc-peek-go{display:inline-flex;align-items:center;min-height:32px;margin-top:4px;font:600 14px/1.4 var(--rc-font);color:var(--rc-accent);text-decoration:none}
+.rc-peek-go:hover{color:var(--rc-ink)}
+.rc-return{position:fixed;z-index:25;left:max(16px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));min-height:40px;padding:0 16px;border:1px solid var(--rc-line);border-radius:20px;background:var(--rc-paper);box-shadow:0 4px 14px rgb(0 0 0 / .06);font:600 14px/1 var(--rc-font);color:var(--rc-accent);cursor:pointer}
+.rc-return:hover{color:var(--rc-ink)}
+.rc-return:focus-visible,a.rc-ref:focus-visible,.rc-peek-go:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:4px}
+/* 跳到的目标淡淡闪一下，找得到落点 */
+.rc-flash{animation:rc-flash 1.8s ease-out}
+@keyframes rc-flash{from{background-color:color-mix(in srgb,var(--rc-accent) 16%,transparent)}to{background-color:transparent}}
+/* 章节速览：右侧一列细刻度展示本章结构。本章目录里的节是较长的刻度，节里的小标题是短刻度，
+   每节之前留半格空白分组。平时安静：小标题几乎隐去，大节浅浅可见；指过去整列清楚，指针附近的刻度
+   像程序坞一样放长（--rc-mag 由脚本设置），悬停的那格浮出标题纸条。当前位置是一根墨色短线，
+   滚动时按弹簧滑动。整列不超过视口高度的七成；窄屏与触屏隐藏 */
+.rc-rail{--rc-tick-h:clamp(3px,calc(70vh / var(--rc-ticks)),10px);position:fixed;z-index:15;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;padding:8px 0}
+.rc-rail .rc-tick{--rc-w:5px;position:relative;display:flex;align-items:center;justify-content:flex-end;width:36px;height:var(--rc-tick-h);text-decoration:none}
+.rc-rail .rc-major{--rc-w:12px}
+.rc-rail .rc-major:not(:first-child){margin-top:calc(var(--rc-tick-h) * 1.5)}
+.rc-rail .rc-tick::before{content:"";width:calc(var(--rc-w) * var(--rc-mag,1));height:1.5px;border-radius:1px;background:var(--rc-ink);opacity:.14;transition:width 140ms ease-out,opacity 200ms ease-out,background-color 160ms ease-out}
+.rc-rail .rc-major::before{height:2px;opacity:.32}
+.rc-rail:hover .rc-tick::before,.rc-rail:focus-within .rc-tick::before{opacity:.4}
+.rc-rail:hover .rc-major::before,.rc-rail:focus-within .rc-major::before{opacity:.7}
+.rc-rail .rc-tick:hover::before,.rc-rail .rc-tick:focus-visible::before{background:var(--rc-accent);opacity:1}
+.rc-rail .rc-tick:focus-visible{outline:none}
+.rc-rail-marker{position:absolute;top:0;right:0;width:20px;height:2px;border-radius:1px;background:var(--rc-ink);opacity:0;pointer-events:none;transition:transform var(--rc-spring-time) var(--rc-spring),opacity 200ms ease-out}
+.rc-rail-marker.is-shown{opacity:.85}
+.rc-rail:hover .rc-rail-marker{opacity:.35}
+.rc-rail .rc-tick-label{position:absolute;right:40px;top:50%;max-width:min(320px,60vw);padding:4px 10px;border:1px solid var(--rc-line);border-radius:6px;background:var(--rc-paper);box-shadow:0 4px 14px rgb(0 0 0 / .06);font:600 13px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transform:translate(4px,-50%);transition:opacity 140ms ease-out,transform 140ms ease-out}
+.rc-rail .rc-tick:hover .rc-tick-label,.rc-rail .rc-tick:focus-visible .rc-tick-label{opacity:1;transform:translate(0,-50%)}
+@media (max-width:1100px),(hover:none){.rc-rail{display:none}}
+@media print{.rc-rail{display:none}}
+@media (prefers-reduced-motion:reduce){.rc-rail-marker,.rc-rail .rc-tick::before,.rc-rail .rc-tick-label{transition:none}.rc-flash{animation:none}.rc-peek{transition:none}.rc-bar,.rc-bar .rc-toc>summary svg,.rc-bar .rc-segmented button::after,.rc-bar .rc-toggle::after{transition:none}}

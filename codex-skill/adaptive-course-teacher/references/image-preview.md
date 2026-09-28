@@ -33,19 +33,21 @@ Keep existing image dimensions, captions, provenance, and source order. Do not n
 
 ## Included Behavior
 
-- Native modal dialog with focus containment, accessible icon controls, captions and image count.
-- Return button and Escape close it without changing the reading scroll position; focus returns to the clicked image.
-- Zoom buttons, wheel zoom, drag-to-pan, touch pinch, double-click zoom, fit/reset, and previous/next within the group. Fit is 100%; maximum is 8 times fit, not eight times original pixels.
-- Loading and failure states; disabled controls at boundaries; zoom resets on image change or viewport resize.
+- Native modal dialog with focus containment, accessible controls, caption and image count. Controls: `← 返回` at top left, count at top right; caption and a control capsule (previous · zoom out · scale · zoom in · next) at the bottom. The scale button shows the zoom level and returns to fit.
+- Motion (critically damped spring, response 0.3 s, the same feel as the reader chrome): the paper backdrop fades in while the full-resolution picture settles in from 96% size; closing reverses it. Do not enlarge the page thumbnail into place: book scans are often low resolution and the zoom reads as forced. Paging slides pictures sideways. Motion starts from the picture's current position, so a half-pulled close continues smoothly.
+- At fit size, dragging sideways pages (with resistance at the first and last picture) and pulling down closes; a short or slow drag springs back. Zoomed drags pan instead.
+- Return, Escape and pull-down close without moving the page, even after paging to other pictures; focus returns to the link that opened the preview.
+- Zoom buttons, wheel zoom, touch pinch, double-click zoom and drag-to-pan. Fit is 100%; maximum is 8 times fit, not eight times original pixels.
+- Loading (shown only after 300 ms) and failure states; disabled controls at boundaries; zoom refits on viewport resize. `prefers-reduced-motion` replaces flights and slides with short fades.
 - Local `file://` works with no CDN, framework, server, telemetry, or runtime installation. Real image links remain usable if JavaScript is unavailable.
 
 ## Fit the Project
 
-Classes are namespaced `al-`; ordinary page typography is untouched. The viewer inherits `--paper`/`--canvas`, `--surface-muted`, `--ink`, `--line`, `--muted`, and `--accent` when present, with standalone defaults. For other token systems, map these on `:root`: `--preview-paper`, `--preview-stage`, `--preview-ink`, `--preview-line`, `--preview-muted`, `--preview-accent`, and optionally `--preview-hover`. Match the project's palette rather than imposing the sample book's colors. Preserve 44px control targets, modest corners, and visible focus. No animation is needed.
+Classes are namespaced `al-`; ordinary page typography is untouched. The look is paper, not glass: a solid paper backdrop, the picture resting on it with a faint print shadow, and a paper capsule with a hairline border. It inherits `--paper`/`--canvas`, `--ink`, `--line`, `--muted`, and `--accent` when present, with standalone defaults, and uses the `UIOption` interface font when the page defines it (the reader chrome does). For other token systems, map these on `:root`: `--preview-paper`, `--preview-ink`, `--preview-line`, `--preview-muted`, `--preview-accent`, and optionally `--preview-font`. Match the project's palette rather than imposing the sample book's colors. Keep 44px control targets and visible keyboard focus. Do not add glass, blur, heavy shadows, or bordered hover states.
 
 ## Verify Before Delivery
 
-Open the real page locally at desktop and 390px/320px mobile widths. Test opening a mid-page image, zoom/pan/reset, group boundaries, a long caption, return with unchanged scroll, and keyboard focus/Escape. Check pinch on a touch-capable test device or report it unverified. Test a missing image and close during loading. Confirm all four local files are delivered, no broken paths, no horizontal toolbar overflow, and the browser console has no unexpected errors. Keep licenses with redistributed runtime files; this package grants no rights to the displayed images.
+Open the real page locally at desktop and 390px/320px mobile widths. Test opening a mid-page image, zoom/pan/fit, group boundaries, a long caption, pull-down and sideways drags including short ones that spring back, unchanged page scroll after closing (also after paging), and keyboard focus/Escape. Check pinch on a touch-capable test device or report it unverified. Test a missing image and close during loading. Confirm all four local files are delivered, no broken paths, no horizontal toolbar overflow, and the browser console has no unexpected errors. Keep licenses with redistributed runtime files; this package grants no rights to the displayed images.
 
 ## Maintainers Only
 

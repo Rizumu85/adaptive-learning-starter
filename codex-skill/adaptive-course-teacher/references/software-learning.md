@@ -16,7 +16,10 @@ Apply this guide when the learner studies software behavior or follows an applic
 - Apply the learner's established naming and project conventions inside the steps. Label these as project adaptations, give a brief source-to-project mapping when necessary, and then use the chosen names consistently. Do not carry another learner's convention into a new project.
 - For version adaptations, preserve the intended result and verify the replacement operation. Put optional advice and troubleshooting outside the verified sequence.
 - Use authorized course discussions to find likely blockers. Distinguish instructor clarification from unverified learner reports. Say when the discussion could not be inspected; never imply it was reviewed.
-- Track known and rejected shortcuts by key combination plus context and function. Recommend retention for recurring practical value, with a brief explanation of that value.
+- Keep a shortcut registry in the project's `reference/`: key combination, mode or editor, function, source lesson, and the learner's decision (keep, already known, not needed). The same key can do different things in different modes, so match by function and context, not by key alone. Recommend a new shortcut only for recurring practical value, and say what real task it speeds up. Do not re-offer ones the learner already knows or declined.
+- When a step describes something by its relation ("the bone extruded from it"), put the concrete name in the same sentence so the step works without the video.
+- When the course uses an add-on, an older version, or a different keymap than the learner, restate the demonstrated result in the learner's setup and say plainly when no exact equivalent exists.
+- When the instructor builds through deliberate wrong attempts, present the final working structure first, then explain the failed attempt only where it prevents a likely mistake.
 
 ## Resuming After a Break
 
@@ -30,16 +33,8 @@ Record viewing, understanding, and hands-on work separately. For each statement 
 
 Creating a guide does not establish that the learner watched the lesson, understood it, or completed the exercise. When a checkpoint is unknown, say so and help identify it before prescribing a restart.
 
-## Optional Interactive Lessons
+## Interactive Lessons
 
-Use these practices when interaction helps explain software behavior and fits the learner's project:
-
-- Establish the initial state and show the consequence of one meaningful change at a time.
-- Preserve other values when switching alternatives for comparison. Provide an explicit reset to the baseline.
-- Keep transitions continuous when their path carries meaning. Make the final state immediately available for reduced-motion users.
-- Show the current step and total. Use a flat sequence for one topic; introduce a nested directory only when explicitly requested or agreed with the learner.
-- Show only the annotations needed for the current decision. Offer additional detail when useful, and keep controls and labels beside the state they describe.
-- Keep layouts stable across steps. Verify that labels remain readable, the visual responds, and the explanation matches the displayed state, including the conclusion.
-- Keep teaching strategy and design deliberations out of lesson prose.
+When interaction helps explain software behavior, follow "Stepped Labs" in `interactive-courseware.md`.
 
 The bundled reading, stepped, and comparison examples are optional starting points. Use `courseware-design.md` for a candidate visual system and `media-workflow.md` for capture and export. Select them according to the learner's accessibility needs, existing project style, host application, and learning obstacle. Adapt dimensions, palette, typography, medium, and interaction depth; do not transplant a prior course's subject matter or assets.

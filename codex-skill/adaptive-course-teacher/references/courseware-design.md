@@ -1,6 +1,6 @@
 # Paper Courseware Starter
 
-Use this as an initial visual language, not an identity that every learner must keep.
+Use this as an initial visual language, not an identity that every learner must keep. Design each page as an educator and an interface designer at once: before styling anything, make the reading order obvious and put each explanation where the eye already is.
 
 ## Learning Structure
 
@@ -51,7 +51,7 @@ Use this as an initial visual language, not an identity that every learner must 
 
 ## Long-Form Reading Navigation
 
-- For continuous chapter readers with many section links, prefer a chapter contents control collapsed by default on both desktop and mobile. Keep the trigger visible without a permanently expanded directory competing with the text; adapt if the learner explicitly prefers a persistent outline.
+- Multi-page book readers use the shared navigation in `reader-chrome.md`. For a single long lesson or reference page, prefer a chapter contents control collapsed by default on both desktop and mobile. Keep the trigger visible without a permanently expanded directory competing with the text; adapt if the learner explicitly prefers a persistent outline.
 - Open a bounded, scrollable dropdown on request without shifting the reading layout. Close it after section selection, Escape, or an outside click. Keep keyboard access and expanded-state semantics; return focus to the trigger on Escape and place the selected heading below any sticky header.
 - This is navigation disclosure, not a new teaching hierarchy. Preserve continuous reading and source order; do not invent nested topics or substeps to populate a menu. Keep necessary step progress visible in interactive lessons. A short page may need no contents menu.
 - Check collapsed/open states, long labels, keyboard use, and anchor positioning on desktop and mobile.

@@ -1,26 +1,36 @@
 # Adaptive Course Teacher
 
-A learning workflow for video courses, textbooks, and exercise-led study. It turns source material into a small learning map, targeted explanation, practice, and durable notes chosen by the learner.
+A long-term learning workflow for video courses, software follow-alongs, books, textbooks, and practice-led study. Each project keeps a mission, trusted sources, learning records, and a checkpoint. Each unit starts with a short map, continues with the learner's own reading or viewing, and ends with a reconstruction of the reasoning, a recall check, and only the notes or lessons the learner chooses to keep.
+
+## What You Get
+
+- A project template that any installed copy can use to start a new learning project.
+- Subject playbooks (video course, software follow-along, book and reading edition, textbook and exercises) that the agent adapts instead of copying between subjects.
+- A learning engine: mission, resources, learning records, glossary, reference sheets, retrieval and spaced review, and choosing the next unit from evidence.
+- Optional presets you can adopt as they are: paper courseware, stepped interactive labs, book reader navigation, an offline image viewer, and a Chinese reading typography pairing.
+- A private learner profile, kept outside this package, so a new project starts from preferences that already worked.
+
+## Install
 
 Give an agent the repository URL and ask it to install this skill:
 https://github.com/Rizumu85/adaptive-learning-starter
 
-The repository root has installation and project-template instructions. This package includes Codex discovery metadata in `agents/openai.yaml`; its teaching references use general agent capabilities. No API key or extra configuration is needed for text-based teaching. Browsing, media processing, and interactive examples require their respective tools. Optional example development uses Node.js; prebuilt HTML examples open without a build.
+Or run `npx skills add Rizumu85/adaptive-learning-starter`.
+
+No API key or configuration is needed for text-based teaching. Browsing course pages, processing media, and building interactive examples need the matching tools on your machine. Example development uses Node.js; the prebuilt HTML examples open without a build. The `agents/` folder holds optional display metadata for one host; other hosts ignore it.
 
 ## Usage
 
-Start with: “Use adaptive-course-teacher to help me study this chapter. Read my project notes and continue from my last exercise.” Existing projects retain their preferences across conversations. A machine-local scratch override is optional, not a required onboarding step.
+- New subject: "Use adaptive-course-teacher to start a learning project for this course in this folder."
+- Returning: "Continue my learning project from the last checkpoint."
+- After a lesson: "I watched it casually. Rebuild the important reasoning and tell me what is worth keeping."
+
+The first project asks a few questions about your goal and how you like to learn. When some preferences settle, the agent offers to save them in a learner profile (`references/learner-profile.md`) so later projects skip those questions.
 
 ## Privacy and Boundaries
 
-Keep personal learning records and licensed sources in the learner's project. External review and hosting require authorization for the intended material and audience; this skill does not itself upload files or synchronize progress. It does not infer mastery from reading, copying, or typing.
+- Your profile, learning records, and licensed sources stay in your own files. The skill does not upload, publish, or synchronize anything by itself; hosting needs your authorization for the material and the audience.
+- It does not count reading, copying, or generated material as learning; it records what you actually showed.
+- To share your setup with a friend, share this skill and the presets you use. Keep your profile private, or share a copy with personal details removed.
 
-See `references/textbook-learning.md` for reading-led lessons and `references/workspace-management.md` for storage and resume behavior. The optional `assets/examples/practice/index.html` demonstrates a catalog and separately saved typed/handwritten work. Its README provides TypeScript build commands and verification limits.
-
-Automated skill-format validation does not establish teaching effectiveness. Windows example build checks and browser checks can be run locally; macOS/Linux device behavior and actual stylus feel need verification on those devices.
-
-## Bounded Book Study
-
-A broad learning request starts necessary setup and one small unit, followed by learner feedback. Repository setup does not authorize whole-book notes or HTML. Explicit batch deliverables remain supported within their stated scope. Generated artifacts are not learner progress.
-
-Use `references/book-learning.md` for source location checks and the bounded reading loop. The optional textbook workflow supplements it where relevant; previous projects supply preferences, not transferable mastery or a fixed lesson format.
+Automated format validation does not show that teaching works. Example builds and browser checks have been run on Windows; macOS and Linux devices and real stylus feel need checking on those devices.

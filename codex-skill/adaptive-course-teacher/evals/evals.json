@@ -50,6 +50,60 @@
         "Does not mark chapters as learned",
         "Does not invent unavailable source contents"
       ]
+    },
+    {
+      "id": 5,
+      "name": "new-software-course-with-profile",
+      "prompt": "New conversation in an empty folder. A learner profile exists and says: Chinese explanations with original English UI terms; notes go to a note app following their note instructions; video lessons cost attention because listening competes with new concepts; animated notes must be WebP. The learner says: 'I want to learn Houdini procedural modeling from this video course. Here is episode 1.' Describe your first actions and your first reply. Do not browse or change files.",
+      "expected_output": "Reads the profile, sets up the project from the bundled template, asks only the mission questions the profile leaves open, proposes the video and software playbooks with a reason, and gives a viewing map for one episode.",
+      "files": [],
+      "expectations": [
+        "Reads the learner profile before asking questions and does not re-ask what it answers",
+        "Creates the project from the bundled template without overwriting files",
+        "Asks why the learner wants this and what outcome counts, in at most three questions",
+        "Proposes the video/software playbook and says why it fits",
+        "Stops after one episode's viewing map"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "dense-book-section",
+      "prompt": "Existing drawing-anatomy book project. Mission: draw figures in motion without structural mistakes. The learner writes: 'From the pelvis names section on it's too detailed and academic. I can't remember so many names, and as an artist I don't know which ones matter.' Plan your response. Do not browse or change files.",
+      "expected_output": "Filters the section by mission with evidence, keeps the book text intact, turns the essential tier into a short active check, and schedules spaced review.",
+      "files": [],
+      "expectations": [
+        "Sorts the names into needed now, recognize, and lookup-only tiers tied to the drawing mission",
+        "Uses evidence such as what the book marks as landmarks or what reappears later",
+        "Does not rewrite or cut the book's text",
+        "Proposes an active check (identify on an image, predict, quick sketch) instead of rereading",
+        "Writes a learning record or checkpoint only from the learner's stated position, without claiming mastery"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "no-transfer-to-new-subject",
+      "prompt": "The learner's previous project was a Blender rigging video course with viewing maps, a mode-aware shortcut registry, and 3D interactive labs. They now start learning to write short Chinese essays from a textbook. Describe how you choose the teaching approach. Do not change files.",
+      "expected_output": "Chooses the textbook playbook from the new subject, keeps only general preferences, and does not bring over the shortcut registry or 3D labs.",
+      "files": [],
+      "expectations": [
+        "Uses the textbook workflow as a starting point and adapts it to essay writing",
+        "Keeps general preferences such as language and attention costs",
+        "Does not propose a shortcut registry, viewing map, or 3D lab for this subject",
+        "States the proposed approach and reason in one or two sentences"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "record-evidence",
+      "prompt": "After an interactive lesson the learner says: 'Totally understood now, thanks! Let us continue with episode 15.' Earlier they could not predict which bone the constraint moves. What do you record before continuing?",
+      "expected_output": "Writes a learning record about the corrected misconception with the learner's statement as evidence, marks the level honestly, and updates the checkpoint.",
+      "files": [],
+      "expectations": [
+        "Writes a numbered learning record for the corrected misconception",
+        "Labels the evidence as the learner's own report unless a check was done",
+        "Updates the checkpoint and plans a later retrieval check",
+        "Does not mark the whole chapter as mastered"
+      ]
     }
   ]
 }

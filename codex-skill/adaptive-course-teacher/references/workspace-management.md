@@ -25,7 +25,7 @@ Resolve platform cache roots at runtime: Windows local application data, macOS u
 
 ## Machine-Local Configuration
 
-An optional ignored `.learning-local.json` may hold `schemaVersion`, `projectId`, and `scratchRoot`. Resolve relative paths against the project, not the shell's current directory. Resolve a configured absolute path only on the current machine. Keep unknown fields when updating configuration. Never store credentials here.
+An optional ignored `.learning-local.json` may hold `schemaVersion`, `projectId`, `scratchRoot`, and `learnerProfile` (see `learner-profile.md`). Resolve relative paths against the project, not the shell's current directory. Resolve a configured absolute path only on the current machine. Keep unknown fields when updating configuration. Never store credentials here.
 
 Keep portable policy and checkpoint information in project notes; keep personal absolute paths in the ignored configuration. Agents and scripts must actually read this file before using an override; this reference alone does not redirect tools or configure cloud clients.
 

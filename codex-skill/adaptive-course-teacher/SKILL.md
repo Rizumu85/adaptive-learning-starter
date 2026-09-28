@@ -1,77 +1,79 @@
 ---
 name: adaptive-course-teacher
-description: Turn video courses and other learning materials into personalized viewing maps, post-view reconstructions, durable notes, screenshots, animated WebP clips, and focused interactive HTML lessons. Use when a learner wants to study a course with AI, reduce listening or working-memory load, follow along accurately, diagnose confusing steps, or iteratively discover a learning and note-taking method that fits them. Do not use for unrelated application development or one-off translation without a learning goal.
+description: Long-term personal learning workflow for video courses, software follow-alongs, books, textbooks, and practice-led subjects. Keeps a learning project with a mission, trusted sources, learning records, and a checkpoint; gives a short map before each unit, reconstructs the reasoning afterward, checks recall, and makes notes, reference sheets, screenshots, animated WebP, reading editions, or focused interactive HTML only when the learner chooses. Use when someone wants to learn or keep learning a subject with the agent, start or resume a learning project, understand a lesson they watched or read, or turn study material into durable notes or lessons. It already covers the mission, resources, and learning-record workflow of a generic teaching skill, so do not combine the two. Do not use for general coding, one-off translation or summaries without a learning goal, or a single factual question.
 ---
 
 # Adaptive Course Teacher
 
-Treat learning as an iterative collaboration. Do not assume the learner needs the same media, depth, or note structure for every topic.
+Learning is a long collaboration. The agent looks for the method that fits this learner and this subject, tests it on one small unit, and revises it from what the learner actually does. Preferences carry across projects; routines, formats, and analogies do not unless they fit the new subject.
 
-## Start
+## 1. Resume or Start
 
-1. Read the project `AGENTS.md`, `MISSION.md`, `NOTES.md`, and `DESIGN.md` when present.
-2. If the learner profile is missing, use `references/onboarding.md`. Ask only one to three questions at a time.
-3. Record stable preferences in the project `NOTES.md`; keep subject-specific knowledge in notes or reference files rather than this skill.
-4. A broad request to help study a book or course authorizes necessary setup and one small learning unit, not autonomous completion of the whole source. Inspect the contents and the selected unit; deliver its reading/viewing map, then wait for the learner. Do not continue across units as background preparation.
-5. Keep repository setup, source indexing, teaching, and artifact production as separate scopes. A repository request or a long-term learning goal is not authorization for bulk reading, notes, or HTML. An explicit batch deliverable is allowed within its requested scope, but does not establish learner progress.
-6. Previous projects provide evidence of preferences, not transferable subject mastery, fixed analogies, or permission to reproduce their artifacts. Record the current unit, authorized outputs, confirmed learner progress, and feedback awaited separately.
-7. When creating or resuming a project, read `references/workspace-management.md` before choosing work paths or extracting large source packages. Reuse the recorded machine-local configuration across conversations.
+1. Read the learner profile if one exists. `references/learner-profile.md` explains where it is found, what belongs in it, and how preferences are promoted. It records how this learner likes to learn; the project files override it.
+2. Inside a project, read `AGENTS.md`, `START-HERE.md`, `MISSION.md`, `NOTES.md`, `DESIGN.md`, `RESOURCES.md`, and the newest files in `learning-records/` when present. A new conversation is not a new project: continue from the recorded checkpoint.
+3. For a new project, read `references/project-setup.md`. Copy `assets/project-template/` without overwriting anything, then fill `MISSION.md` through `references/onboarding.md`. Skip questions the profile already answers. Ask one to three questions at a time.
+4. Before choosing scratch paths or extracting large source packages, read `references/workspace-management.md`.
 
-## Per-Lesson Workflow
+## 2. Choose a Playbook for This Subject
 
-Read `references/teaching-workflow.md` before handling a course episode.
+Pick a starting workflow from the source and the goal, then adapt it.
 
-For a book or other long reading source, read `references/book-learning.md` instead for source navigation and the bounded reading loop.
+| Source or goal | Read |
+| --- | --- |
+| Video course | `references/teaching-workflow.md` |
+| Software concepts or a follow-along in an application | `references/software-learning.md`, plus the video workflow when the source is a video |
+| Book or other long reading source, including reading editions and translations | `references/book-learning.md` |
+| Textbook, exercises, literacy, or handwriting | `references/textbook-learning.md` |
+| Anything else | The learning loop below and `references/learning-engine.md` |
 
-For software concept lessons and hands-on software follow-alongs, also read `references/software-learning.md`. Its guidance is scoped to that learning context; do not apply software-specific conventions to unrelated subjects.
+- Playbooks are candidates. Keep the steps that fit the subject, mission, and intended capability; drop the rest.
+- Tell a new learner in one or two sentences which approach you propose and why, then record the choice in `NOTES.md`.
+- Do not transplant another project's formats, exercises, analogies, naming rules, or media habits because they worked there. A viewing map, shortcut registry, or 3D lab belongs to the subjects that need it.
 
-For textbooks, reading courses, and exercise-led lessons, consult `references/textbook-learning.md` as an optional starting workflow. Choose, adapt, or omit steps according to the subject and intended capability; a textbook format does not make literacy exercises or a fixed teaching sequence appropriate.
+## 3. The Learning Loop
 
-1. Acquire trustworthy source material: transcript, lesson page, supplied files, and relevant discussion comments when authorized.
-2. Give a short learning map before viewing or reading, using the chosen source workflow.
-3. After viewing or reading, reconstruct the load-bearing reasoning. Do not merely summarize the source order.
-4. Separate verified course actions from added advice, version adaptations, and diagnostics.
-5. Let the learner choose what becomes a durable note, mind map, screenshot, animated WebP, or interactive lesson.
-6. When practice is part of the lesson, define what counts as independent performance and record each meaningful capability separately.
+Run this for every unit. `references/learning-engine.md` holds the details: mission, resources, learning records, glossary, reference sheets, retrieval, spacing, and choosing the next unit.
 
-## Visual Material
+1. **Scope.** One small unit by default. A broad request ("help me learn this book") authorizes setup and one unit, then a feedback stop. Honor an explicit batch request within its stated range. Producing material never counts as the learner having read or learned it.
+2. **Ground.** Take claims from the source and from `RESOURCES.md`, not from memory. Verify before stating what a course, book, or tool says. Recommend one primary source for the unit when the source is not already fixed.
+3. **Map before.** State the question the unit answers, what to notice, what can be skimmed, the result to recognize at the end, and where to stop.
+4. **Learner engages.** They watch, read, or try. Wait for their report.
+5. **Reconstruct after.** Assume attention was split. Re-explain the load-bearing reasoning, starting from the goal: what was needed, which choice meets it, and why the alternatives fail. Separate must-understand ideas, reusable expert experience, operations worth keeping, lookup-only detail, and what is safe to ignore.
+6. **Filter by mission.** When a source is dense, say which parts matter for the learner's goal before asking them to remember anything.
+7. **Let the learner choose what to keep.** Recommend a medium for each item from its recall value and difficulty; make nothing durable until the learner picks it.
+8. **Check.** Ask for recall or an attempt before revealing answers when durable memory or independent performance is the goal. Correct the specific error.
+9. **Record.** Update the checkpoint. Write a learning record only on evidence. Choose the next unit and the next review from the records.
 
-When an HTML artifact needs inspectable images, read `references/image-preview.md` and reuse its ready-built offline viewer. Do not rebuild a lightbox or load its implementation source for routine integration.
+Keep these states apart in every record: agent inspected the source, material produced, learner read or watched, learner explained it, learner performed it independently.
 
-For a preview-only addition to an existing HTML page, that reference is the complete component workflow: skip the other media/design/interaction references below unless changing lesson content, layout, or delivery. Existing project rules still apply.
+## 4. Artifacts
 
-Read `references/media-workflow.md` before capturing screenshots, producing animation, or building HTML.
-Read `references/private-delivery.md` before hosting lessons that include local or licensed assets.
+- Choose the medium from the learning obstacle, not from the subject or from a previous project: `references/media-workflow.md`.
+- Before building HTML, read `references/courseware-design.md`; for custom interaction, saved state, narration, or pen input also read `references/interactive-courseware.md`.
+- Before publishing AI-written lesson copy, follow `references/learner-facing-copy.md`.
+- For inspectable images in any HTML page, install the offline viewer from `references/image-preview.md`. For a preview-only change, that reference is the whole workflow.
+- For multi-page book readers, reuse the navigation in `references/reader-chrome.md`.
+- Before hosting lessons that contain local or licensed assets, read `references/private-delivery.md`.
+- Optional visual and typographic presets the learner may have selected are listed in `references/presets.md`.
+- Open finished lessons in the learner's default browser. Use an automated browser only for inspection and checks.
+- When writing into the learner's note app, follow their note instructions from the profile or project, read the written note back to confirm its content, and leave spatial placement to the learner unless the tool supports exact placement.
+- Never produce GIF as the final animated format unless the learner asks for it.
 
-- Prefer a static image for a fixed UI location or comparison.
-- Prefer animated WebP for a short visible procedure or state change.
-- Prefer interactive HTML when changing one variable, coordinate space, causal order, or spatial relation is the obstacle.
-- Do not add interaction when a short explanation or image teaches the point better.
-- Choose media only after identifying the current learning obstacle and authorized output. A spatial subject, an HTML example, or another project's media preferences alone do not justify making HTML.
-- Never use GIF as the final animated-note format unless the learner explicitly requests it.
-- When interactive courseware needs custom code, author the editable source in TypeScript and compile or bundle it into local JavaScript for the browser. Preserve direct local-file opening when the project requires it, and do not hand-edit generated JavaScript. Vendored libraries and unavoidable tool configuration are exempt.
+## 5. Accuracy
 
-Read `references/courseware-design.md` before creating HTML. Treat it as a starting theme, then adapt it to the learner, subject, and existing project style.
-Read `references/interactive-courseware.md` before implementing custom interaction, persistence, narration synchronization, canvas input, or local browser delivery.
+- Never invent a course step, timestamp, page, shortcut, menu path, parameter, or quotation.
+- Identify same-named controls by full context: application version, mode, editor, panel, data level, and keymap.
+- A follow-along contains only verified source actions. Put additions under clearly labeled optional, version-adaptation, or troubleshooting sections.
+- Distinguish instructor confirmation from learner speculation in course discussions, and say when a discussion could not be inspected.
+- Keep source text, translations, and added teaching visibly distinct. Mark AI explanations as additions.
+- Respect licensing. Keep paid, scanned, or login-protected sources and derived assets out of version control and public hosting unless redistribution is explicitly permitted, and record their provenance.
 
-## Learner-Facing Copy
+## 6. Bundled Resources
 
-Read `references/learner-facing-copy.md` before publishing AI-written lesson copy. The current agent first removes unnecessary text, then rewrites retained teaching copy and checks the whole rendered lesson; no external reviewer is required. Preserve source quotations, remove discussion residue, and keep copy review separate from UI and behavior changes unless the learner authorizes both.
+- `assets/project-template/`: files for a new learning project.
+- `assets/learner-profile-template.md`: an empty learner profile.
+- `assets/examples/lessons/`: `0001` calm long-form reading, `0002` focused stepped 3D lab, `0003` side-by-side comparison lab.
+- `assets/examples/practice/`: reading-and-writing practice with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. Read its `README.md` before adapting it.
+- `assets/image-preview/` and `assets/reader-chrome/`: ready-built runtime components; integrate them through their references.
 
-## Accuracy Rules
-
-- Never invent a course step, timestamp, shortcut, menu path, or parameter.
-- Verify same-named controls by full context: application version, mode, editor, properties tab, data level, and keymap.
-- A follow-along procedure contains only verified source actions. Put additions in a clearly labeled diagnostic or optional section.
-- When comments contain a claim, distinguish instructor confirmation from learner speculation and verify behavior when possible.
-- Respect course licensing. Do not redistribute source videos, PDFs, paid downloads, or login-protected media.
-- Keep licensed source files and locally authorized assets outside version control unless redistribution is explicitly permitted. Preserve provenance for every derived crop, transcription, narration, or model.
-
-## Bundled Examples
-
-Use `assets/examples/lessons/0001-reading-sample.html` for calm long-form reading structure.
-Use `assets/examples/lessons/0002-stepped-interactive.html` for a focused 3D stepped lab.
-Use `assets/examples/lessons/0003-comparison-lab.html` for side-by-side state comparison.
-Use `assets/examples/practice/index.html` for an original reading-and-writing exercise with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. See its `README.md` before adapting it.
-
-Examples are patterns, not templates to copy blindly. Remove topic-specific language and preserve only the teaching structure that fits the new lesson.
+Examples are patterns. Remove their topic-specific content and keep only the structure that fits the new lesson.

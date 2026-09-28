@@ -21,20 +21,25 @@ Keep source claims, paraphrases, and supplemental explanations distinguishable. 
 5. Choose what is worth retaining with the learner. Start with the lightest sufficient medium; build an interactive artifact only for a specific obstacle or an explicit request.
 6. Record the learner's confirmed reading position, attempt, unresolved question, and next action. Source inspected by the agent, artifact completed, learner read, and learner demonstrated understanding are different states.
 
-## Book Reading Typography Preferences
+## Dense Sections
 
-Before styling a book reader, reuse the learner's selected reading preferences from project notes or a local learner profile. Keep reading typography separate from software follow-along interfaces. A font preference does not authorize creating HTML or processing more source material.
+When a section lists more names, variations, or steps than the learner's goal needs, apply "Filtering Dense Material" in `learning-engine.md` before the learner tries to memorize it. A learner saying a section is "too detailed" or "I can't tell what matters" is the signal. Keep the book's text complete; change the emphasis and the check, not the source.
 
-An optional Chinese book-reading pairing is **朝華標題B for Chinese headings + 京华老宋 for Chinese body text**. Use it only when selected by the learner; it is not the starter's universal default.
+## Reading Editions
 
-- Headings: 朝華標題B, internal family `ZhaohuaMinB`, full name `ZhaohuaMinB Black`, PostScript name `ZhaohuaMinB-Black`; native weight 900. Apply to the page, chapter, and step headings, not navigation or every emphasized phrase.
-- Chinese body: 京华老宋, with installed aliases such as `KingHwaOldSong`, `KingHwa_OldSong`, `京華老宋體`, or `京華老宋体`. Verify the actual installed family rather than assuming a filename or version label works in CSS.
-- Japanese original text, Japanese comparison subheadings, and furigana retain appropriate Japanese fonts. Do not force Chinese glyph forms onto Japanese text.
-- When trying a new font, preserve the existing type sizes and layout so the learner can judge the font change independently. For a new reader, inherit confirmed project sizes; this pairing does not prescribe universal sizes.
-- Prefer local font lookup and a legible system fallback. Check actual font loading and narrow-screen wrapping, not merely the declared CSS family.
-- Do not bundle, upload, or redistribute licensed fonts without authorization. Machine-specific file fallbacks belong in ignored local configuration, never in shared skill examples. A local installation or file path does not make a font available on other devices.
+When the learner asks for the source itself as a web page (a scanned book is hard to read on screen, or a foreign-language book needs a translation beside it), make a reading edition. This is a separate deliverable from teaching.
 
-Record the selected pairing and its scope in the project's notes and design file. A learner's later change takes precedence; do not retrofit existing projects without a request.
+- Keep the original text and the book's structure. Do not insert AI explanations, reading questions, or editorial notes into the edition. The reading map stays a separate Markdown file.
+- Verify every page against the scan before calling it checked. OCR and text layers are drafts. Keep printed page labels and PDF indices distinct, and record verified pairs rather than a global offset.
+- Crop figures from the source as described in `media-workflow.md`, keep them beside the passage they illustrate, and make them inspectable with `image-preview.md`.
+- With two translations, compare them passage by passage and choose the clearer wording without blending them into a text neither translator wrote. Keep the changes and reasons in a local editorial file.
+- For a machine translation, send short batches, keep the raw output and the reviewed version separately, and review against the source for omissions, invented content, terms, numbering, and image correspondence. Preserve the author's voice: first person stays first person, hedges and feelings stay, and splitting a paragraph into points is paragraphing, not summarizing.
+- For Japanese with furigana, bind each reading to its word with semantic `ruby`, choose readings from context, and leave uncertain proper-noun readings unannotated rather than guessing.
+- Regenerate pages from data and validate that every source paragraph and translation appears exactly once and in order; a navigation or styling change must not change the text.
+- Use the shared navigation in `reader-chrome.md` for multi-page readers.
+- Keep source text, translations, crops, and editorial data in ignored local directories. Host them only as `private-delivery.md` allows.
+
+Reading-edition typography is a learner choice; see `presets.md` for the bundled Chinese reading pairing.
 
 ## Existing Projects
 

@@ -1,4 +1,6 @@
-# Teaching Workflow
+# Video Course Workflow
+
+Use for lessons delivered as videos. It fills in steps 3 to 8 of the learning loop in `SKILL.md` for video; software specifics are in `software-learning.md`.
 
 ## Before Viewing
 
@@ -10,11 +12,11 @@ Extract only:
 - The final result the learner should recognize.
 - Load-bearing concepts and actions.
 - Sections that are demonstrations, deliberate mistakes, cleanup, or safe to skim.
-- Recurring learner confusion, version differences, and instructor corrections.
+- Recurring learner confusion, version differences, and instructor corrections from the discussion. Treat unconfirmed learner guesses as things to test, and do not dump the thread.
 
 Define the smallest observable result for this lesson. If the goal involves production rather than recognition, decide what the learner must do without prompts before calling it learned.
 
-Give a short viewing map with timestamps when verified. Do not create durable notes yet.
+Give a short viewing map with timestamps when verified: the problem, the result to recognize, the sections that carry weight, and the sections that can run in the background. Do not create durable notes yet.
 
 ## After Casual Viewing
 
@@ -67,9 +69,7 @@ Place added advice under `Optional`, `Version adaptation`, or `If this fails`. N
 
 ## Shortcut Memory
 
-Track shortcuts as `key + mode/editor/context + function`. The same key can mean different things in different modes. Record whether the learner already knows it, rejected it, or wants to retain it.
-
-Recommend a shortcut only when it removes recurring friction or captures valuable expert workflow. Explain why it matters in practice.
+Use the shortcut registry in `software-learning.md`.
 
 ## Close the Lesson
 

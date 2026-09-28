@@ -9,6 +9,19 @@ Read this reference when a lesson needs custom browser interaction rather than a
 - Show prerequisite information before independent practice, then remove answer-bearing prompts during recall.
 - Record distinct capabilities separately. Recognition, guided execution, independent recall, correctness, fluency, and presentation must not silently substitute for one another.
 
+## Stepped Labs
+
+Design as an educator and an interface designer at once: the reading order must be obvious before any control is touched.
+
+- One relationship per step. Show a concrete result first, change one variable, then name the concept.
+- Start with a step 0 that shows the default state. Give every slider or toggle an explicit way back to the baseline.
+- Keep the other values when switching alternatives, so the learner compares like with like.
+- Animate changes continuously when the path carries meaning; never jump a moving part to its end state. Reduced motion shows the final state at once.
+- Show the current step and the total. Use a flat sequence for one topic. Add sub-steps with their own progress only when the learner asks for them; do not infer nesting from the amount of content.
+- Show only the annotations the current decision needs, and put each label beside what it describes. Several objects can share one color when telling them apart is not the lesson.
+- Keep layout stable across steps: size the stage and panel to the tallest step instead of letting them jump or scroll inside.
+- Before delivery, check that labels stay readable, every control visibly changes the scene, and the text matches the state shown, including the final summary.
+
 ## Recall Across the Whole Page
 
 Use one recall state for every answer-bearing view. Check the main model, side lists, headings, examples, typed reference, captions, accessible names, and collapsible source panels. Blur or color changes alone do not conceal answers from selection or assistive technology. Hide the relevant views semantically, and check both visual and accessible output.

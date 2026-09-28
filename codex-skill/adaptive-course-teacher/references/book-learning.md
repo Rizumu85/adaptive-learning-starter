@@ -36,7 +36,7 @@ When the learner asks for the source itself as a web page (a scanned book is har
 - For a machine translation, send short batches, keep the raw output and the reviewed version separately, and review against the source for omissions, invented content, terms, numbering, and image correspondence. Preserve the author's voice: first person stays first person, hedges and feelings stay, and splitting a paragraph into points is paragraphing, not summarizing.
 - For Japanese with furigana, bind each reading to its word with semantic `ruby`, choose readings from context, and leave uncertain proper-noun readings unannotated rather than guessing.
 - Regenerate pages from data and validate that every source paragraph and translation appears exactly once and in order; a navigation or styling change must not change the text.
-- Use the shared navigation in `reader-chrome.md` for multi-page readers.
+- Use the shared navigation in `reader-chrome.md` for multi-page readers. Link references in the text to their figures and passages, and add multi-target references where one phrase needs a passage and a figure (or several figures) from different places; `reader-chrome.md` ("References") lists when to add them.
 - Keep source text, translations, crops, and editorial data in ignored local directories. Host them only as `private-delivery.md` allows.
 
 Reading-edition typography is a learner choice; see `presets.md` for the bundled Chinese reading pairing.

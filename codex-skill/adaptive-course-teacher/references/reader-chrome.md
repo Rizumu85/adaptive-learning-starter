@@ -40,6 +40,18 @@ References: when the text points at a figure ("如上图所示", "（左图）")
 - Standalone use: references also work on pages without the bar and footer, such as a reading lesson or reference sheet. Copy `reader-chrome.css` and `reader-chrome.js` into the project, link them, and mark the phrases; the navigation code does nothing when there is no bar.
 - Linking rules: link only when the target is certain. Resolve position words ("左图", "右上图", "（左）") against the figures of the same step or passage by their caption labels, and skip a word when two figures share the position. Resolve page references ("第198页") against the book's page markers. Do not link vague phrases ("后文中", "前面介绍过的内容"). Generators produce these links from data (caption labels, page markers, an explicit reference list) and fail the build when a listed phrase is missing, so edits to the text cannot leave a link pointing at the wrong thing. Multi-target links come only from the explicit list, where a phrase names all of its targets; never merge automatic matches into one link.
 
+When building or reviewing a chapter, look for places where several targets help and add them to the explicit list yourself; the learner does not need to ask for each one. Good candidates:
+
+- A cross-reference ("参考第146页") whose target page has both the text that explains the item and the figure that shows it.
+- A phrase that relies on an explanation in one section and a picture in another, or on an idea split across two pages.
+- A comparison whose two halves live in different places, such as male and female figures in separate sections.
+- A recap sentence that names items taught across several earlier passages or steps.
+- A step that says "像之前那样" when the earlier method is spread over two steps or a step and its figure.
+
+For each candidate, read every target and confirm it is what the phrase needs. Put first whatever answers the phrase most directly: the labelled figure for a landmark name, the explanation for a concept. Keep it to two to four targets and use a single target when one place is enough. Do not add multi-target links to vague phrases or to insert teaching the source does not make. When the book's printed page number points to the wrong place, keep the book's text and ask the learner before redirecting the link. The build fails when a listed phrase or target is missing, and a test checks that every `data-refs` target resolves.
+
+Cross-page targets need the other page to be readable; when none of a link's targets can be read (for example a local `file://` page), clicking falls back to following `href`.
+
 Contents page: the same top bar without the dropdown. Chapter rows use number, title, source-page range, and `整理中` for unfinished chapters (not linked). Chapter titles use the book's reading body font; numbers and page ranges use the sans. The title artwork and page composition stay the book's own.
 
 Control text uses the `UIOption` interface font defined in `reader-chrome.css` (the book-typography preset's MiSans Demibold, looked up locally, falling back to the system sans).

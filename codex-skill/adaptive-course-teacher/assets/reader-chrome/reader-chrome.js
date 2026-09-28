@@ -265,12 +265,14 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     card.style.top = `${below ? r.bottom + 10 : r.top - 10 - h}px`;
     card.style.left = `${Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8)}px`;
   }
+  // 返回 false 表示一处也读不到（比如本地文件读不了别的章节），调用方改为直接跳转
   async function open(link) {
     clearTimeout(hideTimer);
-    if (current === link && !card.hidden) return;
+    if (current === link && !card.hidden) return true;
     const mine = ++token;
     const found = (await Promise.all(targetsOf(link).map(resolve))).filter(Boolean);
-    if (mine !== token || !found.length) return;
+    if (mine !== token) return true;
+    if (!found.length) return false;
     const many = found.length > 1;
     const blocks = found.map(({ el, samePage, url, href }) => {
       // 指向图（figure 或 img）时预览图；指向一页或一段文字时预览标题和开头，即使那一页里有图
@@ -311,6 +313,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     card.classList.remove('is-open');
     place(link);
     requestAnimationFrame(() => card.classList.add('is-open'));
+    return true;
   }
   function close() {
     token++;
@@ -380,6 +383,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       close();
       if (viewer) viewer.click();
       else if (el) jump(link, el);
+      else location.assign(new URL(pic.dataset.target, location.href).href);
       return;
     }
     const link = event.target.closest('a.rc-ref, a.rc-peek-go');
@@ -397,7 +401,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     const touch = event.pointerType && event.pointerType !== 'mouse' && current !== link;
     if (targetsOf(link).length > 1 || touch) {
       event.preventDefault();
-      open(link);
+      open(link).then((shown) => { if (!shown) location.assign(link.href); });
       return;
     }
     const el = local(link.getAttribute('href'));

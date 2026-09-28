@@ -4,6 +4,14 @@ Presets are ready-made visual and interaction choices that other learners can ad
 
 A preset never authorizes producing more material; it only decides how material looks once the learner has asked for it.
 
+## Using and Sharing
+
+- To adopt a preset, the learner names it ("use the book reader navigation preset") or accepts it when the agent offers it. Record it in the learner profile with its scope, for example "Chinese reading typography: book pages only".
+- To opt out for one project, record the exception in that project's `DESIGN.md`.
+- Sharing the whole skill shares every preset. A learner can also share just their selection by passing on the preset lines from their profile; the recipient's agent looks the names up here.
+- To reuse one component outside this skill, copy its reference and asset folder together: `reader-chrome.md` with `assets/reader-chrome/`, or `image-preview.md` with `assets/image-preview/` and `scripts/install-image-preview.cjs`.
+- Fonts are never shared with a preset. Each learner installs licensed fonts on their own devices; pages fall back to system fonts elsewhere.
+
 ## Paper Courseware
 
 Scope: lessons, reference pages, interactive labs.
@@ -35,6 +43,6 @@ Scope: reading pages and book editions only; not software follow-along interface
 - Headings: 朝華標題B (`ZhaohuaMinB`, full name `ZhaohuaMinB Black`, PostScript `ZhaohuaMinB-Black`), native weight 900, for page, chapter, and step headings only.
 - Chinese body: 京华老宋 (`KingHwaOldSong`, `KingHwa_OldSong`, `京華老宋體`, `京華老宋体`). Check the family name actually installed.
 - Controls the reader operates (navigation, contents toggles, chapter links, toolbar labels, language or furigana switches): MiSans Demibold at weight 600 through `local("MiSans Demibold"), local("MiSans-Demibold")`, falling back to the system sans. Reading text, headings, captions, and folios keep their reading fonts.
-- Japanese text, Japanese subheadings, and furigana keep Japanese fonts; do not force Chinese glyph forms onto Japanese.
+- Bilingual Japanese–Chinese editions use the same pairing for the Japanese side: 朝華標題B for Japanese headings, 京华老宋 for Japanese body text and furigana, with Japanese fonts only as fallback. Kanji then take this font's glyph forms. A learner who wants Japanese glyph shapes keeps a Japanese font for the Japanese side instead.
 - When trying a font, keep sizes and layout unchanged so the learner judges only the font. Use local font lookup with a legible fallback, and check real loading and narrow-screen wrapping.
 - Do not bundle, upload, or redistribute licensed fonts. Machine-specific font file fallbacks belong in ignored local configuration. A font installed on one device is not available on others.

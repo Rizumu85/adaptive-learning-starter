@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

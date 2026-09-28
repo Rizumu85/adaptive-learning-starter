@@ -1,0 +1,25 @@
+{
+  "library": {
+    "name": "书架",
+    "storageKey": "my-bookshelf",
+    "searchFrom": 12
+  },
+  "books": [
+    {
+      "id": "sample-book",
+      "title": "示例书",
+      "author": "作者名",
+      "translator": "译者名",
+      "edition": "原文重排阅读版",
+      "category": "绘画",
+      "reader": "/readers/sample-book/local-reading/",
+      "size": { "width": 150, "height": 220, "thickness": 18 },
+      "cover": { "src": "covers/sample-book.svg", "fit": "cover" },
+      "spine": { "color": "#3e5c63", "ink": "#f5f0e4" },
+      "chapters": [
+        { "no": "01", "title": "第一章", "pages": "001–020", "href": "chapter-01.html" },
+        { "no": "02", "title": "第二章", "pages": "021–040", "status": "pending" }
+      ]
+    }
+  ]
+}

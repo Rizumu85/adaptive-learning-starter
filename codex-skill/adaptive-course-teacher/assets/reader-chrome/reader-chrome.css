@@ -136,6 +136,8 @@ a.rc-ref:hover{text-decoration-style:solid}
 .rc-rail .rc-major::before{height:2px;opacity:.32}
 .rc-rail:hover .rc-tick::before,.rc-rail:focus-within .rc-tick::before{opacity:.4}
 .rc-rail:hover .rc-major::before,.rc-rail:focus-within .rc-major::before{opacity:.7}
+/* 当前位置的刻度由墨线代替，自己的线藏起来，免得两条线叠不齐 */
+.rc-rail .rc-tick[aria-current]::before{opacity:0}
 .rc-rail .rc-tick:hover::before,.rc-rail .rc-tick:focus-visible::before{background:var(--rc-accent);opacity:1}
 .rc-rail .rc-tick:focus-visible{outline:none}
 .rc-rail-marker{position:absolute;top:0;right:0;width:20px;height:2px;border-radius:1px;background:var(--rc-ink);opacity:0;pointer-events:none;transition:transform var(--rc-spring-time) var(--rc-spring),opacity 200ms ease-out}

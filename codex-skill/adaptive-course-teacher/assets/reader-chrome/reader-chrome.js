@@ -304,8 +304,11 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       scrubLabel.textContent = majors.get(spot) || headingText(spot);
     }
     if (marker) {
+      // 按实际（带小数的）位置对齐到刻度中线；offsetTop 会取整，差出不到一像素也看得出来
       const tick = ticks[Math.max(0, here)];
-      marker.style.transform = `translateY(${tick.offsetTop + tick.offsetHeight / 2 - 1}px)`;
+      const box = tick.getBoundingClientRect();
+      const y = box.top - rail.getBoundingClientRect().top + box.height / 2 - marker.offsetHeight / 2;
+      marker.style.transform = `translateY(${y.toFixed(2)}px)`;
       marker.classList.toggle('is-shown', here >= 0);
     }
   };

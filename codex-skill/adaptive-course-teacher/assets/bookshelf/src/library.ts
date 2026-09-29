@@ -376,15 +376,17 @@
   let suppressClick = false;
 
   /* ---------- 新章节：书顶露出一截书签带 ---------- */
-  // 每本书的目录页里嵌着本书已上架章节的列表（阅读控件的 #rc-chapters），服务器按登录邮箱记着这位读者看过哪些章。
-  // 有没打开过的新章节时，书顶露出一截书签带，转到这本书时作者后面多一句“新增：…”。
-  // 第一次来时把现有章节都记为看过；本地预览没有接口，什么都不显示。
-  const fresh = new Map<string, string[]>();
+  // 每本书的目录页里嵌着本书已上架章节的列表（阅读控件的 #rc-chapters）。服务器按登录邮箱记着每本书
+  // “已经在目录页看到过”的章节（和阅读控件共用 /api/seen）。还有没看到过的新章节时，书顶露出一截书签带，
+  // 转到这本书时作者后面多一句“新增：…”；进了那本书的目录页、看到“新”之后，书签带就消失。
+  // 没进去看也不会一直挂着：书签带第一次出现 3 小时后自动消失，那几章算看到过；又有新章节时重新计时。
+  // 第一次来时把现有章节都记为看到过。网址加 ?preview-new 时假装每本书最后一章是新加的，只预览、不写入。
+  const fresh_titles = new Map<string, string[]>();
   function showNew(id: string) {
     const line = app.querySelector('.now span');
     if (!line) return;
     line.querySelector('em')?.remove();
-    const titles = fresh.get(id);
+    const titles = fresh_titles.get(id);
     if (!titles?.length) return;
     const em = document.createElement('em');
     em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
@@ -397,17 +399,32 @@
       const found = page.match(/<script type="application\/json" id="rc-chapters">([\s\S]*?)<\/script>/);
       if (!found) return;
       const info = JSON.parse(found[1]);
-      const api = `/api/seen/${encodeURIComponent(info.book)}`;
-      const record = await fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
-      if (!record) return;
-      if (!Array.isArray(record.seen)) {
-        const seen = info.chapters.map((c) => c.id);
-        fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => {});
-        return;
+      const ids = info.chapters.map((c: any) => c.id);
+      let fresh: string[];
+      if (new URLSearchParams(location.search).has('preview-new')) {
+        fresh = ids.slice(-1);
+      } else {
+        const api = `/api/seen/${encodeURIComponent(info.book)}`;
+        const record = await fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
+        if (!record) return;
+        if (!Array.isArray(record.seen)) {
+          fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen: ids }) }).catch(() => {});
+          return;
+        }
+        fresh = ids.filter((id: any) => !record.seen.includes(id));
+        if (!fresh.length) return;
+        const shown = Array.isArray(record.shown) ? record.shown : [];
+        const put = (body: any) => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).catch(() => {});
+        if (fresh.some((id: any) => !shown.includes(id)) || !record.shownAt) {
+          put({ seen: record.seen, shown: fresh, shownAt: Date.now() });
+        } else if (Date.now() - record.shownAt > 3 * 60 * 60 * 1000) {
+          put({ seen: [...new Set([...record.seen, ...ids])] });
+          return;
+        }
       }
-      const titles = info.chapters.filter((c) => !record.seen.includes(c.id)).map((c) => c.title);
+      const titles = info.chapters.filter((c: any) => fresh.includes(c.id)).map((c: any) => c.title);
       if (!titles.length) return;
-      fresh.set(book.id, titles);
+      fresh_titles.set(book.id, titles);
       app.querySelectorAll(`.book[data-id="${CSS.escape(book.id)}"]`).forEach((el) => el.classList.add('has-new'));
       if (app.querySelector('.book.is-current')?.getAttribute('data-id') === book.id) showNew(book.id);
     } catch { /* 读不到就不提示 */ }

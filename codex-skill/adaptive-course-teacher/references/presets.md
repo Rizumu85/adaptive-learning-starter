@@ -28,7 +28,7 @@ Summary: a step 0 baseline, one changed variable per step, continuous transition
 
 Scope: multi-page reading editions and a library of books.
 Where: `reader-chrome.md` and `assets/reader-chrome/`.
-Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, and print-like controls. On a private site with sign-in, new chapters get a small `新` on the contents page, per reader. Usually paired with In-Text References below.
+Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, and print-like controls. On a private site with sign-in, chapters added since a reader last saw the contents page get a small `新` there. Usually paired with In-Text References below.
 
 ## In-Text References
 
@@ -46,7 +46,7 @@ Summary: parallel, translation-only, and original-only views plus a furigana or 
 
 Scope: one entry point for several reading editions.
 Where: `bookshelf.md` and `assets/bookshelf/`.
-Summary: a row of real covers built as flat-colored 3D books, the centered one raised; clicking it opens the book's contents; the last opened book is remembered on the device; configured entirely by `books.json`. With sign-in, a bookmark ribbon marks books with chapters the reader has not opened.
+Summary: a row of real covers built as flat-colored 3D books, the centered one raised; clicking it opens the book's contents; the last opened book is remembered on the device; configured entirely by `books.json`. With sign-in, a bookmark ribbon marks books with chapters the reader has not seen yet; it clears on the contents page or after three hours.
 
 ## In-Reading Practice (guidance only)
 

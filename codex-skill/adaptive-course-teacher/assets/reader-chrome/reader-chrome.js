@@ -535,36 +535,45 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   });
 })();
 
-// 新章节：每位读者（按登录邮箱，存在服务器上）看过哪些章。第一次来时把现有章节都记为看过，
-// 之后上架、还没打开过的章节，在目录页的章名后标一个小小的“新”；打开那一章就记为看过。
-// 本地打开文件或没有接口时什么都不做。
+// 新章节：读者上次在目录页看到之后新加的章节，在目录页的章名后标一个小小的“新”。
+// 服务器按登录邮箱记着每本书“已经在目录页看到过”的章节；目录页显示出“新”的同时就记为看到过，刷新后不再显示。
+// 第一次来时把现有章节都记为看到过，什么都不标。章节页不写记录。
+// 网址加 ?preview-new 时，假装最后一章是新加的，只用来预览样子，不写入记录。本地打开文件或没有接口时什么都不做。
 (() => {
   const data = document.getElementById('rc-chapters');
-  if (!data || !/^https?:$/.test(location.protocol)) return;
+  if (!data) return;
   let info;
   try { info = JSON.parse(data.textContent); } catch { return; }
-  const api = `/api/seen/${encodeURIComponent(info.book)}`;
   const ids = info.chapters.map((c) => c.id);
-  const save = (seen) => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => {});
-  const same = (href) => href.split('#')[0].replace(/index\.html$/, '');
+  const same = (href) => href.split('#')[0].split('?')[0].replace(/index\.html$/, '');
   const titleOf = (link, title) => link.querySelector('[class$="-title"],[class$="-name"],[class="title"],[class="name"]')
     || [...link.querySelectorAll('span,strong,em,b')].find((el) => !el.children.length && el.textContent.trim() === title)
     || link;
-  fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((record) => {
-    if (!record) return;
-    const seen = Array.isArray(record.seen) ? record.seen : null;
-    if (!seen) { save(ids); return; }
-    if (info.current) { if (!seen.includes(info.current)) save([...seen, info.current]); return; }
+  const mark = (fresh) => {
     info.chapters.forEach((chapter) => {
-      if (seen.includes(chapter.id)) return;
+      if (!fresh.has(chapter.id)) return;
       const target = same(new URL(chapter.url, location.href).href);
       document.querySelectorAll('a[href]').forEach((link) => {
         if (link.closest('.rc-bar, .rc-foot') || same(link.href) !== target || link.querySelector('.rc-new')) return;
-        const mark = document.createElement('span');
-        mark.className = 'rc-new';
-        mark.textContent = '新';
-        titleOf(link, chapter.title).append(mark);
+        const tag = document.createElement('span');
+        tag.className = 'rc-new';
+        tag.textContent = '新';
+        titleOf(link, chapter.title).append(tag);
       });
     });
+  };
+  const onContents = !info.current;
+  if (new URLSearchParams(location.search).has('preview-new')) { if (onContents) mark(new Set(ids.slice(-1))); return; }
+  if (!/^https?:$/.test(location.protocol)) return;
+  const api = `/api/seen/${encodeURIComponent(info.book)}`;
+  const save = (seen) => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => {});
+  fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((record) => {
+    if (!record) return;
+    if (!Array.isArray(record.seen)) { save(ids); return; }
+    if (!onContents) return;
+    const fresh = ids.filter((id) => !record.seen.includes(id));
+    if (!fresh.length) return;
+    mark(new Set(fresh));
+    save([...new Set([...record.seen, ...ids])]);
   }).catch(() => {});
 })();

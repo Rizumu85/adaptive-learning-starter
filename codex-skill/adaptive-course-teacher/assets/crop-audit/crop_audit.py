@@ -21,6 +21,9 @@ crops.json: {"unit": 1000, "pages": "<page image pattern with {page}>", "crops":
 "bounds", "exclude"?, "transparent"?, "output"?, "group"?, "audit_ok"?}, ...]}, paths relative to the file.
 audit_ok lists findings already reviewed and kept on purpose: 'clipped:top|bottom|left|right',
 'overlap', 'near-empty'.
+A spread with "parts": [{"page", "bounds", "exclude"?}, ...] is checked page by page for cut lines.
+Entries without a single page and box (whole pages, hand-drawn outlines, other sources) are listed as
+not checked.
 
 From Python, for a project made before the crop record existed (a short adapter reads its own data):
     issues = audit(figures, unit=1000, sheets='work/qa/crop-audit')
@@ -192,24 +195,31 @@ def audit(figures, unit=1000, sheets=None):
 
 
 def load_record(path):
-    """Figures for audit() from a crops.json crop record."""
+    """Figures for audit() from a crops.json crop record, plus the ids it cannot check."""
     path = Path(path).resolve()
     data = json.loads(path.read_text(encoding='utf-8'))
-    figures = []
+    figures, skipped = [], []
     for crop in data['crops']:
-        figures.append({
-            'id': crop['id'], 'bounds': crop['bounds'], 'exclude': crop.get('exclude', []),
-            'page': str(path.parent / data['pages'].format(page=crop['page'])),
-            'image': str(path.parent / crop['output']) if crop.get('output') else None,
-            'group': crop.get('group'), 'accepted': crop.get('audit_ok', []),
-        })
-    return figures, data.get('unit', 1000)
+        base = {'exclude': crop.get('exclude', []), 'group': crop.get('group'), 'accepted': crop.get('audit_ok', [])}
+        page_of = lambda page: str(path.parent / data['pages'].format(page=page))
+        if crop.get('parts'):
+            # A spread joined from several pages: check each page's box for cut lines; the joined
+            # output cannot be compared with one page, so it is not read.
+            for i, part in enumerate(crop['parts']):
+                figures.append({**base, 'id': f'{crop["id"]}#{i + 1}', 'page': page_of(part['page']),
+                                'bounds': part['bounds'], 'exclude': part.get('exclude', []), 'image': None})
+        elif crop.get('bounds') and isinstance(crop.get('page'), int):
+            figures.append({**base, 'id': crop['id'], 'bounds': crop['bounds'], 'page': page_of(crop['page']),
+                            'image': str(path.parent / crop['output']) if crop.get('output') else None})
+        else:
+            skipped.append(crop['id'])  # whole pages, hand-drawn outlines, other sources
+    return figures, data.get('unit', 1000), skipped
 
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1].startswith('-'):
         sys.exit(__doc__)
-    figures, unit = load_record(sys.argv[1])
+    figures, unit, skipped = load_record(sys.argv[1])
     if '--only' in sys.argv:
         rest = sys.argv[sys.argv.index('--only') + 1:]
         wanted = set(rest[:next((i for i, a in enumerate(rest) if a.startswith('--')), len(rest))])
@@ -223,7 +233,8 @@ def main():
     issues = audit(figures, unit, sheets)
     for issue in issues:
         print(f'{issue["kind"]:10} {issue["id"]}: {issue["detail"]}')
-    print(f'{len(figures)} crops checked, {len({i["id"] for i in issues})} flagged')
+    print(f'{len(figures)} crops checked, {len({i["id"] for i in issues})} flagged'
+          + (f'; not checked (no single page box): {", ".join(skipped)}' if skipped else ''))
     sys.exit(1 if issues else 0)
 
 

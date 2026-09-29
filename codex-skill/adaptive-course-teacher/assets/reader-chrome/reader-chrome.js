@@ -415,6 +415,19 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
         const caption = el.querySelector('figcaption');
         const text = caption ? plain(caption) : img.alt;
         if (text) parts.push(line('rc-peek-caption', text));
+        // 图下面标了 data-rc-actions 的操作（比如在线填写、下载空白表），卡片里也列出来
+        const actions = el.querySelector('[data-rc-actions]');
+        if (actions) {
+          const row = document.createElement('p');
+          row.className = 'rc-peek-actions';
+          actions.querySelectorAll('a[href]').forEach((a) => {
+            const copy = a.cloneNode(true);
+            copy.removeAttribute('class');
+            copy.href = new URL(a.getAttribute('href'), url).href;
+            row.append(copy);
+          });
+          if (row.childElementCount) parts.push(row);
+        }
       } else {
         const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4');
         const para = el.matches('p') ? el : [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);

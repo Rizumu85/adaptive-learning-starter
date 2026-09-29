@@ -110,11 +110,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .book:focus,.book:focus-visible{outline:none}
 /* 透明描边让 Chrome 给 3D 变换后的边缘做抗锯齿 */
 .bface{position:absolute;backface-visibility:hidden;outline:1px solid transparent}
-/* 新章节：一条丝带书签夹在书页中间，从书顶露出来，露出的一端剪成燕尾；靠近书脊一侧但不贴边；强调色，不加阴影 */
-.ribbon{position:absolute;left:8%;top:calc(var(--ch) * -.07);width:7.5%;height:calc(var(--ch) * .13);background:var(--accent);
-  clip-path:polygon(0 0,50% 14%,100% 0,100% 100%,0 100%);
-  transform:translateZ(calc(var(--cd) * -.5));opacity:0;transition:opacity 240ms ease-out;pointer-events:none}
-.book.has-new .ribbon{opacity:1}
 .now span em{font:600 12px/1.5 var(--ui-font);font-style:normal;color:var(--accent);margin-left:10px;white-space:nowrap}
 .front{inset:0;overflow:hidden;background:var(--cover-bg);border-radius:0 6px 6px 0;
   box-shadow:var(--shadow-rest);transition:box-shadow var(--spring-time) var(--spring)}

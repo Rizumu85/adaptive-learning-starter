@@ -46,7 +46,7 @@ Summary: parallel, translation-only, and original-only views plus a furigana or 
 
 Scope: one entry point for several reading editions.
 Where: `bookshelf.md` and `assets/bookshelf/`.
-Summary: a row of real covers built as flat-colored 3D books, the centered one raised; clicking it opens the book's contents; the last opened book is remembered on the device; configured entirely by `books.json`. With sign-in, a bookmark ribbon marks books with chapters the reader has not seen yet; it clears on the contents page or after three hours.
+Summary: a row of real covers built as flat-colored 3D books, the centered one raised; clicking it opens the book's contents; the last opened book is remembered on the device; configured entirely by `books.json`. With sign-in, the centered book's line adds `新增：…` while it has chapters the reader has not seen yet; it clears on the contents page or after three hours.
 
 ## In-Reading Practice (guidance only)
 

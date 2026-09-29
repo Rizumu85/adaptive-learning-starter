@@ -84,7 +84,6 @@
         const style = [`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';');
         const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), book.author].filter(Boolean).join('，');
         return `<li class="slot"><a class="book" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`
-            + '<span class="ribbon" aria-hidden="true"></span>'
             + '<span class="bface front">'
             + (cover.src ? `<img src="${esc(cover.src)}" alt="" draggable="false">` : '')
             + '<span class="hinge"></span></span>'
@@ -368,11 +367,10 @@
     app.addEventListener('pointerup', endDrag);
     app.addEventListener('pointercancel', endDrag);
     let suppressClick = false;
-    /* ---------- 新章节：书底垂出一条丝带书签 ---------- */
+    /* ---------- 新章节：书名下一行“新增：…” ---------- */
     // 每本书的目录页里嵌着本书已上架章节的列表（阅读控件的 #rc-chapters）。服务器按登录邮箱记着每本书
-    // “已经在目录页看到过”的章节（和阅读控件共用 /api/seen）。还有没看到过的新章节时，书底垂出一条带燕尾的丝带书签，
-    // 转到这本书时作者后面多一句“新增：…”；进了那本书的目录页、看到“新”之后，书签带就消失。
-    // 没进去看也不会一直挂着：书签带第一次出现 3 小时后自动消失，那几章算看到过；又有新章节时重新计时。
+    // “已经在目录页看到过”的章节（和阅读控件共用 /api/seen）。还有没看到过的新章节时，转到这本书时作者后面多一句“新增：…”；
+    // 进了那本书的目录页就消失。没进去看也不会一直挂着：第一次出现 3 小时后自动消失，那几章算看到过；又有新章节时重新计时。
     // 第一次来时把现有章节都记为看到过。网址加 ?preview-new 时假装每本书最后一章是新加的，只预览、不写入。
     const fresh_titles = new Map();
     function showNew(id) {
@@ -427,7 +425,6 @@
             if (!titles.length)
                 return;
             fresh_titles.set(book.id, titles);
-            app.querySelectorAll(`.book[data-id="${CSS.escape(book.id)}"]`).forEach((el) => el.classList.add('has-new'));
             if (app.querySelector('.book.is-current')?.getAttribute('data-id') === book.id)
                 showNew(book.id);
         }

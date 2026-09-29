@@ -13,6 +13,8 @@ Use when a learner has several reading editions and wants one entry point. The s
 - `tools/preview.py`: a read-only local server on 127.0.0.1. It serves the shelf and maps `/readers/<id>/` to the book projects listed in `preview.local.json` (copy `preview.local.example.json`), exposing only their `local-reading/` and `assets/` folders.
 - `src/library.ts`: editable source. After changing it, run `npm ci` and `npm run build`; do not edit the generated JavaScript.
 
+When the shelf is published on a private host, keep the host configuration, access checks, and upload tools in the shelf project (for example a `deploy/` folder beside `index.html`), never inside one of the books. Each book project only builds its own reading edition; the shelf project stages and uploads every book from there, so finishing or archiving one book never strands the site.
+
 `books.json` cannot be read from `file://`; open the shelf through `tools/preview.py` or a web host.
 
 ## books.json

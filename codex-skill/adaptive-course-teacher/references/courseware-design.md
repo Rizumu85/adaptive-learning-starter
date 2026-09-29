@@ -74,6 +74,7 @@ This section belongs to the paper courseware preset: it applies when the learner
 - Buttons and actions: accent text, or text with a hairline border when it must read as a button. Continuous values: a hairline track, a small ink handle, and the value printed as text beside it, with a reset to the baseline.
 - Surfaces: paper color, hairline borders, at most a faint contact shadow. Group with spacing and hairlines before adding a panel.
 - Do not use filled pills, sliding switch thumbs, checkboxes, native `<select>` menus, frosted glass or blur, glowing or heavy shadows, gradients, or outlined hover states. Hover changes ink or underline, not the box.
+- Icons are thin line-drawn inline SVG in `currentColor`. Never use emoji, and never use symbol characters that Apple devices draw as color emoji (↩ ↗ ↔ ▶ ◀ ➡ ⬅ ✔ ✖ ☑ ⚠ ★ © as an icon, and anything in the emoji ranges). Plain arrows such as ← → and the ▾ chevron are safe as text.
 - Keyboard focus shows a thin accent ring; keep 44px touch targets even when the visible mark is small.
 - Where a bundled example or older project page conflicts with this section (the glass panels and glowing slider handles in `0002-stepped-interactive.html`), follow this section.
 

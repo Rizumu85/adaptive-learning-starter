@@ -338,7 +338,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   const back = document.createElement('button');
   back.type = 'button';
   back.className = 'rc-return';
-  back.textContent = '↩ 回到原文';
+  // 箭头用线条图标，不用箭头符号字符：苹果设备会把那类字符画成彩色 emoji
+  back.innerHTML = '<svg class="rc-return-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M6 3.5 2.5 7 6 10.5M2.5 7H10a3.5 3.5 0 0 1 0 7H8.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>回到原文';
   back.hidden = true;
   document.body.append(card, back);
 

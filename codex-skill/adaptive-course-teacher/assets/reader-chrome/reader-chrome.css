@@ -123,6 +123,8 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-peek.is-many .rc-peek-text{-webkit-line-clamp:3}
 .rc-peek-go:hover{color:var(--rc-ink)}
 .rc-return{position:fixed;z-index:25;left:max(16px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));min-height:40px;padding:0 16px;border:1px solid var(--rc-line);border-radius:20px;background:var(--rc-paper);box-shadow:0 4px 14px rgb(0 0 0 / .06);font:600 14px/1 var(--rc-font);color:var(--rc-accent);cursor:pointer}
+.rc-return{display:inline-flex;align-items:center;gap:6px}
+.rc-return-icon{flex:none}
 .rc-return:hover{color:var(--rc-ink)}
 .rc-return:focus-visible,a.rc-ref:focus-visible,.rc-peek-go:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:4px}
 /* 跳到的目标淡淡闪一下，找得到落点 */

@@ -95,7 +95,28 @@ def style(cfg, width=None):
     return f' style="{";".join(f"{k}:{v}" for k, v in values.items())}"' if values else ''
 
 
-def bar(cfg, page_url, toc='', tools='', here=False, width=None):
+def chapter_id(url):
+    """Stable chapter id from its published path: ch05/ -> ch05, making2.html -> making2, index.html -> index."""
+    path = re.sub(r'[?#].*$', '', url)
+    path = re.sub(r'(^|/)index\.html$', r'', path).rstrip('/')
+    name = re.sub(r'\.html$', '', path).split('/')[-1].lower()
+    return re.sub(r'[^a-z0-9-]+', '-', name).strip('-') or 'index'
+
+
+def catalog(cfg, page_url, current=None):
+    """The book's published chapters for the "新" marks; only when the config names the book's shelf id."""
+    if not cfg.get('id'):
+        return ''
+    data = {'book': cfg['id'], 'chapters': [
+        {'id': chapter_id(c['url']), 'url': rel(page_url, c['url']), 'title': c['title']}
+        for c in cfg['chapters'] if c.get('status') != 'pending']}
+    if current:
+        data['current'] = chapter_id(current['url'])
+    text = json.dumps(data, ensure_ascii=False).replace('</', '<\/')
+    return f'<script type="application/json" id="rc-chapters">{text}</script>'
+
+
+def bar(cfg, page_url, toc='', tools='', here=False, width=None, extra=''):
     book = escape(cfg['book'])
     title = (f'<span class="rc-here" aria-current="page">{book}</span>' if here
              else f'<a class="rc-book" href="{rel(page_url, cfg["directory"]["url"])}">{book}</a>')
@@ -106,7 +127,7 @@ def bar(cfg, page_url, toc='', tools='', here=False, width=None):
                  f'<nav class="rc-toc-panel" aria-label="本章目录">{toc}</nav></details></div>')
     return (f'<!--rc:bar--><div class="rc-bar" role="banner"{style(cfg, width)}><div class="rc-bar-inner">'
             f'<nav class="rc-trail" aria-label="书籍导航"><a class="rc-shelf" href="{cfg.get("shelf", "/")}">书架</a>'
-            f'<span class="rc-sep" aria-hidden="true">/</span>{title}</nav>{right}</div></div><!--/rc:bar-->')
+            f'<span class="rc-sep" aria-hidden="true">/</span>{title}</nav>{right}</div></div>{extra}<!--/rc:bar-->')
 
 
 def foot(cfg, page_url, prev, nxt, credits=''):
@@ -162,7 +183,7 @@ def decorate(s, cfg, file, toc='', tools='', credits=''):
     page = page_entry(cfg, file)
     prev, nxt = neighbours(cfg, page)
     s = FOOT.sub('', BAR.sub('', s))
-    s = insert_bar(s, bar(cfg, page['url'], toc or sections_from(s), tools))
+    s = insert_bar(s, bar(cfg, page['url'], toc or sections_from(s), tools, extra=catalog(cfg, page['url'], page)))
     s = insert_foot(s, foot(cfg, page['url'], prev, nxt, credits))
     return with_assets(s, cfg, page)
 
@@ -170,7 +191,8 @@ def decorate(s, cfg, file, toc='', tools='', credits=''):
 def decorate_directory(s, cfg):
     """Add the bar to the book's contents page; the book name is the current page."""
     directory = cfg['directory']
-    s = insert_bar(BAR.sub('', s), bar(cfg, directory['url'], here=True, width=directory.get('width')))
+    s = insert_bar(BAR.sub('', s), bar(cfg, directory['url'], here=True, width=directory.get('width'),
+                                     extra=catalog(cfg, directory['url'])))
     return with_assets(s, cfg, directory)
 
 

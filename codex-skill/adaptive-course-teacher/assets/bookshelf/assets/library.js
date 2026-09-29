@@ -84,6 +84,7 @@
         const style = [`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';');
         const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), book.author].filter(Boolean).join('，');
         return `<li class="slot"><a class="book" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`
+            + '<span class="ribbon" aria-hidden="true"></span>'
             + '<span class="bface front">'
             + (cover.src ? `<img src="${esc(cover.src)}" alt="" draggable="false">` : '')
             + '<span class="hinge"></span></span>'
@@ -244,6 +245,7 @@
         if (book && now && changed) {
             now.firstElementChild.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
             now.lastElementChild.textContent = book.author ? `${book.author} 著` : '';
+            showNew(book.id);
             if (!reduceMotion.matches)
                 now.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: EASE });
         }
@@ -366,6 +368,51 @@
     app.addEventListener('pointerup', endDrag);
     app.addEventListener('pointercancel', endDrag);
     let suppressClick = false;
+    /* ---------- 新章节：书顶露出一截书签带 ---------- */
+    // 每本书的目录页里嵌着本书已上架章节的列表（阅读控件的 #rc-chapters），服务器按登录邮箱记着这位读者看过哪些章。
+    // 有没打开过的新章节时，书顶露出一截书签带，转到这本书时作者后面多一句“新增：…”。
+    // 第一次来时把现有章节都记为看过；本地预览没有接口，什么都不显示。
+    const fresh = new Map();
+    function showNew(id) {
+        const line = app.querySelector('.now span');
+        if (!line)
+            return;
+        line.querySelector('em')?.remove();
+        const titles = fresh.get(id);
+        if (!titles?.length)
+            return;
+        const em = document.createElement('em');
+        em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
+        line.append(em);
+    }
+    async function checkNew(book) {
+        if (!book.directoryUrl || !/^https?:$/.test(location.protocol))
+            return;
+        try {
+            const page = await fetch(book.directoryUrl).then((r) => (r.ok ? r.text() : ''));
+            const found = page.match(/<script type="application\/json" id="rc-chapters">([\s\S]*?)<\/script>/);
+            if (!found)
+                return;
+            const info = JSON.parse(found[1]);
+            const api = `/api/seen/${encodeURIComponent(info.book)}`;
+            const record = await fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
+            if (!record)
+                return;
+            if (!Array.isArray(record.seen)) {
+                const seen = info.chapters.map((c) => c.id);
+                fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => { });
+                return;
+            }
+            const titles = info.chapters.filter((c) => !record.seen.includes(c.id)).map((c) => c.title);
+            if (!titles.length)
+                return;
+            fresh.set(book.id, titles);
+            app.querySelectorAll(`.book[data-id="${CSS.escape(book.id)}"]`).forEach((el) => el.classList.add('has-new'));
+            if (app.querySelector('.book.is-current')?.getAttribute('data-id') === book.id)
+                showNew(book.id);
+        }
+        catch { /* 读不到就不提示 */ }
+    }
     /* ---------- 书页 ---------- */
     function renderBook(id) {
         const book = byId(id);
@@ -507,6 +554,7 @@
         library = { ...library, ...(data.library || {}) };
         books = validate(data.books || []);
         render();
+        books.forEach(checkNew);
     })
         .catch((error) => {
         const hint = location.protocol === 'file:'

@@ -23,6 +23,10 @@ Use when a learner has several reading editions and wants one entry point. The s
 - `cover.src` and `cover.fit` (`cover`, or `contain` for a cut-out figure); `spine.color`, `spine.ink`, optional `spine.art` and `spine.author`.
 - Contents: either `directoryUrl`, which sends the reader to the book's own contents page, or `reader` plus `chapters` (`no`, `title`, `pages`, `href` relative to `reader`, optional `status: "pending"` for unfinished chapters, shown grey).
 
+## New Chapters
+
+On a signed-in private site, a book whose contents page embeds the reader chrome's chapter list shows a thin accent bookmark ribbon above its top edge when the reader has chapters they have not opened, and the line under the centered book adds `新增：…`. The shelf reads the list from each book's `directoryUrl` page and the reader's record from `/api/seen/<id>` (see "New chapters" in `reader-chrome.md`); `books.json` chapter lists are not used for this. Local previews show nothing.
+
 ## Look and Motion
 
 The shelf follows the paper presets: flat colors, a real cover on the front face, a vertical title on the spine, a thin paper-colored page edge and top, a soft contact shadow on the cover plus a fainter shadow on the wall behind the book. Opening a book lays a translucent paper veil over the shelf and lets the page transition fade; it does not enlarge the cover. The centered book's contents page is prepared in the background after it stays centered for 600 ms. Wheel, drag, arrow keys, and Tab move between books.

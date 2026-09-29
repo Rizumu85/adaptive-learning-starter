@@ -112,6 +112,8 @@ a.rc-ref:hover{text-decoration-style:solid}
 .rc-peek-caption{margin:8px 0 0;font:400 13px/1.6 var(--rc-font);color:var(--rc-muted)}
 .rc-peek-text{margin:0;font-size:15px;line-height:1.75;text-indent:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .rc-peek-go{display:inline-flex;align-items:center;min-height:32px;margin-top:4px;font:600 14px/1.4 var(--rc-font);color:var(--rc-accent);text-decoration:none}
+/* 新章节：章名后一个小小的“新”，强调色文字，不加底色或边框 */
+.rc-new{margin-left:8px;font:600 12px/1 var(--rc-font);color:var(--rc-accent);letter-spacing:0;vertical-align:.15em;white-space:nowrap}
 /* 要学的名称（rc-key）：学习提示选出的少数名称，在正文里像一道淡淡的马克笔；悬停照样预览原书定义 */
 a.rc-ref.rc-key{color:inherit;text-decoration:none;padding:0 1px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone;background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 30%,transparent) 52% 94%,transparent 94%)}
 a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 45%,transparent) 52% 94%,transparent 94%)}

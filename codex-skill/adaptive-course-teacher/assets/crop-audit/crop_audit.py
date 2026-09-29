@@ -15,15 +15,17 @@ look, so nobody has to inspect hundreds of them:
 It never changes a crop. Flagged crops get a review sheet: the page around the box, the box in
 teal, suspected cuts in red.
 
-Use from Python (a project adapter reads its own manifest):
+Command line, reading the project's crop record (see "Crop Record" in media-workflow.md):
+    python crop_audit.py local-reading/crops.json [--sheets work/qa/crop-audit] [--only ID ...]
+crops.json: {"unit": 1000, "pages": "<page image pattern with {page}>", "crops": [{"id", "page",
+"bounds", "exclude"?, "transparent"?, "output"?, "group"?, "audit_ok"?}, ...]}, paths relative to the file.
+audit_ok lists findings already reviewed and kept on purpose: 'clipped:top|bottom|left|right',
+'overlap', 'near-empty'.
+
+From Python, for a project made before the crop record existed (a short adapter reads its own data):
     issues = audit(figures, unit=1000, sheets='work/qa/crop-audit')
-where each figure is a dict: id, page (path to the page image), bounds [x0, y0, x1, y1],
-optional exclude (list of boxes cut out on purpose), optional image (path to the output crop),
-optional group (only crops of the same group are compared for overlap), optional accepted (issues
-already reviewed and kept on purpose: 'clipped:top|bottom|left|right', 'overlap', 'near-empty').
-Or from the command line with a JSON manifest {"unit": 1000, "figures": [...]}, paths relative
-to the manifest:
-    python crop_audit.py manifest.json [--sheets DIR]
+where each figure is a dict: id, page (path to the page image), bounds, optional exclude, image
+(output path), group and accepted (same meaning as audit_ok).
 Exit code 1 when anything is flagged.
 """
 import json
@@ -189,20 +191,39 @@ def audit(figures, unit=1000, sheets=None):
     return issues
 
 
+def load_record(path):
+    """Figures for audit() from a crops.json crop record."""
+    path = Path(path).resolve()
+    data = json.loads(path.read_text(encoding='utf-8'))
+    figures = []
+    for crop in data['crops']:
+        figures.append({
+            'id': crop['id'], 'bounds': crop['bounds'], 'exclude': crop.get('exclude', []),
+            'page': str(path.parent / data['pages'].format(page=crop['page'])),
+            'image': str(path.parent / crop['output']) if crop.get('output') else None,
+            'group': crop.get('group'), 'accepted': crop.get('audit_ok', []),
+        })
+    return figures, data.get('unit', 1000)
+
+
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or sys.argv[1].startswith('-'):
         sys.exit(__doc__)
-    manifest = Path(sys.argv[1]).resolve()
-    data = json.loads(manifest.read_text(encoding='utf-8'))
-    for f in data['figures']:
-        for key in ('page', 'image'):
-            if f.get(key):
-                f[key] = str(manifest.parent / f[key])
+    figures, unit = load_record(sys.argv[1])
+    if '--only' in sys.argv:
+        rest = sys.argv[sys.argv.index('--only') + 1:]
+        wanted = set(rest[:next((i for i, a in enumerate(rest) if a.startswith('--')), len(rest))])
+        groups = {f['group'] for f in figures if f['id'] in wanted}
+        # keep the neighbours on the same pages so overlaps are still checked
+        figures = [f for f in figures if f['id'] in wanted or f['group'] in groups]
     sheets = sys.argv[sys.argv.index('--sheets') + 1] if '--sheets' in sys.argv else None
-    issues = audit(data['figures'], data.get('unit', 1000), sheets)
+    missing = sorted({f['page'] for f in figures if not Path(f['page']).is_file()})
+    if missing:
+        sys.exit(f'Page images not found (render them first): {missing[:3]}')
+    issues = audit(figures, unit, sheets)
     for issue in issues:
         print(f'{issue["kind"]:10} {issue["id"]}: {issue["detail"]}')
-    print(f'{len(data["figures"])} crops checked, {len({i["id"] for i in issues})} flagged')
+    print(f'{len(figures)} crops checked, {len({i["id"] for i in issues})} flagged')
     sys.exit(1 if issues else 0)
 
 

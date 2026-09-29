@@ -39,6 +39,7 @@ When the learner asks for the source itself as a web page (a scanned book is har
 - A reading aid for rare characters is optional: when the learner reads in a language whose text includes rare or commonly misread characters (for example uncommon anatomical characters in Chinese), annotate them with `ruby` at their first appearance in each chapter only, leave the text itself unchanged, and skip added practice blocks. Ask before adding it to a new book.
 - Regenerate pages from data and validate that every source paragraph and translation appears exactly once and in order; a navigation or styling change must not change the text.
 - Use the shared navigation in `reader-chrome.md` for multi-page readers. Link references in the text to their figures and passages, and add multi-target references where one phrase needs a passage and a figure (or several figures) from different places; `reader-chrome.md` ("References") lists when to add them.
+- Record every figure cut from the book in `local-reading/crops.json` (see "Crop Record" in `media-workflow.md`) and run the crop audit before publishing a chapter.
 - Keep source text, translations, crops, and editorial data in ignored local directories. Host them only as `private-delivery.md` allows.
 
 Reading-edition typography is a learner choice; see `presets.md` for the bundled Chinese reading pairing.

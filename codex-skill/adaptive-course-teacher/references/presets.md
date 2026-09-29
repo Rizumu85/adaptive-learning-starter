@@ -28,13 +28,13 @@ Summary: a step 0 baseline, one changed variable per step, continuous transition
 
 Scope: multi-page reading editions and a library of books.
 Where: `reader-chrome.md` and `assets/reader-chrome/`.
-Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, and print-like controls. On a private site with sign-in, chapters added since a reader last saw the contents page get a small `新` there. Usually paired with In-Text References below.
+Summary: a quiet top bar with `书架 / 书名` and a chapter-contents dropdown, a chapter footer, a structure rail, print-like controls, and the same book tab icon on every page (the shelf page keeps a bookshelf icon). On a private site with sign-in, chapters added since a reader last saw the contents page get a small `新` there. Usually paired with In-Text References below.
 
 ## In-Text References
 
 Scope: any long page where the text points at a figure or another passage ("如上图所示", "参考第198页") that may be out of view: book readers, reading lessons, reference sheets.
 Where: "References" in `reader-chrome.md`; the same two runtime files in `assets/reader-chrome/`. It works without the top bar and footer.
-Summary: the phrase becomes a dotted accent link; hovering shows a floating paper card with the figure and caption or the passage's first lines; clicking jumps there with a brief highlight and a `↩ 回到原文` chip. One phrase can also point to several places at once, such as a passage and a figure in different sections; the card then lists each of them with its own jump link. Links are generated only when the targets are certain. When a study hint has picked a few must-learn names, their mentions can carry a light marker stroke instead (`rc-key`), still previewing the definition.
+Summary: the phrase becomes a dotted accent link; hovering shows a floating paper card with the figure and caption or the passage's first lines; clicking jumps there with a brief highlight and a `回到原文` chip. One phrase can also point to several places at once, such as a passage and a figure in different sections; the card then lists each of them with its own jump link. Links are generated only when the targets are certain. When a study hint has picked a few must-learn names, their mentions can carry a light marker stroke instead (`rc-key`), still previewing the definition.
 
 ## Bilingual Reading Edition
 

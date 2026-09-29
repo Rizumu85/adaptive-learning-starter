@@ -59,6 +59,8 @@ New chapters (optional, needs a signed-in private site): when the config has `id
 
 Contents page: the same top bar without the dropdown. Chapter rows use number, title, source-page range, and `整理中` for unfinished chapters (not linked). Chapter titles use the book's reading body font; numbers and page ranges use the sans. The title artwork and page composition stay the book's own.
 
+Tab icon: every chapter and contents page carries the same small book icon (a teal book with a spine line and two text lines), and the library's homepage carries a bookshelf icon (three spines). The two are not swapped or mixed, so the browser tab tells the reader whether they are on the shelf or inside a book. `with_assets` in `apply_reader_chrome.py` replaces any icon the page already has with the book icon, so pages decorated by the chrome need nothing extra; a book page built without the chrome should copy `BOOK_ICON` from there.
+
 Control text uses the `UIOption` interface font defined in `reader-chrome.css` (the book-typography preset's MiSans Demibold, looked up locally, falling back to the system sans).
 
 ## Files
@@ -109,4 +111,4 @@ A JSON file in the book project, for example `tools/reader-chrome.json`:
 
 ## Verification
 
-Check one chapter and the contents page at desktop width and at 375px: bar on one line, dropdown aligned to the content column's right edge without horizontal overflow, bar hides and returns with scrolling, only the current section is accent in the open dropdown, footer labels aligned with a single divider above them, keyboard reaches every control, and the book's own tools still work. For references: hover shows the card beside the phrase, a multi-target card lists every target in order and each jump link works, a jump highlights the target, `回到原文` returns, and an automated pass confirms every link lands on the figure whose caption carries that label (or on the right page marker). Compare each rebuilt page's `<main>` text with the previous build so navigation changes cannot alter the book's text.
+Check one chapter and the contents page at desktop width and at 375px: bar on one line, dropdown aligned to the content column's right edge without horizontal overflow, bar hides and returns with scrolling, only the current section is accent in the open dropdown, footer labels aligned with a single divider above them, keyboard reaches every control, the tab shows the book icon (not the shelf icon), and the book's own tools still work. For references: hover shows the card beside the phrase, a multi-target card lists every target in order and each jump link works, a jump highlights the target, `回到原文` returns, and an automated pass confirms every link lands on the figure whose caption carries that label (or on the right page marker). Compare each rebuilt page's `<main>` text with the previous build so navigation changes cannot alter the book's text.

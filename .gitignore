@@ -7,3 +7,4 @@ codex-skill/*-workspace/
 
 # External skill evaluation snapshots and outputs.
 codex-skill/*-workspace/
+__pycache__/

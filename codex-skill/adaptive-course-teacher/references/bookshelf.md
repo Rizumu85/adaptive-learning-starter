@@ -31,6 +31,8 @@ On a signed-in private site, when a book whose contents page embeds the reader c
 
 The shelf follows the paper presets: flat colors, a real cover on the front face, a vertical title on the spine, a thin paper-colored page edge and top, a soft contact shadow on the cover plus a fainter shadow on the wall behind the book. Opening a book lays a translucent paper veil over the shelf and lets the page transition fade; it does not enlarge the cover. The centered book's contents page is prepared in the background after it stays centered for 600 ms. Wheel, drag, arrow keys, and Tab move between books.
 
+The page's tab icon is the bookshelf icon in `index.html` (three spines in teal, slate, and gold); reading editions use the single-book icon from the reader chrome (see "Tab icon" in `reader-chrome.md`). Do not give a book page the shelf icon.
+
 Typography uses the learner's reading preset when the fonts are installed and falls back to system fonts otherwise. Keep the page free of welcome text and cards.
 
 ## Verify

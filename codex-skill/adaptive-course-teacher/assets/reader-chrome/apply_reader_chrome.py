@@ -29,6 +29,11 @@ from pathlib import Path
 # Lucide chevron-down (ISC license).
 CHEVRON = ('<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
            'stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>')
+# 每本书的标签页图标：一本书（书架首页用三本书的书架图标，两者不混用）。
+BOOK_ICON = ('<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E'
+             '%3Crect x=%276%27 y=%273%27 width=%2721%27 height=%2726%27 rx=%272%27 fill=%27%23147d8f%27/%3E'
+             '%3Cpath d=%27M11 3v26M15 11h8M15 16h8%27 stroke=%27%23f7f5ef%27 stroke-width=%272%27/%3E%3C/svg%3E">')
+ICON = re.compile(r'<link\b[^>]*\brel="(?:shortcut )?icon"[^>]*>')
 BAR = re.compile(r'<!--rc:bar-->.*?<!--/rc:bar-->', re.S)
 FOOT = re.compile(r'<!--rc:foot-->.*?<!--/rc:foot-->', re.S)
 
@@ -146,7 +151,8 @@ def with_assets(s, cfg, page):
     href = rel(page['url'], cfg['assets']).rstrip('/') + '/'
     s = re.sub(r'<link rel="stylesheet" href="[^"]*reader-chrome\.css">', '', s)
     s = re.sub(r'<script defer src="[^"]*reader-chrome\.js"></script>', '', s)
-    s = s.replace('</head>', f'<link rel="stylesheet" href="{href}reader-chrome.css"></head>', 1)
+    s = ICON.sub('', s)
+    s = s.replace('</head>', f'{BOOK_ICON}<link rel="stylesheet" href="{href}reader-chrome.css"></head>', 1)
     return s.replace('</body>', f'<script defer src="{href}reader-chrome.js"></script></body>', 1)
 
 

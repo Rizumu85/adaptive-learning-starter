@@ -371,9 +371,14 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     const el = doc && doc.getElementById(id);
     return el ? { el, samePage, url, href } : null;
   }
+  // 双语书（body[data-view]）：卡片只显示一种语言。只看原文时取 .source，其余（对照、只看译文）取 .target
+  const sourceOnly = () => document.body.dataset.view === 'source';
   const plain = (node) => {
     const copy = node.cloneNode(true);
     copy.querySelectorAll('rt, rp, .ja').forEach((n) => n.remove());
+    if (document.body.dataset.view && copy.querySelector('.source, .target')) {
+      copy.querySelectorAll(sourceOnly() ? '.target, .target-heading' : '.source, .source-heading').forEach((n) => n.remove());
+    }
     return copy.textContent.replace(/\s+/g, ' ').trim();
   };
   const line = (className, textContent) => Object.assign(document.createElement('p'), { className, textContent });
@@ -430,7 +435,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
         }
       } else {
         const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4');
-        const para = el.matches('p') ? el : [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);
+        const lang = document.body.dataset.view ? (sourceOnly() ? 'p.source' : 'p.target') : null;
+        const para = el.matches('p') ? el : (lang && el.querySelector(lang)) || [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);
         if (heading) parts.push(line('rc-peek-title', plain(heading)));
         if (para) parts.push(line('rc-peek-text', plain(para)));
       }

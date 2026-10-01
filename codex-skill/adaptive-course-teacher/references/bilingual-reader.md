@@ -40,9 +40,10 @@ Headings that exist in both languages use `.source-heading` and `.target-heading
 - Desktop parallel view: two columns, each original paragraph level with its translation. Single-language views narrow to one reading column.
 - Narrow screens: each original paragraph followed by its translation, marked with a thin left rule; source order is kept.
 - The reading-aid toggle hides `rt` without changing layout, and is disabled in the translation-only view.
-- Set fonts with `--bilingual-source-font` and `--bilingual-target-font` on `:root`. Sizes default to 20px source and 22px translation on desktop; adjust in the book stylesheet if the learner's confirmed sizes differ.
+- Set fonts with `--bilingual-source-font` and `--bilingual-target-font` on `:root` in the book's stylesheet. `bilingual.css` declares no `:root` defaults (it falls back inside `var()`), so stylesheet order cannot override the book's choice. A copy made before 2026-10-01 still carries `:root{--bilingual-source-font:serif;…}`: if the translation renders in the system serif instead of the book's font, that is why; replace the copy from the skill, or load `bilingual.css` before the book's stylesheet. Sizes default to 20px source and 22px translation on desktop; adjust in the book stylesheet if the learner's confirmed sizes differ.
+- A Latin-script original (English and the like) keeps a Latin serif on the source side; see "Chinese Reading Typography" in `presets.md`. The reading-aid toggle is left out for such a source.
 - Figures, captions, and step structure stay outside `.bilingual` rows and follow the book's own layout.
 
 ## Verify
 
-Switch all three views and the toggle on desktop and at 375px; reload to confirm the choice persists; confirm paragraph pairs stay aligned and no text is lost in any view; check that the toggle is disabled in the translation-only view and that keyboard arrows move between views.
+Switch all three views and the toggle on desktop and at 375px; reload to confirm the choice persists; confirm paragraph pairs stay aligned and no text is lost in any view; check that the toggle is disabled in the translation-only view and that keyboard arrows move between views. Read `getComputedStyle` of one `.source` and one `.target` paragraph in a real browser and confirm the font-family is the book's, not a bare `serif`.

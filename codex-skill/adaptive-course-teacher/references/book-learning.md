@@ -4,7 +4,7 @@
 
 Read the project instructions and inspect the contents plus one candidate section. Separate the learner's long-term goal from today's scope. If the starting point is unknown, propose one short unit and ask whether the learner has already read it; do not assume chapter one or transfer progress from another subject.
 
-Provide a short reading map: the question to investigate, the verified location, one or two features to notice, and a natural stopping point. Stop after handing over this unit. Do not process later chapters to keep working while the learner reads. A requested whole-book outline may cover headings, but is not authorization to summarize every page or build every lesson.
+Deliver the unit as a reading edition of its pages (see "Reading Editions" below); a book not in the learner's language gets a bilingual edition from the first unit. In conversation, say which pages the unit covers and where to stop. Do not write a separate reading-map file: viewing maps belong to video and software courses. Stop after handing over this unit. Do not process later chapters to keep working while the learner reads. A requested whole-book outline may cover headings, but is not authorization to summarize every page or build every lesson.
 
 ## Source Locations
 
@@ -14,7 +14,7 @@ Keep source claims, paraphrases, and supplemental explanations distinguishable. 
 
 ## Reading Loop
 
-1. Give the map for the selected short unit in conversation. A whole chapter is not the default unit.
+1. Hand over the reading edition for the selected short unit and name the stopping point in conversation. A whole chapter is not the default unit.
 2. Let the learner read and report what they noticed or where they became confused.
 3. Reconstruct the missing reasoning with concrete observations appropriate to this subject, then name the concept. Do not reuse a fixed analogy across topics.
 4. When useful, suggest one small application suited to the learner's goal. For drawing, this could be identifying a visible landmark or making a quick structural sketch; do not prescribe the same exercise for every section.
@@ -27,9 +27,9 @@ When a section lists more names, variations, or steps than the learner's goal ne
 
 ## Reading Editions
 
-When the learner asks for the source itself as a web page (a scanned book is hard to read on screen, or a foreign-language book needs a translation beside it), make a reading edition. This is a separate deliverable from teaching.
+A book project's units are delivered as reading editions by default: each unit's pages as a web page, with the original beside a translation when the book is not in the learner's language. The learner profile or the project's `AGENTS.md` may turn this off. The edition is the source, not the teaching.
 
-- Keep the original text and the book's structure. Do not insert AI explanations, reading questions, or editorial notes into the edition. The reading map stays a separate Markdown file.
+- Keep the original text and the book's structure. Do not insert AI explanations, reading questions, or editorial notes into the edition. Orientation and teaching stay in conversation.
 - Verify every page against the scan before calling it checked. OCR and text layers are drafts. Keep printed page labels and PDF indices distinct, and record verified pairs rather than a global offset.
 - Draft text from scans and image-only books with PP-OCRv5 through RapidOCR: `assets/ocr/ocr_draft.py` runs it locally and offline on PDF pages or page images and writes each page's lines with boxes on the 1000-wide scale of `crops.json`. One recognizer covers simplified and traditional Chinese, Japanese and English. On verified pages from three books (2026-09) it missed or misread 3 of 2440 characters on simplified scans (PP-OCRv4: 20), 4 of 972 on traditional Chinese and English captions (PP-OCRv4: 17), and 55 of 2632 on Japanese (Windows OCR: 335), at about five seconds a page. Use a text layer instead when the PDF has a reliable one. The output is still a draft: check every line against the page, and look by eye at reading order across columns, ruby, text over drawings, light text on dark ground and handwriting. Record the engine and version in the project's notes.
 - Crop figures from the source as described in `media-workflow.md`, keep them beside the passage they illustrate, and make them inspectable with `image-preview.md`.

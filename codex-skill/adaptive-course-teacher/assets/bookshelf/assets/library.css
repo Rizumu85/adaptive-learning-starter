@@ -16,7 +16,6 @@
   /* 像 Paper：影子和书差不多大、向下偏移，边缘只稍微柔一点 */
   /* 两侧的书：封面用最初的投影；整本书（连同书页那一截）投到墙上的影子形状相同、更淡 */
   --shadow-rest:0 3px 4px rgb(45 38 30 / .22);
-  --shadow-wall:0 6px 14px rgb(45 38 30 / .18);
   --shadow-float:0 34px 14px -6px rgb(45 38 30 / .30);
   /* 首页：当前书的放大倍数和抬起高度（px） */
   --current-scale:1.14;
@@ -114,9 +113,10 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .front{inset:0;overflow:hidden;background:var(--cover-bg);border-radius:0 6px 6px 0;
   box-shadow:var(--shadow-rest);transition:box-shadow var(--spring-time) var(--spring)}
 .is-current .front{box-shadow:var(--shadow-float)}
-/* 墙面投影：挂在书背那一面（往后一个书厚），整本书——连同书页那一截——都在墙上留下一道淡影；
-   封面自己的投影另外保留（中间那本抬起时换成大投影） */
-.wall-shadow{inset:0;transform:translateZ(calc(var(--cd) * -1));border-radius:0 6px 6px 0;box-shadow:var(--shadow-wall)}
+/* 墙面投影：挂在书背那一面（往后一个书厚）的一团模糊淡影，整本书——连同书脊或书页那一截——都在墙上留下影子。
+   透视会把书背那一面往屏幕中间挪；用外圈 box-shadow 的话，远离中间那侧的影子会整个藏在书后，放宽又会露出空心的内部，
+   所以改成实心半透明色块加模糊，并左右各放宽约三分之一书厚，书脊和书页两侧都看得到。封面自己的投影另外保留（中间那本抬起时换成大投影） */
+.wall-shadow{inset:4px calc(var(--cd) * -.35) -6px;transform:translateZ(calc(var(--cd) * -1));border-radius:0 6px 6px 0;background:rgb(45 38 30 / .16);filter:blur(9px)}
 .front img{display:block;width:100%;height:100%;padding:var(--pad,0);object-fit:var(--fit,cover);object-position:var(--pos,50% 50%)}
 .spine-face{right:100%;top:0;width:var(--cd);height:var(--ch);transform-origin:100% 50%;transform:rotateY(-90deg);overflow:hidden}
 /* 首页上切口和顶面只有几像素宽，细纸页线斜着看会断断续续，改成平涂纸色 */

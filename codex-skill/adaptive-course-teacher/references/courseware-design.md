@@ -92,7 +92,7 @@ This section belongs to the paper courseware preset: it applies when the learner
 - No horizontal overflow.
 - Stable panel dimensions.
 - Direct local-file opening works without a server.
-- Desktop and mobile screenshots pass. Take desktop screenshots of long reading pages with a headless browser and a render budget (`msedge --headless=new --virtual-time-budget=8000 --window-size=1440,16000 --screenshot=…`, splitting the result into viewport-sized pieces to look at); the in-app browser pane times out on screenshots while it is hidden behind another window, and headless browsers clamp narrow widths, so check phone width in the pane with its mobile preset instead. Smooth scrolling never runs in a hidden tab, so an anchor that "does not work" there is usually not a bug; test with `scrollIntoView({behavior: 'instant'})` first.
+- Desktop and mobile screenshots pass. Take desktop screenshots of long reading pages with a headless browser and a render budget (`msedge --headless=new --virtual-time-budget=8000 --window-size=1440,16000 --screenshot=…`, splitting the result into viewport-sized pieces to look at); an embedded or background browser tab may not paint while it is hidden and its screenshots time out, and headless browsers clamp narrow widths, so check phone width in a visible browser with device emulation instead. Smooth scrolling never runs in a hidden tab, so an anchor that "does not work" there is usually not a bug; test with `scrollIntoView({behavior: 'instant'})` first.
 - Interactive canvases are nonblank and controls visibly respond.
 - Saved learner work survives reload, and any clear action has the intended recovery behavior.
 - Learner-facing copy still matches the final rendered controls and state.

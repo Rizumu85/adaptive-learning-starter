@@ -49,8 +49,16 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .identity p,.identity h1{margin:0;font:600 14px/1.5 var(--ui-font)}
 
 /* 书架 */
-.search{display:flex;align-items:center;gap:8px;font:600 14px/1.5 var(--ui-font);color:var(--muted)}
-.search input{width:220px;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+/* 查找：和纸同色的浅底胶囊，放大镜在框内，不用白框和单独的“查找”字样 */
+.search{position:relative;display:flex;align-items:center;color:var(--muted)}
+.search svg{position:absolute;left:11px;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;pointer-events:none}
+.search input{width:220px;height:34px;padding:0 12px 0 32px;border:1px solid transparent;border-radius:999px;background:rgb(24 24 27 / .045);color:var(--ink);font:400 14px/1.5 var(--sans);transition:background-color .15s,border-color .15s}
+.search input::placeholder{color:#8c9094}
+.search input:hover{background:rgb(24 24 27 / .065)}
+.search input:focus{outline:none;background:#fffdf8;border-color:var(--accent)}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;width:14px;height:14px;cursor:pointer;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='m4 4 6 6m0-6-6 6' stroke='%236b6f72' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.search:focus-within{color:var(--ink-soft)}
 .shelf-group+.shelf-group{margin-top:24px}
 .shelf-group h2{margin:0 0 -24px;font:600 13px/1.5 var(--sans);color:var(--muted);text-align:center}
 .shelf-empty{margin:24px 0 0;color:var(--muted);text-align:center}

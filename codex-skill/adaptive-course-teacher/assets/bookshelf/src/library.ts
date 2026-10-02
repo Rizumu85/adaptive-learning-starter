@@ -145,7 +145,7 @@
       app.replaceChildren(shelfPage);
     } else {
       const search = books.length >= library.searchFrom
-        ? `<label class="search"><span>查找</span><input type="search" value="${esc(query)}" placeholder="书名、作者、分类" autocomplete="off"></label>`
+        ? `<label class="search"><span class="sr-only">查找</span><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><input type="search" value="${esc(query)}" placeholder="书名、作者、分类" autocomplete="off"></label>`
         : '';
       app.innerHTML = `<div class="page shelf-view"><header class="identity"><h1>${esc(library.name)}</h1>${search}</header>`
         + '<div class="now"><strong></strong><span></span></div>'

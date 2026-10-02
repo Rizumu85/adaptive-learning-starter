@@ -20,7 +20,8 @@ When the shelf is published on a private host, keep the host configuration, acce
 ## books.json
 
 - `library.name`: the title shown on the shelf page. `library.storageKey`: a short unique key; the last opened book is remembered under it on the reader's device. `library.searchFrom`: from this many books on, a search box and category rows appear.
-- Each book: `id` (stable, lowercase with hyphens), `title`, `author`, optional `subtitle`, `translator`, `edition`, `category`.
+- Each book: `id` (stable, lowercase with hyphens), `title`, `author`, optional `originalTitle`, `subtitle`, `translator`, `edition`, `category`.
+- Titles follow one rule on every book: `title` is the name in the reader's language (for a Chinese-reading shelf, the Chinese title, or a short Chinese name when the book has none) and goes on the spine; `originalTitle` holds the original-language title, shown as small text under it (`The Wild Garden · William Robinson 著`) and included in search; `subtitle` is only a real subtitle of the book (理解人体结构), never the original title or a translation of the title.
 - The order of `books` is the order on the shelf. Insert a new book beside the books of the same `category` (or the nearest subject when its category is new), keeping each category together and placing closely related books next to each other (two anatomy books, two illustrators' art books). Do not append it at the end by default.
 - `size` in millimetres (`width`, `height`, `thickness`) sets proportions; every book is shown at the same height.
 - `cover.src` and `cover.fit` (`cover`, or `contain` for a cut-out figure); `spine.color`, `spine.ink`, optional `spine.art` and `spine.author`.

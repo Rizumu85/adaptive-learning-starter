@@ -148,6 +148,8 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .book-head h1{margin:0 0 14px;font:900 42px/1.3 var(--heading);color:var(--ink);text-wrap:balance}
 .book-head h1:focus{outline:none}
 .book-head h1 small{display:block;margin-top:6px;font-size:22px;line-height:1.5}
+/* 原书名：书名统一用中文，原书名在下面作小字 */
+.book-head h1 small.original{margin-top:4px;font:500 16px/1.5 var(--sans);color:var(--muted)}
 .byline{margin:0;font-size:15px;line-height:1.8;color:#4b4f53}
 .edition{margin:10px 0 0;font-size:13px;color:var(--muted)}
 

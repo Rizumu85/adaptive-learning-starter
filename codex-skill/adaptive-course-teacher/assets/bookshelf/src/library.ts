@@ -98,7 +98,7 @@
     const { W, H, D } = bookMetrics(book);
     const cover = book.cover || {};
     const style = [`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';');
-    const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), book.author].filter(Boolean).join('，');
+    const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), book.originalTitle, book.author].filter(Boolean).join('，');
     return `<li class="slot"><a class="book" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`
       + '<span class="bface front">'
       + (cover.src ? `<img src="${esc(cover.src)}" alt="" draggable="false">` : '')
@@ -112,7 +112,7 @@
 
   function matches(book, q) {
     if (!q) return true;
-    const hay = [book.title, book.subtitle, book.author, book.translator, book.category, book.edition]
+    const hay = [book.title, book.subtitle, book.originalTitle, book.author, book.translator, book.category, book.edition]
       .filter(Boolean).join(' ').toLowerCase();
     return q.toLowerCase().split(/\s+/).filter(Boolean).every((word) => hay.includes(word));
   }
@@ -260,7 +260,7 @@
     const now = app.querySelector('.now');
     if (book && now && changed) {
       now.firstElementChild.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
-      now.lastElementChild.textContent = book.author ? `${book.author} 著` : '';
+      now.lastElementChild.textContent = [book.originalTitle, book.author ? `${book.author} 著` : ''].filter(Boolean).join(' · ');
       showNew(book.id);
       if (!reduceMotion.matches) now.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: EASE });
     }
@@ -464,7 +464,7 @@
     app.innerHTML = '<div class="page book-view">'
       + '<nav class="identity" aria-label="返回"><a class="back" href="#/">← 书架</a></nav>'
       + '<div class="book-layout">'
-      + `<header class="book-head"><h1 tabindex="-1">${esc(book.title)}${book.subtitle ? `<small>${esc(book.subtitle)}</small>` : ''}</h1>`
+      + `<header class="book-head"><h1 tabindex="-1">${esc(book.title)}${book.subtitle ? `<small>${esc(book.subtitle)}</small>` : ''}${book.originalTitle ? `<small class="original">${esc(book.originalTitle)}</small>` : ''}</h1>`
       + (byline ? `<p class="byline">${byline}</p>` : '')
       + (book.edition ? `<p class="edition">${esc(book.edition)}</p>` : '')
       + '</header>'

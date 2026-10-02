@@ -47,6 +47,16 @@ def main():
                 if not (Path(base) / href.split("#")[0]).is_file():
                     errors.append(f"{name} / {title}: 本机找不到 {href}")
 
+    # 书架到 searchFrom 本（默认 12）起按分类分排；只有一本的分类会孤零零占一排
+    books = data.get("books", [])
+    if len(books) >= (data.get("library") or {}).get("searchFrom", 12):
+        counts = {}
+        for book in books:
+            counts[book.get("category")] = counts.get(book.get("category"), 0) + 1
+        for category, count in counts.items():
+            if count < 2:
+                errors.append(f"分类“{category}”只有一本书：并入最接近的分类")
+
     if errors:
         print("\n".join(errors))
         sys.exit(1)

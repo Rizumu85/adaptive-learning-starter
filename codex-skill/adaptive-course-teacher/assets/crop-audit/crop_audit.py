@@ -29,6 +29,8 @@ crops.json: {"unit": 1000, "pages": "<page image pattern with {page}>", "crops":
 audit_ok lists findings already reviewed and kept on purpose: 'clipped:top|bottom|left|right',
 'overlap', 'near-empty', 'paper' (a photo with a pale border, kept opaque on purpose).
 A spread with "parts": [{"page", "bounds", "exclude"?}, ...] is checked page by page for cut lines.
+A record cut from two editions gives "pages" as a map, {"en": "<pattern>", "zh": "<pattern>"}, and each
+crop (or part) names its "edition".
 Entries without a single page and box (whole pages, hand-drawn outlines, other sources) are listed as
 not checked.
 
@@ -242,18 +244,25 @@ def load_record(path):
     """Figures for audit() from a crops.json crop record, plus the ids it cannot check."""
     path = Path(path).resolve()
     data = json.loads(path.read_text(encoding='utf-8'))
+    if 'pages' not in data:
+        sys.exit('This crop record has no "pages" pattern: render the page images and add it, '
+                 "or run the project's own adapter that calls audit()")
+
+    def page_of(page, edition):
+        pattern = data['pages'][edition] if isinstance(data['pages'], dict) else data['pages']
+        return str(path.parent / pattern.format(page=page))
+
     figures, skipped = [], []
     for crop in data['crops']:
         base = {'exclude': crop.get('exclude', []), 'group': crop.get('group'), 'accepted': crop.get('audit_ok', [])}
-        page_of = lambda page: str(path.parent / data['pages'].format(page=page))
         if crop.get('parts'):
             # A spread joined from several pages: check each page's box for cut lines; the joined
             # output cannot be compared with one page, so it is not read.
             for i, part in enumerate(crop['parts']):
-                figures.append({**base, 'id': f'{crop["id"]}#{i + 1}', 'page': page_of(part['page']),
+                figures.append({**base, 'id': f'{crop["id"]}#{i + 1}', 'page': page_of(part['page'], part.get('edition', crop.get('edition'))),
                                 'bounds': part['bounds'], 'exclude': part.get('exclude', []), 'image': None})
         elif crop.get('bounds') and isinstance(crop.get('page'), int):
-            figures.append({**base, 'id': crop['id'], 'bounds': crop['bounds'], 'page': page_of(crop['page']),
+            figures.append({**base, 'id': crop['id'], 'bounds': crop['bounds'], 'page': page_of(crop['page'], crop.get('edition')),
                             'image': str(path.parent / crop['output']) if crop.get('output') else None})
         else:
             skipped.append(crop['id'])  # whole pages, hand-drawn outlines, other sources

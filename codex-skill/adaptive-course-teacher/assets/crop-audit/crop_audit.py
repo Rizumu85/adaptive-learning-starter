@@ -11,6 +11,8 @@ look, so nobody has to inspect hundreds of them:
               shows ink from the shared area, usually a piece of the neighbouring figure (give figures
               a `group` when several documents reuse one page).
 * near-empty- the output has almost no ink, so the box probably sits in the wrong place.
+* paper     - the output is fully opaque and its outer edge is almost all light paper: a drawing on
+              paper whose paper was not removed, so it will sit in a white box on the reader's page.
 
 It never changes a crop. Flagged crops get a review sheet: the page around the box, the box in
 teal, suspected cuts in red.
@@ -20,7 +22,7 @@ Command line, reading the project's crop record (see "Crop Record" in media-work
 crops.json: {"unit": 1000, "pages": "<page image pattern with {page}>", "crops": [{"id", "page",
 "bounds", "exclude"?, "transparent"?, "output"?, "group"?, "audit_ok"?}, ...]}, paths relative to the file.
 audit_ok lists findings already reviewed and kept on purpose: 'clipped:top|bottom|left|right',
-'overlap', 'near-empty'.
+'overlap', 'near-empty', 'paper' (a photo with a pale border, kept opaque on purpose).
 A spread with "parts": [{"page", "bounds", "exclude"?}, ...] is checked page by page for cut lines.
 Entries without a single page and box (whole pages, hand-drawn outlines, other sources) are listed as
 not checked.
@@ -43,6 +45,7 @@ FAR = 18           # ...and still within BAND+1..FAR pixels, so a few pixels of 
 MIN_HITS = 3       # edge pixels that must cross before a side is reported
 FAINT = 235        # for near-empty: pale pencil counts as drawing
 MIN_INK = 0.003    # share of the crop that must be drawing, or it is reported as near-empty
+PAPER = 0.85       # share of an opaque crop's outer edge that is light paper before it is reported
 MIN_SHARED_INK = 150  # ink pixels of a shared area visible in both crops before it matters
 MARGIN = 0.12      # context around the box on review sheets, as a share of the box size
 
@@ -83,6 +86,23 @@ def clipped(gray, box, excluded, others):
                               if any(_inside(x + dx * BAND, y + dy * BAND, [obox]) for x, y in hits)), None)
             found.append((side, len(hits), hits, neighbour))
     return found
+
+
+def paper_border(path):
+    """Share of the outer edge that is light, nearly neutral paper, or None when the image has transparency."""
+    with Image.open(path) as image:
+        rgba = image.convert('RGBA')
+    if rgba.getchannel('A').getextrema()[0] < 255:
+        return None
+    rgb = rgba.convert('RGB')
+    w, h = rgb.size
+    ring = max(2, round(min(w, h) * 0.01))
+    px = rgb.load()
+    step = max(1, (w + h) // 2000)
+    edge = [(x, y) for x in range(0, w, step) for y in list(range(ring)) + list(range(h - ring, h))]
+    edge += [(x, y) for y in range(0, h, step) for x in list(range(ring)) + list(range(w - ring, w))]
+    light = sum(1 for x, y in edge if min(px[x, y]) >= 205 and max(px[x, y]) - min(px[x, y]) <= 40)
+    return light / len(edge)
 
 
 def ink_share(path):
@@ -188,6 +208,11 @@ def audit(figures, unit=1000, sheets=None):
                 if share < MIN_INK and 'near-empty' not in f.get('accepted', ()):
                     detail = f'only {share:.2%} ink in the output'
                     issues.append({'id': f['id'], 'kind': 'near-empty', 'detail': detail})
+                    notes.append(detail)
+                paper = paper_border(f['image'])
+                if paper is not None and paper >= PAPER and 'paper' not in f.get('accepted', ()):
+                    detail = f'opaque, and {paper:.0%} of its edge is paper: remove the paper unless it is a photo'
+                    issues.append({'id': f['id'], 'kind': 'paper', 'detail': detail})
                     notes.append(detail)
             if notes and sheets:
                 sheet(page, box, marks, Path(sheets) / f'{f["id"]}.jpg', f'{f["id"]}: ' + '; '.join(notes))

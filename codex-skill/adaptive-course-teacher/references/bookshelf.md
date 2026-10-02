@@ -21,6 +21,7 @@ When the shelf is published on a private host, keep the host configuration, acce
 
 - `library.name`: the title shown on the shelf page. `library.storageKey`: a short unique key; the last opened book is remembered under it on the reader's device. `library.searchFrom`: from this many books on, a search box and category rows appear.
 - Each book: `id` (stable, lowercase with hyphens), `title`, `author`, optional `subtitle`, `translator`, `edition`, `category`.
+- The order of `books` is the order on the shelf. Insert a new book beside the books of the same `category` (or the nearest subject when its category is new), keeping each category together and placing closely related books next to each other (two anatomy books, two illustrators' art books). Do not append it at the end by default.
 - `size` in millimetres (`width`, `height`, `thickness`) sets proportions; every book is shown at the same height.
 - `cover.src` and `cover.fit` (`cover`, or `contain` for a cut-out figure); `spine.color`, `spine.ink`, optional `spine.art` and `spine.author`.
 - Contents: either `directoryUrl`, which sends the reader to the book's own contents page, or `reader` plus `chapters` (`no`, `title`, `pages`, `href` relative to `reader`, optional `status: "pending"` for unfinished chapters, shown grey).

@@ -120,8 +120,11 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     const spot = target.matches('h2,h3') ? target : target.querySelector('h2,h3') || target;
     majors.set(spot, links[i].textContent.replace(/\s+/g, ' ').trim());
   });
-  const spots = main ? [...new Set([...majors.keys(), ...main.querySelectorAll('h2,h3')])]
-    .filter((el) => main.contains(el))
+  // 目录页不放速览：章节列表本身就是目录，刻度只会是一排没有层次的线
+  const onContents = !!document.querySelector('.rc-bar .rc-here');
+  const spots = main && !onContents ? [...new Set([...majors.keys(), ...main.querySelectorAll('h2,h3')])]
+    // 页面里自带的导航（比如章内小目录）里的标题不算本章结构
+    .filter((el) => main.contains(el) && !el.closest('nav'))
     .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)) : [];
   let ticks = [];
   let rail = null;
@@ -131,12 +134,14 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     rail.className = 'rc-rail';
     rail.setAttribute('aria-label', '章节速览');
     // 每个大节前留出半格空白分组；整列高度按“刻度数 + 组间空白”分配
-    const groups = majors.size ? spots.filter((s) => majors.has(s)).length : 1;
+    // 没有层次（每个刻度都是大节，或者本章没有目录）时，全部用淡的短刻度，不分组：一排同样深的长线太重
+    const flat = !majors.size || spots.every((s) => majors.has(s));
+    const groups = flat ? 1 : spots.filter((s) => majors.has(s)).length;
     rail.style.setProperty('--rc-ticks', String(spots.length + Math.max(0, groups - 1) * 1.5));
     spots.forEach((spot, i) => {
       if (!spot.id) spot.id = `rc-h${i + 1}`;
       const tick = document.createElement('a');
-      tick.className = majors.has(spot) || !majors.size ? 'rc-tick rc-major' : 'rc-tick';
+      tick.className = !flat && majors.has(spot) ? 'rc-tick rc-major' : 'rc-tick';
       tick.href = `#${spot.id}`;
       const text = majors.get(spot) || headingText(spot);
       const label = document.createElement('span');

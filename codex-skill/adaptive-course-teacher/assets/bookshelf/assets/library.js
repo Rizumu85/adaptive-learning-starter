@@ -135,12 +135,21 @@
             revealWhenReady(shelfPage);
             const input = app.querySelector('.search input');
             if (input) {
-                input.addEventListener('input', () => {
-                    query = input.value.trim();
+                // 拼音等输入法：选字提交前的字母不当作查找词，提交时（compositionend）再查
+                const update = () => {
+                    const next = input.value.trim();
+                    if (next === query)
+                        return;
+                    query = next;
                     app.querySelector('.shelves').innerHTML = shelvesHtml();
                     revealWhenReady(shelfPage);
                     settle();
+                };
+                input.addEventListener('input', (event) => {
+                    if (!event.isComposing)
+                        update();
                 });
+                input.addEventListener('compositionend', update);
             }
         }
         const returning = lastBookId && app.querySelector(`.book[data-id="${CSS.escape(lastBookId)}"]`);

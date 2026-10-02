@@ -121,7 +121,9 @@
     const large = books.length >= library.searchFrom;
     const visible = books.filter((book) => matches(book, query));
     if (!visible.length) return '<p class="shelf-empty">没有找到匹配的书。</p>';
-    const row = (list) => `<div class="row"><ul class="track">${list.map(bookHtml).join('')}</ul></div>`;
+    // 每一排有自己的当前书，书名写在这一排上方（分排时在分类名下面）
+    const row = (list) => '<div class="now"><strong></strong><span></span></div>'
+      + `<div class="row"><ul class="track">${list.map(bookHtml).join('')}</ul></div>`;
     if (!large) return `<section class="shelf-group" aria-label="书架">${row(visible)}</section>`;
 
     const groups = new Map();
@@ -148,7 +150,6 @@
         ? `<label class="search"><span class="sr-only">查找</span><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><input type="search" value="${esc(query)}" placeholder="书名、作者、分类" autocomplete="off"></label>`
         : '';
       app.innerHTML = `<div class="page shelf-view"><header class="identity"><h1>${esc(library.name)}</h1>${search}</header>`
-        + '<div class="now"><strong></strong><span></span></div>'
         + `<div class="shelves">${shelvesHtml()}</div></div>`;
       shelfPage = app.firstElementChild;
       revealWhenReady(shelfPage);
@@ -221,11 +222,17 @@
     }
   }
 
-  // 选出当前书：返回时是刚才那本；否则是上次打开的那本；第一次访问随机选一本
+  // 每一排选出当前书：返回时是刚才那本；否则是上次打开的那本；都不在这一排时随机选一本
   function settle(preferred?: HTMLElement | null) {
-    const all = [...app.querySelectorAll('.book')];
-    const current = preferred || lastOpenedBook() || all[Math.floor(Math.random() * all.length)];
-    if (current) setCurrent(current, { scroll: 'instant' });
+    const last = lastOpenedBook();
+    app.querySelectorAll('.row').forEach((row) => {
+      const all = [...row.querySelectorAll<HTMLElement>('.book')];
+      const current = [preferred, last].find((book) => book && row.contains(book)) || all[Math.floor(Math.random() * all.length)];
+      if (current) setCurrent(current, { scroll: 'instant' });
+    });
+    // 后台准备的目录页：最可能打开的那本（刚才那本或上次打开的那本）
+    const likely = preferred || last;
+    if (likely) prepare(byId(likely.getAttribute('data-id')));
   }
 
   // 当前书放大、抬起，像 Paper 里选中的手帐
@@ -259,16 +266,17 @@
   function setCurrent(bookEl, { scroll }: { scroll?: 'instant' | 'smooth' } = {}) {
     if (!bookEl || (bookEl.classList.contains('is-current') && !scroll)) return;
     const changed = !bookEl.classList.contains('is-current');
-    app.querySelectorAll('.book.is-current').forEach((el) => el.classList.remove('is-current'));
+    const group = bookEl.closest('.shelf-group');
+    group.querySelectorAll('.book.is-current').forEach((el) => el.classList.remove('is-current'));
     bookEl.classList.add('is-current');
     const slot = bookEl.parentElement;
     const book = byId(bookEl.dataset.id);
     prepare(book);
-    const now = app.querySelector('.now');
+    const now = group.querySelector('.now');
     if (book && now && changed) {
       now.firstElementChild.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
       now.lastElementChild.textContent = [book.originalTitle, book.author ? `${book.author} 著` : ''].filter(Boolean).join(' · ');
-      showNew(book.id);
+      showNew(bookEl);
       if (!reduceMotion.matches) now.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: EASE });
     }
     if (scroll) {
@@ -387,11 +395,11 @@
   // 进了那本书的目录页就消失。没进去看也不会一直挂着：第一次出现 3 小时后自动消失，那几章算看到过；又有新章节时重新计时。
   // 第一次来时把现有章节都记为看到过。网址加 ?preview-new 时假装每本书最后一章是新加的，只预览、不写入。
   const fresh_titles = new Map<string, string[]>();
-  function showNew(id: string) {
-    const line = app.querySelector('.now span');
+  function showNew(bookEl: HTMLElement) {
+    const line = bookEl.closest('.shelf-group')?.querySelector('.now span');
     if (!line) return;
     line.querySelector('em')?.remove();
-    const titles = fresh_titles.get(id);
+    const titles = fresh_titles.get(bookEl.dataset.id);
     if (!titles?.length) return;
     const em = document.createElement('em');
     em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
@@ -430,7 +438,8 @@
       const titles = info.chapters.filter((c: any) => fresh.includes(c.id)).map((c: any) => c.title);
       if (!titles.length) return;
       fresh_titles.set(book.id, titles);
-      if (app.querySelector('.book.is-current')?.getAttribute('data-id') === book.id) showNew(book.id);
+      const current = app.querySelector<HTMLElement>(`.book.is-current[data-id="${CSS.escape(book.id)}"]`);
+      if (current) showNew(current);
     } catch { /* 读不到就不提示 */ }
   }
 

@@ -60,7 +60,10 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='m4 4 6 6m0-6-6 6' stroke='%236b6f72' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") center/14px no-repeat}
 .search:focus-within{color:var(--ink-soft)}
 .shelf-group+.shelf-group{margin-top:24px}
-.shelf-group h2{margin:0 0 -24px;font:600 13px/1.5 var(--sans);color:var(--muted);text-align:center}
+/* 分排时：分类名在上，下面是这一排当前书的书名 */
+.shelf-group h2{margin:clamp(20px,6vh,64px) 0 0;font:600 13px/1.5 var(--sans);color:var(--muted);text-align:center}
+.shelf-group+.shelf-group h2{margin-top:0}
+.shelf-group h2+.now{margin-top:6px}
 .shelf-empty{margin:24px 0 0;color:var(--muted);text-align:center}
 
 /* 当前书的书名：像 Paper 顶部的手帐名，真实文字 */

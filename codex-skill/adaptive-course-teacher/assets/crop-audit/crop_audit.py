@@ -11,6 +11,11 @@ look, so nobody has to inspect hundreds of them:
               shows ink from the shared area, usually a piece of the neighbouring figure (give figures
               a `group` when several documents reuse one page).
 * near-empty- the output has almost no ink, so the box probably sits in the wrong place.
+* outside   - the box reaches past the page. Both axes use the page-width scale, so a portrait page
+              runs from y=0 to about 1414 (A4), not to 1000.
+* scale     - (whole record) every box on portrait pages stops just short of y=1000, though those pages
+              run well past it: the coordinates were probably normalized to the page height, which cuts
+              figures off more the lower they sit. Convert them (y * height/width) and recut.
 * paper     - the output is fully opaque and its outer edge is almost all light paper: a drawing on
               paper whose paper was not removed, so it will sit in a white box on the reader's page.
 
@@ -161,6 +166,7 @@ def sheet(page, box, marks, path, note):
 def audit(figures, unit=1000, sheets=None):
     """Return a list of issues: {'id', 'kind', 'detail'}; write review sheets when `sheets` is a folder."""
     issues = []
+    lows = []  # (page height in units, box bottom) on portrait pages, for the scale check
     by_page = {}
     for f in figures:
         by_page.setdefault(str(f['page']), []).append(f)
@@ -169,8 +175,15 @@ def audit(figures, unit=1000, sheets=None):
             page = source.convert('RGB')
         gray = page.convert('L')
         boxes = {f['id']: _px(f['bounds'], page, unit) for f in group}
+        height = unit * page.height / page.width
         for f in group:
             box = boxes[f['id']]
+            x0, y0, x1, y1 = f['bounds']
+            if height >= unit * 1.15:
+                lows.append(y1)
+            if min(x0, y0) < -unit / 100 or x1 > unit * 1.01 or y1 > height + unit / 100:
+                issues.append({'id': f['id'], 'kind': 'outside',
+                               'detail': f'box {f["bounds"]} reaches past the page (0..{unit} wide, 0..{height:.0f} high)'})
             excluded = [_px(b, page, unit) for b in f.get('exclude', [])]
             others = [(oid, obox) for oid, obox in boxes.items() if oid != f['id']]
             marks, notes = [], []
@@ -216,6 +229,12 @@ def audit(figures, unit=1000, sheets=None):
                     notes.append(detail)
             if notes and sheets:
                 sheet(page, box, marks, Path(sheets) / f'{f["id"]}.jpg', f'{f["id"]}: ' + '; '.join(notes))
+    # Boxes measured against the page height instead of its width all end at or above y=1000 and,
+    # since figures sit everywhere on a page, several of them end close to it.
+    if len(lows) >= 8 and max(lows) <= unit + 2 and sum(y >= unit * 0.85 for y in lows) >= 2:
+        issues.append({'id': '*', 'kind': 'scale', 'detail': (
+            f'all {len(lows)} boxes on portrait pages end at or above y={unit}, though the pages run to about '
+            f'{unit * 1.414:.0f}: bounds look normalized to the page height; y must use the page-width scale')})
     return issues
 
 

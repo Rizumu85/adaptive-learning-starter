@@ -15,14 +15,14 @@
   /* 书本身用平涂色块；阴影柔和：贴在面上的书阴影很浅，选中浮起的书在下方投一块影子 */
   /* 像 Paper：影子和书差不多大、向下偏移，边缘只稍微柔一点 */
   /* 两侧的书：封面用最初的投影；整本书（连同书页那一截）投到墙上的影子形状相同、更淡 */
-  --shadow-rest:2px 3px 3px rgb(45 38 30 / .24);
-  --shadow-wall:3px 5px 6px rgb(45 38 30 / .14);
-  --shadow-float:14px 34px 12px -4px rgb(45 38 30 / .30);
+  --shadow-rest:0 3px 4px rgb(45 38 30 / .22);
+  --shadow-wall:0 5px 9px rgb(45 38 30 / .14);
+  --shadow-float:0 34px 14px -6px rgb(45 38 30 / .30);
   /* 首页：当前书的放大倍数和抬起高度（px） */
   --current-scale:1.14;
   --current-lift:14;
-  --page-edge:#f3eee1;
-  --page-top:#f3eee1;
+  --page-edge:#e2dac8;
+  --page-top:#eae3d3;
   --page-line:#ddd5c3;
   --sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
   --song:ReadingOldSong,"Songti SC",SimSun,serif;
@@ -120,22 +120,21 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .front img{display:block;width:100%;height:100%;padding:var(--pad,0);object-fit:var(--fit,cover);object-position:var(--pos,50% 50%)}
 .spine-face{right:100%;top:0;width:var(--cd);height:var(--ch);transform-origin:100% 50%;transform:rotateY(-90deg);overflow:hidden}
 /* 首页上切口和顶面只有几像素宽，细纸页线斜着看会断断续续，改成平涂纸色 */
-/* 书页切口和顶面是平涂纸色；按 Paper 的画法不用渐变，也不画细线（斜看会锯齿） */
+/* 书页切口和顶面是平涂纸色，比墙面暗一档（切口在背光面更暗），读起来是书页而不是一圈亮描边；不用渐变，也不画细线（斜看会锯齿） */
 .fore-face{left:100%;top:0;width:var(--cd);height:var(--ch);transform-origin:0 50%;transform:rotateY(90deg);
   background:var(--page-edge)}
 .top-face{left:0;bottom:100%;width:var(--cw);height:var(--cd);transform-origin:50% 100%;transform:rotateX(90deg);
   background:var(--page-top)}
 
-/* 书脊：两侧深色窄带是书脊转向封面的转折，宽度和书板厚度一致 */
+/* 书脊：两侧深色细带是书脊转向封面的转折，固定 2–3px；按书脊宽度放大的话，厚书会像被粗线描了一圈。顶端不加横带（没有书脊小图时会和两侧连成三边框） */
 .spine{
-  --joint:max(2px,calc(var(--w) * .1));
+  --joint:clamp(2px,calc(var(--w) * .06),3px);
   position:relative;display:flex;flex-direction:column;align-items:center;
   width:var(--w);height:var(--h);padding:0 0 10px;overflow:hidden;
   background:var(--spine);color:var(--spine-ink);
   box-shadow:inset var(--joint) 0 0 var(--side),inset calc(var(--joint) * -1) 0 0 var(--side);
 }
 .spine-art{display:block;width:calc(100% - var(--joint) * 2);height:var(--art-h);object-fit:cover;flex:none}
-.spine-rule{flex:none;width:calc(100% - var(--joint) * 2);height:6px;background:var(--side)}
 /* 竖排时 flex 的 row 方向就是从上到下 */
 .spine-text{flex:1;min-height:0;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;writing-mode:vertical-rl;text-orientation:mixed}
 .spine-title{font:900 var(--title-size,16px)/1.05 var(--heading);white-space:nowrap}

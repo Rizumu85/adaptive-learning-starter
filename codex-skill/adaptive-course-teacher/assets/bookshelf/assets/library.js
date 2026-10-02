@@ -71,7 +71,7 @@
         ].join(';');
         const art = artH
             ? `<img class="spine-art" src="${esc(spine.art)}" alt="" style="object-position:${esc(spine.artPosition || '50% 50%')}">`
-            : '<span class="spine-rule"></span>';
+            : '';
         return `<span class="spine" style="${esc(style)}">${art}<span class="spine-text">`
             + `<span class="spine-title">${esc(book.title)}</span>`
             + (author ? `<span class="spine-author">${esc(author)}</span>` : '')

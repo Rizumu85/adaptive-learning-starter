@@ -40,6 +40,8 @@ Reuse a relevant source illustration beside the explanation it supports. Prefer 
    | A photograph, or a fully painted picture whose background is part of the image | Keep opaque; write the reason on the crop entry |
    | A near-white, uneven scan where removal erases pale washes or handwriting, or leaves blocks | Keep opaque; write the reason on the crop entry (on light reader paper its box is barely visible) |
 
+   The line between the two is where the white is, not how white it is. White inside the picture (the picture's own blank areas, a software screenshot's white ground, white inside a printed frame) belongs to the picture and stays. White outside it that is plainly the page (paper around the picture, the strip of paper between two pictures cropped together, the blank that came in with a number or a leader line) goes: tighten the box, exclude the strip, or clear only the paper connected to the crop edge. An opaque crop of a photograph or screenshot with a band of page paper on one side is a crop fault, not a reason to keep the band.
+
    Checks that apply to every row:
    - Set the paper value per crop, not per book: measure the luminance of the crop's border pixels with a low percentile, so ink that reaches the edge does not count (a clean scan reads 250–255, a greyish one 220–235), and start the transparency ramp below it.
    - Do not turn every near-white pixel transparent: eyes, highlights, water, pale objects and enclosed details can be artwork. Paper connected to the edge can still hold light artwork, so look at the mask; keep an area whose identity is uncertain.

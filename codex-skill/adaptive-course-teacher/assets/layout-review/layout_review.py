@@ -127,6 +127,7 @@ def main():
     parser.add_argument('--pdf-pages', help='page indexes of this unit in the source, e.g. 34-39 or 34-36,40')
     parser.add_argument('--widths', default='1440,820,390')
     parser.add_argument('--browser', help='path to Chrome or Edge when it is not found automatically')
+    parser.add_argument('--view', choices=['parallel', 'target', 'source'], help='bilingual reader: capture this view instead of the default one')
     args = parser.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -144,6 +145,8 @@ def main():
     command = ['node', str(Path(__file__).with_name('layout_shots.mjs')), args.page, '--out', str(out), '--widths', args.widths]
     if args.browser:
         command += ['--browser', args.browser]
+    if args.view:
+        command += ['--view', args.view]
     result = subprocess.run(command, timeout=240)
     if result.returncode:
         sys.exit(result.returncode)

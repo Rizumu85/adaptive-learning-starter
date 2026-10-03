@@ -30,6 +30,8 @@ To see where a whole book needs review, survey it first: `python <skill>/assets/
 
 `report.json` also lists `anchors`: the vertical position of every section and heading with an id, so a printed page can be found in the tiles. A figure inside an element with `data-layout-ok` is not reported.
 
+A bilingual reader has more than one layout: capture the view the learner reads in and the parallel view as well (`--view parallel`, `target` or `source`); a group that fits a single-language column can break in two columns.
+
 The findings are where to start looking, not the verdict. A small picture alone can be right, and a broken composition can have no finding at all.
 
 ## Procedure
@@ -58,6 +60,9 @@ Work through one unit completely before starting the next.
    - A group that can be partly restored should be: put the companions together now, and record what is still missing (for example "the three lines' landing points are not shown"). Leaving pictures scattered because the full relation cannot be rebuilt is the worse outcome.
    - Captions are bound to their pictures even when the source data lists them as loose text: a caption line that floats away from its picture is a layout fault. Moving or rebinding a caption block is allowed when its wording stays the same; update any review hash or order record that depends on it and note the move.
    - Pictures that follow one another without words are fine when each carries a printed number the text cites, or when the book itself sets them as a plate. After checking them against the printed page, mark them reviewed (`layout_ok` on the figure, written out by the generator as `data-layout-ok`) so the tool stops reporting them.
+   - Heading levels are layout. A printed label inside a group (a category tag over a few items, a tab on a boxed note) is not a chapter heading: give it the level of a label, so it reads as part of its group and stays out of the page's contents list. The wording does not change.
+   - A printed arrow, rule or bracket that ties pictures together may be redrawn by the layout (an arrow between a before and an after picture); like markers, it is layout and is recorded as such.
+   - A typeset diagram that was cropped as one picture with its printed labels still inside, untranscribed, is a transcription gap first: list it. Once its labels are transcribed and translated it becomes an "around" composition.
    - Do not use a layout whose meaning is wrong (a "steps" container for things that are not steps) without recording that it is used only as a container; prefer adding a neutral one.
 5. **Rebuild, run the project's verification, and run the tool again.** Open the tiles at all three widths beside the large printed pages. Accept the unit when the reader test passes at every width, and:
    - no caption is under 220 px outside a grid, and nothing is wider than the screen;

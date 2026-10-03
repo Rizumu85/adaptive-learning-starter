@@ -47,7 +47,10 @@ def page_numbers(text):
     numbers = []
     for part in text.split(','):
         first, _, last = part.partition('-')
-        numbers += list(range(int(first), int(last or first) + 1))
+        first, last = int(first), int(last or first)
+        if last < first:
+            raise ValueError(f'page range {part.strip()} runs backwards')
+        numbers += list(range(first, last + 1))
     return numbers
 
 
@@ -102,6 +105,7 @@ def printed_arrangement(report, crops_path):
         bounds, page, output = crop.get('bounds'), crop.get('page'), crop.get('output')
         if output and bounds and len(bounds) == 4 and not isinstance(page, list):
             by_file[Path(output).name] = (crop.get('id', output), (crop.get('edition'), page), bounds)
+    k = record.get('unit', 1000) / 1000  # the tolerances below are in thousandths of the page width
     width = max(report['widths'], key=int)
     shown = {f['file']: f for f in report['widths'][width].get('figures', []) if f['file'] in by_file}
     names = sorted(shown)
@@ -113,7 +117,7 @@ def printed_arrangement(report, crops_path):
                 continue
             tall = min(ba[3], bb[3]) - max(ba[1], bb[1])
             wide = min(ba[2], bb[2]) - max(ba[0], bb[0])
-            beside = tall >= 0.5 * min(ba[3] - ba[1], bb[3] - bb[1]) and wide <= 5
+            beside = tall >= 0.5 * min(ba[3] - ba[1], bb[3] - bb[1]) and wide <= 5 * k
             wa, wb = shown[a], shown[b]
             on_row = wa['y'] < wb['y'] + wb['h'] and wb['y'] < wa['y'] + wa['h']
             if beside and not on_row:
@@ -121,8 +125,8 @@ def printed_arrangement(report, crops_path):
             gap_x = max(ba[0], bb[0]) - min(ba[2], bb[2])
             gap_y = max(ba[1], bb[1]) - min(ba[3], bb[3])
             # Boxes that abut with no gutter at all; panels of a tight grid keep a gutter of a few units.
-            touching_side = -3 <= gap_x <= 1.5 and tall >= 0.8 * min(ba[3] - ba[1], bb[3] - bb[1])
-            touching_stack = -3 <= gap_y <= 1.5 and wide >= 0.8 * min(ba[2] - ba[0], bb[2] - bb[0])
+            touching_side = -3 * k <= gap_x <= 1.5 * k and tall >= 0.8 * min(ba[3] - ba[1], bb[3] - bb[1])
+            touching_stack = -3 * k <= gap_y <= 1.5 * k and wide >= 0.8 * min(ba[2] - ba[0], bb[2] - bb[0])
             if touching_side or touching_stack:
                 found.append({'kind': 'cut-frame', 'id': ida, 'with': idb, 'y': wa['y']})
     report['widths'][width]['findings'] += found

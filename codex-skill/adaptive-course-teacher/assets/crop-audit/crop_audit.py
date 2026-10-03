@@ -248,7 +248,9 @@ def load_record(path):
         sys.exit('This crop record has no "pages" pattern: render the page images and add it, '
                  "or run the project's own adapter that calls audit()")
 
-    def page_of(page, edition):
+    def page_of(page, edition, id):
+        if isinstance(data['pages'], dict) and edition not in data['pages']:
+            sys.exit(f'Crop {id} has edition {edition!r}, but "pages" only has patterns for: {", ".join(data["pages"])}')
         pattern = data['pages'][edition] if isinstance(data['pages'], dict) else data['pages']
         return str(path.parent / pattern.format(page=page))
 
@@ -259,10 +261,10 @@ def load_record(path):
             # A spread joined from several pages: check each page's box for cut lines; the joined
             # output cannot be compared with one page, so it is not read.
             for i, part in enumerate(crop['parts']):
-                figures.append({**base, 'id': f'{crop["id"]}#{i + 1}', 'page': page_of(part['page'], part.get('edition', crop.get('edition'))),
+                figures.append({**base, 'id': f'{crop["id"]}#{i + 1}', 'page': page_of(part['page'], part.get('edition', crop.get('edition')), crop['id']),
                                 'bounds': part['bounds'], 'exclude': part.get('exclude', []), 'image': None})
         elif crop.get('bounds') and isinstance(crop.get('page'), int):
-            figures.append({**base, 'id': crop['id'], 'bounds': crop['bounds'], 'page': page_of(crop['page'], crop.get('edition')),
+            figures.append({**base, 'id': crop['id'], 'bounds': crop['bounds'], 'page': page_of(crop['page'], crop.get('edition'), crop['id']),
                             'image': str(path.parent / crop['output']) if crop.get('output') else None})
         else:
             skipped.append(crop['id'])  # whole pages, hand-drawn outlines, other sources
@@ -276,9 +278,11 @@ def main():
     if '--only' in sys.argv:
         rest = sys.argv[sys.argv.index('--only') + 1:]
         wanted = set(rest[:next((i for i, a in enumerate(rest) if a.startswith('--')), len(rest))])
-        groups = {f['group'] for f in figures if f['id'] in wanted}
+        # a spread is named by its record id; its parts are checked as id#1, id#2, ...
+        named = {f['id'] for f in figures if f['id'] in wanted or f['id'].rsplit('#', 1)[0] in wanted}
+        groups = {f['group'] for f in figures if f['id'] in named}
         # keep the neighbours on the same pages so overlaps are still checked
-        figures = [f for f in figures if f['id'] in wanted or f['group'] in groups]
+        figures = [f for f in figures if f['id'] in named or f['group'] in groups]
     sheets = sys.argv[sys.argv.index('--sheets') + 1] if '--sheets' in sys.argv else None
     missing = sorted({f['page'] for f in figures if not Path(f['page']).is_file()})
     if missing:

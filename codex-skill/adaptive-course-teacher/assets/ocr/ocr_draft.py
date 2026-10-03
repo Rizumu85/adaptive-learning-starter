@@ -37,7 +37,10 @@ def pages(source, spec):
         import pymupdf
         doc = pymupdf.open(source)
         first, _, last = spec.partition('-')
-        for number in range(int(first), int(last or first) + 1):
+        first, last = int(first), int(last or first)
+        if last < first:
+            raise ValueError(f'page range {spec} runs backwards')
+        for number in range(first, last + 1):
             pix = doc[number - 1].get_pixmap(dpi=DPI)
             yield f'p{number:04}', Image.frombytes('RGB', [pix.width, pix.height], pix.samples)
     else:
@@ -47,10 +50,11 @@ def pages(source, spec):
 
 
 def main():
-    if len(sys.argv) < 3:
+    pdf = len(sys.argv) > 1 and sys.argv[1].lower().endswith('.pdf')
+    if len(sys.argv) < (4 if pdf else 3):
         sys.exit(__doc__)
     source = sys.argv[1]
-    spec, out = (sys.argv[2], sys.argv[3]) if source.lower().endswith('.pdf') else ('', sys.argv[2])
+    spec, out = (sys.argv[2], sys.argv[3]) if pdf else ('', sys.argv[2])
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     ocr = engine()

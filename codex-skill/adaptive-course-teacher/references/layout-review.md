@@ -1,8 +1,19 @@
 # Layout Review of a Reading Edition
 
-Use when a learner says pictures in a reading edition are hard to interpret, too small, or cut loose from their text; when checking an edition another agent built; and before publishing any book whose pages are designed spreads (magazines, art books, guides, catalogues). The rule this enforces is in `book-learning.md` ("Read each page's layout before cutting it up").
+Use when a learner says pictures in a reading edition are hard to interpret, too small, or cut loose from their text; when checking an edition another agent built; and before publishing any book whose pages are designed spreads (magazines, art books, guides, catalogues, design sketchbooks). The rule this enforces is in `book-learning.md` ("Read each page's layout before cutting it up").
 
-The printed page is the specification. It says which pictures belong together and to which text. The web page must say the same thing at desktop, tablet and phone width. The text itself does not change in a layout review.
+The printed page is the specification. It says which pictures belong together, which text each belongs to, and what each note points at. The web page must say the same thing at desktop, tablet and phone width. The wording of the text does not change in a layout review.
+
+**The test of a finished unit is the reader, not the procedure.** Cover the printed page and look only at the web page: for every picture, can you say what it belongs to, and for every note, what it points at? If not, the unit is not done, however many fields were set and however clean the findings list is. A review that changes little on a page the learner called unreadable has failed; say so instead of reporting completion.
+
+## Two kinds of page design
+
+Decide this first for every group of pictures; the two need opposite treatment.
+
+- **Typeset composition.** The designer arranged printed text blocks and pictures: a map with inset photos and captions, a grid of products, a picture beside its paragraph. The text is type, so it must be transcribed, translated and readable as text. **Rebuild the arrangement in HTML** so it reflows.
+- **Hand-annotated cluster.** The author drew or wrote on the page by hand: a sketch with hand-written labels and leader lines, a reference photo pasted beside it with a scribbled note, arrows and circles drawn across pictures. The handwriting and lines are part of the drawing, and no HTML layout keeps a hand-drawn line attached to the stroke it points at. **Keep the whole cluster as one picture**, handwriting, lines and pasted photos included, and list the transcribed notes with their translations under it, in the order they read on the page. Do not cut the sketch, the photos and the notes into separate figures, and do not crop the handwriting off and retype it as a caption: that leaves lines pointing at nothing.
+
+A page can hold both: a typeset heading and body paragraphs around several hand-annotated clusters. A cluster is never the whole page; crop it tightly, leaving out typeset body text, running heads and folios.
 
 ## Material
 
@@ -13,7 +24,7 @@ python <skill>/assets/layout-review/layout_review.py --page local-reading/<unit>
     --out work/qa/layout/<unit> --pdf <source.pdf> --pdf-pages <first>-<last>
 ```
 
-It writes the printed pages as spreads (`book-NN.png`), the web page at 1440, 820 and 390 px in tiles (`w1440-NN.png` and so on), and `report.json` with findings: `small-alone` (a picture under 40% of the column with nothing beside it), `narrow-caption` (a caption under 220 px), `overflow`. Use `--images "<pattern with {page}>"` instead of `--pdf` when the source is page images. The sheets are whole-page renders: `--out` must be an ignored working folder, never the published reader.
+It writes the printed pages as overview spreads (`book-NN.png`) and one large image per page (`pages/pNNNN.png`, for reading handwriting and following lines), the web page at 1440, 820 and 390 px in tiles (`w1440-NN.png` and so on), and `report.json` with findings: `small-alone` (a small picture with nothing beside it), `wordless-run` (pictures following one another with no words), `narrow-caption` (a caption under 220 px), `overflow`. Use `--images "<pattern with {page}>"` when the source is page images. These are whole-page renders: `--out` must be an ignored working folder, never the published reader.
 
 The findings are where to start looking, not the verdict. A small picture alone can be right, and a broken composition can have no finding at all.
 
@@ -21,47 +32,56 @@ The findings are where to start looking, not the verdict. A small picture alone 
 
 Work through one unit completely before starting the next.
 
-1. **Read the printed pages first.** Open every `book-NN.png`. For each page, write down the groups: which pictures belong together, and what the page uses to say so (leader lines, numbers, a frame or tinted box, a picture set beside its note, items scattered around a title, arrows between steps, a before-and-after pair, rows and columns).
-2. **Find each group on the web page.** Open the 1440 px tiles. For every group from step 1, check whether a reader can still tell that these pictures belong together and to which text.
-3. **Give every group one verdict** from this list, and write it down before changing anything:
+1. **Read the printed pages first.** Open the overview, then every large page. For each page, write down the groups: which pictures belong together, and what the page uses to say so (leader lines, numbers, a frame or tinted box, a picture set beside its note, items scattered around a title, arrows between steps, a before-and-after pair, rows and columns, hand-written notes and lines).
+2. **Find each group on the web page.** Open the 1440 px tiles and apply the reader test above to each group.
+3. **Give every group one verdict** and write it down before changing anything:
 
    | Verdict | When | What the page should do |
    | --- | --- | --- |
-   | keep | The picture is an independent illustration and reads on its own | Nothing |
-   | beside | A small picture belongs to one note or caption | Picture beside that text; stacked on a phone |
-   | grid | Several sibling items, each with its own label | One cell per item, label under it |
-   | around | A central picture with callouts or insets tied to places on it | Central picture with its entries in columns beside it on wide screens and below it on narrow ones; matching markers on the picture and on each entry |
+   | keep | An independent illustration that reads on its own | Nothing |
+   | cluster | Hand-annotated: sketch, pasted photos, hand-written notes, drawn lines or arrows | One picture of the whole cluster; its notes transcribed and translated underneath, in page order |
+   | beside | Typeset: a small picture belongs to one note or caption | Picture beside that text; stacked on a phone |
+   | set | Typeset: a main picture with its reference pictures or notes, no order implied | Main picture and companions in one group, side by side on wide screens |
+   | grid | Typeset: several sibling items, each with its own label | One cell per item, label under it |
+   | around | Typeset: a central picture with callouts or insets tied to places on it | Central picture with its entries beside it on wide screens and below it on narrow ones; matching markers on the picture and on each entry |
    | steps, compare, table | A sequence, a pair, or rows and columns | The generator's step, comparison or table layout |
-   | new layout needed | None of the above keeps the relation | Stop for this group; see "When nothing fits" |
+   | new layout | Typeset, and none of the above keeps the relation | See "When nothing fits" |
 
-4. **Apply the verdict through the project's generator.** Tag the source data with the layout fields the project already has (its `AGENTS.md` or `NOTES.md` lists them). Do not edit generated HTML, do not change any text, and do not recrop pictures in this pass.
-5. **Rebuild, run the project's verification, and run the tool again.** Open the tiles at all three widths beside the book sheet. Accept the unit when:
-   - every picture shows what it belongs to, at every width;
-   - no caption is under 220 px outside a grid;
-   - nothing is wider than the screen;
-   - on the phone, a picture that stacks sits directly above or below its own text;
+4. **Apply the verdict through the project's generator and source data.** Never edit generated HTML and never change the wording of the text.
+   - Layout fields, and which picture a caption is bound to, are both layout: bind each note to the picture it describes, and place it where the book prints it.
+   - A cluster needs a new crop: one box around the whole cluster in the crop record, the piece crops it replaces removed, every note of the cluster bound to it, then recut and run the crop audit. Where two clusters' boxes overlap, exclude the neighbour's part.
+   - A group that can be partly restored should be: put the companions together now, and record what is still missing (for example "the three lines' landing points are not shown"). Leaving pictures scattered because the full relation cannot be rebuilt is the worse outcome.
+   - Do not use a layout whose meaning is wrong (a "steps" container for things that are not steps) without recording that it is used only as a container; prefer adding a neutral one.
+5. **Rebuild, run the project's verification, and run the tool again.** Open the tiles at all three widths beside the large printed pages. Accept the unit when the reader test passes at every width, and:
+   - no caption is under 220 px outside a grid, and nothing is wider than the screen;
+   - on the phone, each picture sits directly above or below its own text. This outranks keeping the book's left and right: reorder a group for the phone if a picture would otherwise read as belonging to its neighbour;
+   - on wide screens, sides and order follow the book;
    - pages of other units changed only in their stylesheet version, if at all.
-6. **Record and commit per unit.** In `NOTES.md`, one line per group: pages, figure ids, verdict, fields used. Then the open list from "When nothing fits".
+6. **Record and commit per unit.** In `NOTES.md`, one line per group: pages, figure ids, verdict, what was done, what is still missing. Then the open list.
 
 ## Markers in place of leader lines
 
-Lines cannot follow a layout that reflows, so an "around" composition uses markers: the same letter on the picture and at the start of its entry. Use letters when the book already numbers things, so the two do not collide. Markers are layout, not book text; say so in `NOTES.md`. Keep them flat and quiet: translucent paper-coloured fill, a thin accent border, solid letter, no glow or shadow.
+Only for typeset "around" compositions. Lines cannot follow a layout that reflows, so the same letter goes on the picture and at the start of its entry. Use letters when the book already numbers things. Markers are layout, not book text; say so in `NOTES.md`. Keep them flat and quiet: translucent paper-coloured fill, a thin accent border, solid letter, no glow or shadow.
 
-Place each marker on the point where the printed line starts, as a percentage of the picture's width and height. Measure on a copy of the picture with a 10% grid drawn over it, then check the screenshot: every marker must sit on its line's origin. Entries keep the book's order and side.
+Place each marker where the printed line starts, as a percentage of the picture's width and height. Measure on a copy of the picture with a 10% grid drawn over it, then check the screenshot: every marker must sit on its line's origin. Entries keep the book's order and side.
 
 ## When nothing fits
 
-Do not force a composition into a layout that changes its meaning, and do not replace it with a scan of the whole page. Leave that group as it is, and add it to an open list in `NOTES.md`: unit, pages, figure ids, what the page ties together and how. Then go on with the other groups. A new layout in the generator is a separate task for a stronger model or the next session: it has to hold at all three widths, be named, and be recorded with its fields.
+A typeset composition that no existing layout keeps needs a new layout in the generator. Whether to build it now depends on the instructions and on capability:
 
-The same applies to marker positions you cannot measure with confidence: list the composition as open instead of guessing.
+- If the learner or the project's `AGENTS.md` said not to change the generator, or you cannot verify a new layout at all three widths, restore what the existing layouts can (step 4), and add the group to an open list in `NOTES.md`: unit, pages, figure ids, what the page ties together and how, and what kind of layout would keep it.
+- Otherwise build it: a named, reusable layout driven by fields in the source data (never one page's HTML), holding at 1440, 820 and 390 px, documented with its fields in the project's `AGENTS.md` or `NOTES.md`. Then apply it and verify as above.
+
+Never force a composition into a layout that changes its meaning, and never replace it with a scan of the whole page. Marker positions you cannot measure with confidence go on the open list instead of being guessed.
 
 ## Do not
 
-- enlarge a small picture to fill the column to make it "readable"; it needs its companions or its text, not size;
-- add explanations, numbering or headings the book does not have (markers excepted, as above);
-- move text out of the book's reading order, apart from keeping a composition's entries together;
-- mark a unit done from the findings list alone, without opening the printed pages and the screenshots.
+- enlarge a small picture to fill the column to make it "readable"; it needs its companions or its text, not size (a cluster may be shown a little above scan size so its handwriting is legible);
+- add explanations, numbering or headings the book does not have (markers excepted);
+- move text out of the book's reading order, apart from keeping a composition's parts together;
+- mark a unit done from the findings list alone, without opening the large printed pages and the screenshots;
+- fix transcription or translation in this pass: list what you notice (a misread hand-written word, an inconsistent term, a stroke no crop includes) for the learner.
 
 ## Report
 
-Tell the learner, per unit: how many groups were reviewed, how many changed and into what, how many stay open and why, and which widths were checked by screenshot.
+Tell the learner, per unit: the groups found, each verdict, what changed, what stays open and why, which widths were checked by screenshot, and the result of the reader test in plain words, including where it still fails.

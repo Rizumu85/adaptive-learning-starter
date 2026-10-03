@@ -91,7 +91,14 @@ const MEASURE = `(() => {
     const captionWidth = caption && caption.textContent.trim() ? Math.round(caption.getBoundingClientRect().width) : null;
     const id = figure.id || image.getAttribute('src').split('/').pop().split('?')[0];
     const base = { id, y: Math.round(r.top + scrollY), width: Math.round(r.width), share: +(r.width / columnWidth).toFixed(2) };
-    if (r.width < columnWidth * 0.4 && r.width < 320 && !beside) findings.push({ ...base, kind: 'small-alone' });
+    const neighbours = [figure.previousElementSibling, figure.nextElementSibling];
+    // On a phone a small picture stacked right against its own caption or text is normal.
+    const stacked = innerWidth < 700 && (captionWidth !== null
+      || neighbours.some((el) => el && !el.matches('figure') && el.textContent.trim()));
+    if (r.width < columnWidth * 0.4 && r.width < 320 && !beside && !stacked) findings.push({ ...base, kind: 'small-alone' });
+    // Pictures following one another with no words: nothing says what they are or what they belong to.
+    const bare = (el) => el && el.matches('figure') && !(el.querySelector('figcaption')?.textContent.trim());
+    if (captionWidth === null && !inRow && neighbours.some(bare)) findings.push({ ...base, kind: 'wordless-run' });
     if (captionWidth !== null && captionWidth < 220 && columnWidth > 300 && !inRow) findings.push({ ...base, kind: 'narrow-caption', captionWidth });
     if (r.right > innerWidth + 1) findings.push({ ...base, kind: 'overflow' });
   }

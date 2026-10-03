@@ -8,11 +8,14 @@ spreads, the web page at desktop, tablet and phone width, and a list of figures 
 
 Writes into --out:
     book-NN.png        the printed pages, two to a row, six to a sheet (page number in the corner)
+    pages/pNNNN.png    each printed page on its own, large enough to read handwriting and follow leader lines
     w<width>-NN.png    the web page in 3000 px tall tiles, at each width
     report.json        page heights, tile ranges and findings per width
 
 Findings (see references/layout-review.md for what to do with them):
-    small-alone      a picture narrower than 40% of the column with nothing beside it
+    small-alone      a picture narrower than 40% of the column with nothing beside it (on a phone, only
+                     when it has no caption and no text directly before or after it)
+    wordless-run     two or more pictures in a row with no caption or text between them
     narrow-caption   a caption squeezed to less than 220 px
     overflow         a picture wider than the screen; pageOverflow means the page scrolls sideways
 
@@ -29,6 +32,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 PAGE_WIDTH = 620   # px per printed page on a sheet: enough to see layout, not a reading copy
+LARGE_WIDTH = 1400  # px for the single pages: handwriting and thin leader lines stay readable
 PER_SHEET = 6
 
 
@@ -40,24 +44,29 @@ def page_numbers(text):
     return numbers
 
 
-def printed_pages(args, numbers):
+def printed_pages(args, numbers, out):
+    large = out / 'pages'
+    large.mkdir(exist_ok=True)
     if args.pdf:
         import pymupdf
         document = pymupdf.open(args.pdf)
         for number in numbers:
             page = document[number - 1]
-            scale = PAGE_WIDTH / page.rect.width
+            scale = LARGE_WIDTH / page.rect.width
             pixmap = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
-            yield number, Image.frombytes('RGB', [pixmap.width, pixmap.height], pixmap.samples)
+            image = Image.frombytes('RGB', [pixmap.width, pixmap.height], pixmap.samples)
+            image.save(large / f'p{number:04}.png')
+            yield number, image.resize((PAGE_WIDTH, round(image.height * PAGE_WIDTH / image.width)), Image.LANCZOS)
     else:
         for number in numbers:
             with Image.open(args.images.format(page=number)) as image:
                 image = image.convert('RGB')
-                yield number, image.resize((PAGE_WIDTH, round(image.height * PAGE_WIDTH / image.width)))
+                image.resize((LARGE_WIDTH, round(image.height * LARGE_WIDTH / image.width)), Image.LANCZOS).save(large / f'p{number:04}.png')
+                yield number, image.resize((PAGE_WIDTH, round(image.height * PAGE_WIDTH / image.width)), Image.LANCZOS)
 
 
 def book_sheets(args, out):
-    pages = list(printed_pages(args, page_numbers(args.pdf_pages)))
+    pages = list(printed_pages(args, page_numbers(args.pdf_pages), out))
     files = []
     for start in range(0, len(pages), PER_SHEET):
         group = pages[start:start + PER_SHEET]
@@ -90,7 +99,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     if (args.pdf or args.images) and args.pdf_pages:
-        print('book sheets:', ', '.join(book_sheets(args, out)))
+        print('book sheets:', ', '.join(book_sheets(args, out)), '+ single pages in pages/')
     else:
         print('No --pdf/--images with --pdf-pages given: only the web page is captured; open the printed pages yourself.')
 

@@ -72,6 +72,8 @@ const MEASURE = `(() => {
   for (const figure of document.querySelectorAll('figure')) {
     const image = figure.querySelector('img');
     if (!image || !visible(image)) continue;
+    // Reviewed against the printed page and kept on purpose (the generator writes data-layout-ok).
+    if (figure.closest('[data-layout-ok]')) continue;
     const r = image.getBoundingClientRect();
     const middle = r.top + r.height / 2;
     const besideText = others.some((el) => {
@@ -104,7 +106,10 @@ const MEASURE = `(() => {
     if (captionWidth !== null && captionWidth < 220 && columnWidth > 300 && !inRow) findings.push({ ...base, kind: 'narrow-caption', captionWidth });
     if (r.right > innerWidth + 1) findings.push({ ...base, kind: 'overflow' });
   }
-  return JSON.stringify({ height: document.documentElement.scrollHeight, columnWidth: Math.round(columnWidth),
+  // Where each section starts, so a printed page or heading can be found in the tiles.
+  const anchors = [...document.querySelectorAll('section[id], h1[id], h2[id], h3[id], [id^="page-"], [id^="pdf-"]')]
+    .map((el) => ({ id: el.id, y: Math.round(el.getBoundingClientRect().top + scrollY) }));
+  return JSON.stringify({ height: document.documentElement.scrollHeight, columnWidth: Math.round(columnWidth), anchors,
     pageOverflow: document.documentElement.scrollWidth > innerWidth + 1, findings });
 })()`;
 

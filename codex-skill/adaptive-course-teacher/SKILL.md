@@ -53,6 +53,7 @@ Keep these states apart in every record: agent inspected the source, material pr
 - New controls and components, including ones no reference covers, follow the design system the learner chose. With the paper courseware preset, that is "Controls" in `references/courseware-design.md`; otherwise follow the project's `DESIGN.md` consistently instead of inventing a new style.
 - Before publishing AI-written lesson copy, follow `references/learner-facing-copy.md`.
 - For inspectable images in any HTML page, install the offline viewer from `references/image-preview.md`. For a preview-only change, that reference is the whole workflow.
+- When pictures in a reading edition are hard to interpret, cut loose from their text, or too small, or when checking a finished edition's layout against the book, follow `references/layout-review.md`; it is the whole workflow for that task.
 - For multi-page book readers, reuse the navigation in `references/reader-chrome.md`; for original-and-translation pages add `references/bilingual-reader.md`; for one entry point to several books use `references/bookshelf.md`.
 - Before hosting lessons that contain local or licensed assets, read `references/private-delivery.md`.
 - Optional visual and typographic presets the learner may have selected are listed in `references/presets.md`.
@@ -77,5 +78,6 @@ Keep these states apart in every record: agent inspected the source, material pr
 - `assets/examples/lessons/`: `0001` calm long-form reading, `0002` focused stepped 3D lab, `0003` side-by-side comparison lab.
 - `assets/examples/practice/`: reading-and-writing practice with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. Read its `README.md` before adapting it.
 - `assets/image-preview/`, `assets/reader-chrome/`, `assets/bilingual-reader/`, and `assets/bookshelf/`: ready-built components; integrate them through their references.
+- `assets/crop-audit/`, `assets/ocr/`, and `assets/layout-review/`: checking and drafting tools for book projects; each is introduced where its reference uses it.
 
 Examples are patterns. Remove their topic-specific content and keep only the structure that fits the new lesson.

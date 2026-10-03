@@ -4,7 +4,10 @@
 .source{font-family:var(--bilingual-source-font,serif);font-size:20px;line-height:2.25;line-break:strict}
 .target{font-family:var(--bilingual-target-font,serif);font-size:22px;line-height:1.95}
 ruby{ruby-align:center}
-rt{font-size:.52em;font-weight:400}
+/* 注音（假名）用界面的无衬线体、600 字重：小字号下比正文的宋体清楚。大小保持 .52em：两个假名正好落在一个汉字的宽度内，
+   再大就会比汉字宽、把正文的字推开。字体只调用本机安装，可用 --bilingual-ruby-font 覆盖 */
+@font-face{font-family:BilingualRuby;src:local("MiSans Demibold"),local("MiSans-Demibold");font-weight:600;font-display:swap}
+rt{font-family:var(--bilingual-ruby-font,BilingualRuby,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif);font-size:.52em;font-weight:600;line-height:1}
 .hide-ruby rt{visibility:hidden}
 body[data-view=target] .source,body[data-view=target] .source-heading{display:none}
 body[data-view=source] .target,body[data-view=source] .target-heading{display:none}

@@ -2,6 +2,7 @@
 // Used by layout_review.py; can also run alone:
 //   node layout_shots.mjs <page.html or URL> --out <folder> [--widths 1440,820,390] [--browser <path>] [--findings-only]
 // --findings-only skips the screenshots and writes report.json alone (for surveying a whole book).
+// --scale 2 captures at double pixel density, for judging small type.
 // --view parallel|target|source switches a bilingual reader to that view before measuring (default: the page's own).
 // Needs Node 22+ and an installed Chrome or Edge. Writes w<width>-NN.png tiles and report.json.
 // It drives the browser over the DevTools protocol, so phone widths are real (headless
@@ -26,6 +27,7 @@ const url = /^[a-z]+:\/\//i.test(target) ? target : pathToFileURL(resolve(target
 const TILE = 3000;
 const findingsOnly = args.includes('--findings-only');
 const view = flag('--view');
+const scale = Number(flag('--scale', '1'));  // 2 renders small type (furigana, labels) as a high-density screen shows it
 
 const candidates = [flag('--browser'), process.env.BROWSER,
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -141,7 +143,7 @@ try {
   await send('Page.enable');
   const report = { page: url, widths: {} };
   for (const width of widths) {
-    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 700 });
+    await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: scale, mobile: width < 700 });
     const loaded = new Promise((done) => { events.set('Page.loadEventFired', done); setTimeout(done, 20000); });
     await send('Page.navigate', { url });
     await loaded;

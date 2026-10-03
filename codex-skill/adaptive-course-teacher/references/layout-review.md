@@ -14,6 +14,8 @@ The printed page is the specification. It says which pictures belong together, w
 
 What you notice but may not change (a misread hand-written word, an untranscribed label, an inconsistent term) goes on a list for the learner; a later proofreading pass fixes it.
 
+**Everything here serves the person reading.** The aim is that someone reading the page understands it with no more effort than the printed page asks: they see at once what a picture belongs to and what a note points at, without matching a picture against a list, scrolling back, or guessing. Following the book's layout, keeping a cluster whole, splitting it, choosing a side or an order: each is right only when it makes reading easier. When two rules pull apart, or none fits, choose what the reader's eye finds easiest, and record what you chose and why. A rule applied in a way that makes the page harder to read has been applied wrongly.
+
 **The test of a finished unit is the reader, not the procedure.** Cover the printed page and look only at the web page: for every picture, can you say what it belongs to, and for every note, what it points at? If not, the unit is not done, however many fields were set and however clean the findings list is. A review that changes little on a page the learner called unreadable has failed; say so instead of reporting completion.
 
 ## Two kinds of page design

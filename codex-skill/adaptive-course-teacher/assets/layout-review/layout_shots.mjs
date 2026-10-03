@@ -1,6 +1,7 @@
 // Screenshots of one reader page at several widths, plus a list of figures worth a look.
 // Used by layout_review.py; can also run alone:
-//   node layout_shots.mjs <page.html or URL> --out <folder> [--widths 1440,820,390] [--browser <path>]
+//   node layout_shots.mjs <page.html or URL> --out <folder> [--widths 1440,820,390] [--browser <path>] [--findings-only]
+// --findings-only skips the screenshots and writes report.json alone (for surveying a whole book).
 // Needs Node 22+ and an installed Chrome or Edge. Writes w<width>-NN.png tiles and report.json.
 // It drives the browser over the DevTools protocol, so phone widths are real (headless
 // --window-size clamps narrow windows) and lazy images are loaded before the capture.
@@ -22,6 +23,7 @@ const out = resolve(flag('--out', 'layout-review'));
 const widths = flag('--widths', '1440,820,390').split(',').map(Number);
 const url = /^[a-z]+:\/\//i.test(target) ? target : pathToFileURL(resolve(target)).href;
 const TILE = 3000;
+const findingsOnly = args.includes('--findings-only');
 
 const candidates = [flag('--browser'), process.env.BROWSER,
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -140,7 +142,7 @@ try {
     })()`);
     const measured = JSON.parse(await evaluate(MEASURE));
     const tiles = [];
-    for (let top = 0, n = 0; top < measured.height; top += TILE, n++) {
+    for (let top = 0, n = 0; top < measured.height && !findingsOnly; top += TILE, n++) {
       const height = Math.min(TILE, measured.height - top);
       const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true,
         clip: { x: 0, y: top, width, height, scale: 1 } });

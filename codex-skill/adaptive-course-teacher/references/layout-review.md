@@ -26,6 +26,8 @@ python <skill>/assets/layout-review/layout_review.py --page local-reading/<unit>
 
 It writes the printed pages as overview spreads (`book-NN.png`) and one large image per page (`pages/pNNNN.png`, for reading handwriting and following lines), the web page at 1440, 820 and 390 px in tiles (`w1440-NN.png` and so on), and `report.json` with findings: `small-alone` (a small picture with nothing beside it), `wordless-run` (pictures following one another with no words), `narrow-caption` (a caption under 220 px), `overflow`. Use `--images "<pattern with {page}>"` when the source is page images. These are whole-page renders: `--out` must be an ignored working folder, never the published reader.
 
+To see where a whole book needs review, survey it first: `python <skill>/assets/layout-review/layout_review.py --survey local-reading --out work/qa/layout/_survey` lists the findings per page at 1440 px, most first, without screenshots.
+
 The findings are where to start looking, not the verdict. A small picture alone can be right, and a broken composition can have no finding at all.
 
 ## Procedure

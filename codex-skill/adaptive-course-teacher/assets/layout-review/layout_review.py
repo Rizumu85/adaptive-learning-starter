@@ -19,6 +19,9 @@ Findings (see references/layout-review.md for what to do with them):
     narrow-caption   a caption squeezed to less than 220 px
     overflow         a picture wider than the screen; pageOverflow means the page scrolls sideways
 
+Survey a whole reader first to see where to start (findings at 1440 px only, no screenshots):
+    python layout_review.py --survey local-reading --out work/qa/layout/_survey
+
 The book sheets are whole-page renders: keep --out in an ignored working folder, never in the
 published reader. Needs PyMuPDF and Pillow for the sheets, Node 22+ and Chrome or Edge for the
 screenshots (layout_shots.mjs, beside this file). Exit code 1 when a width has findings.
@@ -85,9 +88,39 @@ def book_sheets(args, out):
     return files
 
 
+def survey(folder, out, browser):
+    """Findings per page of a reader, most first: where a layout review should start."""
+    rows = []
+    for page in sorted(Path(folder).glob('*.html')):
+        target = out / page.stem
+        command = ['node', str(Path(__file__).with_name('layout_shots.mjs')), str(page), '--out', str(target),
+                   '--widths', '1440', '--findings-only'] + (['--browser', browser] if browser else [])
+        try:
+            done = subprocess.run(command, timeout=120, capture_output=True)
+        except subprocess.TimeoutExpired:
+            rows.append((-1, page.name, 'timed out'))
+            continue
+        if done.returncode or not (target / 'report.json').exists():
+            rows.append((-1, page.name, 'failed'))
+            continue
+        data = json.loads((target / 'report.json').read_text(encoding='utf-8'))['widths']['1440']
+        kinds = {}
+        for finding in data['findings']:
+            kinds[finding['kind']] = kinds.get(finding['kind'], 0) + 1
+        rows.append((len(data['findings']), page.name, ', '.join(f'{k} {v}' for k, v in sorted(kinds.items()))
+                     + (' PAGE SCROLLS SIDEWAYS' if data['pageOverflow'] else '')))
+    rows.sort(reverse=True)
+    (out / 'survey.json').write_text(json.dumps(rows, ensure_ascii=False, indent=1), encoding='utf-8')
+    for count, name, detail in rows:
+        if count:
+            print(f'{count:4}  {name}  {detail}')
+    print(f'{len(rows)} pages, {sum(1 for r in rows if r[0] > 0)} with findings, {sum(max(r[0], 0) for r in rows)} findings')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    parser.add_argument('--page', required=True, help='reader page (HTML file or URL)')
+    parser.add_argument('--page', help='reader page (HTML file or URL)')
+    parser.add_argument('--survey', help='folder of reader pages: list findings per page instead of reviewing one')
     parser.add_argument('--out', required=True, help='working folder for the review material (keep it out of the published reader)')
     parser.add_argument('--pdf', help='source PDF of the book')
     parser.add_argument('--images', help='page image pattern with {page}, when there is no PDF')
@@ -97,6 +130,11 @@ def main():
     args = parser.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    if args.survey:
+        survey(args.survey, out, args.browser)
+        return
+    if not args.page:
+        parser.error('--page or --survey is required')
 
     if (args.pdf or args.images) and args.pdf_pages:
         print('book sheets:', ', '.join(book_sheets(args, out)), '+ single pages in pages/')

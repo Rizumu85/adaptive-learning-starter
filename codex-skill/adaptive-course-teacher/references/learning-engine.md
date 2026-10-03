@@ -91,7 +91,7 @@ Lessons are rarely revisited; reference sheets are. After a unit, when the learn
 - Integrate adopted advice from the source directly into the rule where it belongs. Do not keep a separate "the source says / we do" comparison unless the contrast prevents a likely mistake.
 - Keep one canonical home per note. When notes live in an external note app, do not keep a stale local duplicate.
 
-`GLOSSARY.md` holds terms the learner can already use correctly, one or two sentences each, with the preferred term and aliases to avoid. Add a term after the learner uses it correctly, not when it is first introduced. Once a term is in the glossary, use it consistently in lessons and notes. When the field uses a word loosely, state how this project uses it. Revise a definition in place when understanding deepens instead of keeping stale entries; group terms under subheadings once clusters appear.
+`GLOSSARY.md` holds terms the learner can already use correctly, one or two sentences each, with the preferred term and aliases to avoid. Add a term after the learner uses it correctly, not when it is first introduced. Once a term is in the glossary, use it consistently in lessons and notes. When the field uses a word loosely, state how this project uses it. Revise a definition in place when understanding deepens instead of keeping stale entries; group terms under subheadings once groups of related terms appear.
 
 ## Lessons
 

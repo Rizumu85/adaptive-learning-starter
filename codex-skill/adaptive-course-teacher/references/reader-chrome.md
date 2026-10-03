@@ -84,21 +84,21 @@ A JSON file in the book project, for example `tools/reader-chrome.json`:
 ```json
 {
   "root": "../local-reading",
-  "book": "荒木飞吕彦的漫画术",
+  "book": "示例书",
   "shelf": "/",
   "assets": "../assets/",
   "width": "828px",
   "directory": {"file": "index.html", "url": "index.html"},
   "chapters": [
     {"file": "preface.html", "url": "preface.html", "title": "前言"},
-    {"file": "chapter-01.html", "url": "chapter-01.html", "title": "导入部分的画法"},
-    {"file": "chapter-03.html", "url": "chapter-03.html", "title": "如何塑造角色", "status": "pending"}
+    {"file": "chapter-01.html", "url": "chapter-01.html", "title": "第一章"},
+    {"file": "chapter-03.html", "url": "chapter-03.html", "title": "第三章", "status": "pending"}
   ]
 }
 ```
 
 - `file` is on disk relative to `root`; `url` is the published path. Links are computed from `url`, so a deployment layout may differ from the project layout.
-- `legacy` names an adapter that removes a book's earlier navigation when the post-build step first runs (`stonehouse`, `araki`); omit it for new books.
+- `legacy` names an adapter that removes a book's earlier navigation when the post-build step first runs (the adapters are listed in `LEGACY` in the script); omit it for new books.
 - In the post-build step, section links for the dropdown come from a prior run, the legacy adapter, or the page's sections. Only `#` links survive.
 - Reruns are idempotent: inserted chrome sits between `<!--rc:bar-->` / `<!--rc:foot-->` markers and is replaced.
 

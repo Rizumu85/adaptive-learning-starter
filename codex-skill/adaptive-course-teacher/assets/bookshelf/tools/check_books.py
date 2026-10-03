@@ -10,7 +10,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REQUIRED = ("id", "title", "author", "edition", "category", "reader", "size", "chapters")
+# edition 可选；目录要么用 directoryUrl（书自己的目录页），要么用 reader + chapters；category 在分排时才必填（见下）
+REQUIRED = ("id", "title", "author", "size")
 
 
 def main():
@@ -24,6 +25,8 @@ def main():
         for key in REQUIRED:
             if not book.get(key):
                 errors.append(f"{name}: 缺少 {key}")
+        if not book.get("directoryUrl") and not (book.get("reader") and book.get("chapters")):
+            errors.append(f"{name}: 需要 directoryUrl，或者 reader 加 chapters")
         if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", book.get("id", "")):
             errors.append(f"{name}: id 只用小写字母、数字和连字符")
         if book.get("id") in seen:
@@ -52,6 +55,9 @@ def main():
     if len(books) >= (data.get("library") or {}).get("searchFrom", 12):
         counts = {}
         for book in books:
+            if not book.get("category"):
+                errors.append(f"{book.get('id', '?')}: 书架已按分类分排，缺少 category")
+                continue
             counts[book.get("category")] = counts.get(book.get("category"), 0) + 1
         for category, count in counts.items():
             if count < 2:

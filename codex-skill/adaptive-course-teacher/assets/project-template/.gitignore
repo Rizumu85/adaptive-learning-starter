@@ -4,6 +4,10 @@
 # Locally authorized fonts, narration, models, and derived assets stay local.
 /assets/local/
 
+# Reading editions hold the book's text and cropped figures: local by default.
+# A learner who backs them up to a private repository adds them explicitly.
+/local-reading/
+
 # Temporary extraction, review, and browser-test output.
 /work/
 

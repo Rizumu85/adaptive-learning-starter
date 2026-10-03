@@ -136,13 +136,17 @@ def survey(folder, out, browser):
         target = out / page.stem
         command = ['node', str(Path(__file__).with_name('layout_shots.mjs')), str(page), '--out', str(target),
                    '--widths', '1440', '--findings-only'] + (['--browser', browser] if browser else [])
-        try:
-            done = subprocess.run(command, timeout=120, capture_output=True)
-        except subprocess.TimeoutExpired:
-            rows.append((-1, page.name, 'timed out'))
-            continue
-        if done.returncode or not (target / 'report.json').exists():
-            rows.append((-1, page.name, 'failed'))
+        problem = None
+        for _ in range(2):  # a browser that fails to start once usually starts the second time
+            try:
+                done = subprocess.run(command, timeout=120, capture_output=True, text=True, errors='replace')
+                problem = None if done.returncode == 0 and (target / 'report.json').exists() else                     'failed: ' + (done.stderr or done.stdout).strip().splitlines()[-1:][0] if (done.stderr or done.stdout).strip() else 'failed'
+            except subprocess.TimeoutExpired:
+                problem = 'timed out'
+            if not problem:
+                break
+        if problem:
+            rows.append((-1, page.name, problem))
             continue
         data = json.loads((target / 'report.json').read_text(encoding='utf-8'))['widths']['1440']
         kinds = {}

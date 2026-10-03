@@ -71,6 +71,12 @@ const MEASURE = `(() => {
   const visible = (el) => { const r = el.getBoundingClientRect(); return r.width > 1 && r.height > 1; };
   const others = [...document.querySelectorAll('p, h1, h2, h3, li, figcaption, img')].filter(visible);
   const findings = [];
+  // Every picture's place on the page, for comparing with where the crop record says it was printed.
+  const figures = [...document.querySelectorAll('figure img')].filter(visible).map((img) => {
+    const r = img.getBoundingClientRect();
+    return { file: img.getAttribute('src').split('/').pop().split('?')[0], x: Math.round(r.left), y: Math.round(r.top + scrollY),
+      w: Math.round(r.width), h: Math.round(r.height) };
+  });
   for (const figure of document.querySelectorAll('figure')) {
     const image = figure.querySelector('img');
     if (!image || !visible(image)) continue;
@@ -111,7 +117,7 @@ const MEASURE = `(() => {
   // Where each section starts, so a printed page or heading can be found in the tiles.
   const anchors = [...document.querySelectorAll('section[id], h1[id], h2[id], h3[id], [id^="page-"], [id^="pdf-"]')]
     .map((el) => ({ id: el.id, y: Math.round(el.getBoundingClientRect().top + scrollY) }));
-  return JSON.stringify({ height: document.documentElement.scrollHeight, columnWidth: Math.round(columnWidth), anchors,
+  return JSON.stringify({ height: document.documentElement.scrollHeight, columnWidth: Math.round(columnWidth), anchors, figures,
     pageOverflow: document.documentElement.scrollWidth > innerWidth + 1, findings });
 })()`;
 

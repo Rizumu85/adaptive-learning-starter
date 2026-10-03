@@ -30,6 +30,8 @@ To see where a whole book needs review, survey it first: `python <skill>/assets/
 
 `report.json` also lists `anchors`: the vertical position of every section and heading with an id, so a printed page can be found in the tiles. A figure inside an element with `data-layout-ok` is not reported.
 
+For plate-like books (an atlas, a catalogue, a book of photographs), pictures without words are normal and `wordless-run` is mostly noise. Add `--crops local-reading/crops.json`: the tool then compares where the crop record places each picture on the printed page with where it sits on the wide screen, and reports `row-split` (two pictures printed side by side are no longer side by side) and `cut-frame` (two crops whose boxes touch along a whole edge, probably one printed frame cut into pieces). A third fault it cannot see must be looked for by eye: body text the book prints between two pictures moved above or below them.
+
 A bilingual reader has more than one layout: capture the view the learner reads in and the parallel view as well (`--view parallel`, `target` or `source`); a group that fits a single-language column can break in two columns.
 
 The findings are where to start looking, not the verdict. A small picture alone can be right, and a broken composition can have no finding at all.

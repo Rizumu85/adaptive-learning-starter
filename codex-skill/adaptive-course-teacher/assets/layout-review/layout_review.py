@@ -16,6 +16,10 @@ Findings (see references/layout-review.md for what to do with them):
     small-alone      a picture narrower than 40% of the column with nothing beside it (on a phone, only
                      when it has no caption and no text directly before or after it)
     wordless-run     two or more pictures in a row with no caption or text between them
+    row-split        (with --crops) two pictures the crop record places side by side on the printed page
+                     are no longer side by side on a wide screen
+    cut-frame        (with --crops) two crops whose boxes touch along a whole edge: probably one printed
+                     frame cut into pieces
     narrow-caption   a caption squeezed to less than 220 px
     overflow         a picture wider than the screen; pageOverflow means the page scrolls sideways
 
@@ -88,6 +92,43 @@ def book_sheets(args, out):
     return files
 
 
+def printed_arrangement(report, crops_path):
+    """Compare where the crop record says pictures sit on the printed page with where they sit on the
+    widest captured screen. Useful for plate-like books, where pictures without words are normal and the
+    real faults are a printed row turned into a column and one frame cut into several crops."""
+    record = json.loads(Path(crops_path).read_text(encoding='utf-8'))
+    by_file = {}
+    for crop in record.get('crops', []):
+        bounds, page, output = crop.get('bounds'), crop.get('page'), crop.get('output')
+        if output and bounds and len(bounds) == 4 and not isinstance(page, list):
+            by_file[Path(output).name] = (crop.get('id', output), (crop.get('edition'), page), bounds)
+    width = max(report['widths'], key=int)
+    shown = {f['file']: f for f in report['widths'][width].get('figures', []) if f['file'] in by_file}
+    names = sorted(shown)
+    found = []
+    for i, a in enumerate(names):
+        for b in names[i + 1:]:
+            (ida, pa, ba), (idb, pb, bb) = by_file[a], by_file[b]
+            if pa != pb:
+                continue
+            tall = min(ba[3], bb[3]) - max(ba[1], bb[1])
+            wide = min(ba[2], bb[2]) - max(ba[0], bb[0])
+            beside = tall >= 0.5 * min(ba[3] - ba[1], bb[3] - bb[1]) and wide <= 5
+            wa, wb = shown[a], shown[b]
+            on_row = wa['y'] < wb['y'] + wb['h'] and wb['y'] < wa['y'] + wa['h']
+            if beside and not on_row:
+                found.append({'kind': 'row-split', 'id': ida, 'with': idb, 'y': wa['y']})
+            gap_x = max(ba[0], bb[0]) - min(ba[2], bb[2])
+            gap_y = max(ba[1], bb[1]) - min(ba[3], bb[3])
+            # Boxes that abut with no gutter at all; panels of a tight grid keep a gutter of a few units.
+            touching_side = -3 <= gap_x <= 1.5 and tall >= 0.8 * min(ba[3] - ba[1], bb[3] - bb[1])
+            touching_stack = -3 <= gap_y <= 1.5 and wide >= 0.8 * min(ba[2] - ba[0], bb[2] - bb[0])
+            if touching_side or touching_stack:
+                found.append({'kind': 'cut-frame', 'id': ida, 'with': idb, 'y': wa['y']})
+    report['widths'][width]['findings'] += found
+    return found
+
+
 def survey(folder, out, browser):
     """Findings per page of a reader, most first: where a layout review should start."""
     rows = []
@@ -127,6 +168,7 @@ def main():
     parser.add_argument('--pdf-pages', help='page indexes of this unit in the source, e.g. 34-39 or 34-36,40')
     parser.add_argument('--widths', default='1440,820,390')
     parser.add_argument('--browser', help='path to Chrome or Edge when it is not found automatically')
+    parser.add_argument('--crops', help='crop record (crops.json): also compare the printed arrangement with the wide screen')
     parser.add_argument('--view', choices=['parallel', 'target', 'source'], help='bilingual reader: capture this view instead of the default one')
     args = parser.parse_args()
     out = Path(args.out)
@@ -152,6 +194,9 @@ def main():
         sys.exit(result.returncode)
 
     report = json.loads((out / 'report.json').read_text(encoding='utf-8'))
+    if args.crops:
+        printed_arrangement(report, args.crops)
+        (out / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     flagged = False
     for width, data in report['widths'].items():
         kinds = {}
@@ -159,6 +204,7 @@ def main():
             kinds.setdefault(finding['kind'], []).append(finding['id'])
         flagged = flagged or bool(kinds) or data['pageOverflow']
         for kind, ids in kinds.items():
+            ids = list(dict.fromkeys(ids))
             print(f'{width}px {kind} ({len(ids)}): {", ".join(ids)}')
     print(f'material in {out}')
     sys.exit(1 if flagged else 0)

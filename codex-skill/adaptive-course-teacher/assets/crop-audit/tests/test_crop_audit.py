@@ -193,6 +193,43 @@ def test_audit_ok_accepts_paper(tmp_path):
     assert kinds(crop_audit.audit([figure(p, (200, 400, 400, 600), image=out, accepted=['paper'])])) == []
 
 
+def ring_cleared(tmp_path, name, frame=False):
+    """A crop marked transparent where only a thin outer ring was cleared: white paper inside, a drawing
+    in the middle. With frame=True the opaque part ends at a black frame line instead (white inside a
+    frame is part of the picture)."""
+    image = Image.new('RGBA', (400, 400), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((10, 10, 389, 389), fill=(250, 249, 244, 255))
+    if frame:
+        draw.rectangle((10, 10, 389, 389), outline=(0, 0, 0, 255), width=8)
+    draw.rectangle((150, 150, 250, 250), fill=(0, 0, 0, 255))
+    path = tmp_path / name
+    image.save(path)
+    return str(path)
+
+
+def test_paper_reports_a_transparent_output_that_only_lost_a_ring(tmp_path):
+    p = page(tmp_path)
+    out = ring_cleared(tmp_path, 'ring.png')
+    issues = crop_audit.audit([figure(p, (200, 400, 400, 600), image=out)])
+    assert kinds(issues) == ['paper']
+    assert 'has transparency' in issues[0]['detail']
+
+
+def test_paper_ignores_white_inside_a_frame(tmp_path):
+    p = page(tmp_path)
+    out = ring_cleared(tmp_path, 'framed.png', frame=True)
+    opaque, light, rim = crop_audit.paper_left(out)
+    assert opaque >= crop_audit.STILL_OPAQUE and light >= crop_audit.STILL_PAPER and rim < crop_audit.PAPER_RIM
+    assert kinds(crop_audit.audit([figure(p, (200, 400, 400, 600), image=out)])) == []
+
+
+def test_audit_ok_accepts_paper_left_in_a_transparent_output(tmp_path):
+    p = page(tmp_path)
+    out = ring_cleared(tmp_path, 'ring.png')
+    assert kinds(crop_audit.audit([figure(p, (200, 400, 400, 600), image=out, accepted=['paper'])])) == []
+
+
 # outside ---------------------------------------------------------------------------------------
 
 @pytest.mark.parametrize('bounds', [(900, 100, 1050, 200), (-30, 100, 200, 200), (100, 1300, 300, 1500)])

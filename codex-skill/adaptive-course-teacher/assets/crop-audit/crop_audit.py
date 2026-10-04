@@ -18,6 +18,9 @@ look, so nobody has to inspect hundreds of them:
               figures off more the lower they sit. Convert them (y * height/width) and recut.
 * paper     - the output is fully opaque and its outer edge is almost all light paper: a drawing on
               paper whose paper was not removed, so it will sit in a white box on the reader's page.
+              Also an output that has transparency but is still almost all opaque, mostly light paper,
+              with paper where the opaque part ends: only a thin ring was cleared. White inside a
+              frame is not reported, because there the opaque part ends at the frame line.
 
 It never changes a crop. Flagged crops get a review sheet: the page around the box, the box in
 teal, suspected cuts in red.
@@ -44,7 +47,7 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 
 INK = 170          # page luminance below this counts as printed line work or text (not tinted backgrounds)
 BAND = 6           # a crossing line must show ink within this many pixels outside the edge
@@ -53,6 +56,9 @@ MIN_HITS = 3       # edge pixels that must cross before a side is reported
 FAINT = 235        # for near-empty: pale pencil counts as drawing
 MIN_INK = 0.003    # share of the crop that must be drawing, or it is reported as near-empty
 PAPER = 0.85       # share of an opaque crop's outer edge that is light paper before it is reported
+STILL_OPAQUE = 0.85  # a crop with transparency is reported when this share of it is still opaque,
+STILL_PAPER = 0.6    # ...this share of the opaque part is light paper,
+PAPER_RIM = 0.3      # ...and this share of the opaque part's rim is light paper (not a frame line)
 MIN_SHARED_INK = 150  # ink pixels of a shared area visible in both crops before it matters
 MARGIN = 0.12      # context around the box on review sheets, as a share of the box size
 
@@ -110,6 +116,39 @@ def paper_border(path):
     edge += [(x, y) for y in range(0, h, step) for x in list(range(ring)) + list(range(w - ring, w))]
     light = sum(1 for x, y in edge if min(px[x, y]) >= 205 and max(px[x, y]) - min(px[x, y]) <= 40)
     return light / len(edge)
+
+
+def _light(rgb):
+    """Mask of light, nearly neutral pixels (the same test as paper_border)."""
+    r, g, b = rgb.split()
+    low = ImageChops.darker(ImageChops.darker(r, g), b)
+    high = ImageChops.lighter(ImageChops.lighter(r, g), b)
+    return ImageChops.multiply(low.point(lambda v: 255 if v >= 205 else 0),
+                               ImageChops.subtract(high, low).point(lambda v: 255 if v <= 40 else 0))
+
+
+def paper_left(path):
+    """For an output that has transparency: (share of the crop still opaque, share of the opaque part
+    that is light paper, share of the opaque part's rim that is light paper). None when the image is
+    fully opaque or fully transparent."""
+    with Image.open(path) as image:
+        rgba = image.convert('RGBA')
+    if rgba.getchannel('A').getextrema()[0] == 255:
+        return None
+    factor = max(1, max(rgba.size) // 500)
+    if factor > 1:
+        rgba = rgba.reduce(factor)
+    w, h = rgba.size
+    opaque = rgba.getchannel('A').point(lambda v: 255 if v >= 250 else 0)
+    count = opaque.histogram()[255]
+    if not count:
+        return None
+    light = ImageChops.multiply(_light(rgba.convert('RGB')), opaque)
+    inner = ImageOps.expand(opaque, 1, 0).filter(ImageFilter.MinFilter(3)).crop((1, 1, w + 1, h + 1))
+    rim = ImageChops.subtract(opaque, inner)
+    rim_count = rim.histogram()[255]
+    rim_light = ImageChops.multiply(rim, light).histogram()[255]
+    return count / (w * h), light.histogram()[255] / count, rim_light / rim_count if rim_count else 0.0
 
 
 def ink_share(path):
@@ -227,6 +266,13 @@ def audit(figures, unit=1000, sheets=None):
                 paper = paper_border(f['image'])
                 if paper is not None and paper >= PAPER and 'paper' not in f.get('accepted', ()):
                     detail = f'opaque, and {paper:.0%} of its edge is paper: remove the paper unless it is a photo'
+                    issues.append({'id': f['id'], 'kind': 'paper', 'detail': detail})
+                    notes.append(detail)
+                left = paper_left(f['image']) if paper is None else None
+                if (left and left[0] >= STILL_OPAQUE and left[1] >= STILL_PAPER and left[2] >= PAPER_RIM
+                        and 'paper' not in f.get('accepted', ())):
+                    detail = (f'has transparency, but {left[0]:.0%} of the crop is still opaque and {left[1]:.0%} of '
+                              'that is light paper: the paper around the picture was not removed')
                     issues.append({'id': f['id'], 'kind': 'paper', 'detail': detail})
                     notes.append(detail)
             if notes and sheets:

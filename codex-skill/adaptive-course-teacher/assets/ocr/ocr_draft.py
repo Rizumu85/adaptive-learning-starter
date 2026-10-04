@@ -12,6 +12,9 @@ Writes one JSON per page: {"page", "width", "height", "lines": [{"text", "score"
 `box` [x0, y0, x1, y1] on a page 1000 units wide (the same scale as crops.json), in the order the
 engine returns them. Reading order across columns, ruby, text over drawings, light text on dark
 ground and handwriting need a look by eye whatever the engine.
+
+ocr_second.py makes an optional second draft with a different engine and ocr_compare.py marks
+where the two differ.
 """
 import glob
 import json

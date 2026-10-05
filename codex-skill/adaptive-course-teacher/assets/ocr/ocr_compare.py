@@ -17,8 +17,8 @@ The first folder holds ocr_draft.py output (lines with boxes), the second ocr_se
 
 Punctuation and spacing are ignored when comparing. A sentence the engines agree on is less likely
 to be wrong, not certain to be right, and what neither engine read appears nowhere: every page is
-still checked against the scan. On two Japanese books the engines differed on 46% and 70% of the
-sentences, so expect this to direct the proofreading rather than to shrink it to a few lines.
+still checked against the scan. On a Japanese book the engines differed on 31% of the sentences, so
+expect this to direct the proofreading rather than to shrink it to a few lines.
 """
 import difflib
 import json

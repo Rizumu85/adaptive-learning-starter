@@ -1,10 +1,10 @@
-"""Draft text from scanned pages with PP-OCRv5 (RapidOCR), locally and offline.
+"""Draft text from scanned pages with PP-OCRv6 medium (RapidOCR), locally and offline.
 
 One recognizer reads simplified and traditional Chinese, Japanese and English. The output is a
 draft and a search aid: every line still has to be checked against the page before it counts as
 the book's text.
 
-    pip install rapidocr onnxruntime pymupdf
+    pip install "rapidocr>=3.9.2" onnxruntime pymupdf   # an older RapidOCR falls back to PP-OCRv5
     python ocr_draft.py book.pdf 11-35 work/ocr/          # PDF pages 11 to 35 (1-based)
     python ocr_draft.py "work/source/p0*.jpg" work/ocr/   # page images
 
@@ -29,6 +29,14 @@ DPI = 200  # render resolution for PDF pages; small captions read better at 200 
 
 def engine():
     from rapidocr import LangRec, ModelType, OCRVersion, RapidOCR
+    if hasattr(OCRVersion, 'PPOCRV6'):
+        from rapidocr import LangDet
+        print('engine: PP-OCRv6 medium', file=sys.stderr)
+        return RapidOCR(params={'Rec.lang_type': LangRec.CH, 'Rec.ocr_version': OCRVersion.PPOCRV6,
+                                'Rec.model_type': ModelType.MEDIUM, 'Det.lang_type': LangDet.CH,
+                                'Det.ocr_version': OCRVersion.PPOCRV6, 'Det.model_type': ModelType.MEDIUM})
+    # PP-OCRv6 misreads far fewer Japanese characters; this branch only keeps an old install working.
+    print('engine: PP-OCRv5 (this RapidOCR has no PP-OCRv6: pip install -U "rapidocr>=3.9.2")', file=sys.stderr)
     return RapidOCR(params={'Rec.lang_type': LangRec.CH, 'Rec.ocr_version': OCRVersion.PPOCRV5,
                             'Rec.model_type': ModelType.SERVER,
                             'Det.ocr_version': OCRVersion.PPOCRV5, 'Det.model_type': ModelType.MOBILE})

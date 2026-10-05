@@ -1,7 +1,8 @@
 """Optional second OCR draft with Xiaomi-OCR-0, a small vision-language model, on a local GPU.
 
 It reads a whole page and returns headings and merged paragraphs in reading order, which the first
-engine (ocr_draft.py, PP-OCRv5) does not. It returns no coordinates, skips most text inside figures,
+engine (ocr_draft.py, PP-OCRv6) does not. It reads Chinese body text more accurately than the first
+engine and Japanese less accurately. It returns no coordinates, skips most text inside figures,
 captions and handwriting, and can occasionally reword a phrase. So it never replaces the first
 draft: run both, then ocr_compare.py marks where they differ.
 

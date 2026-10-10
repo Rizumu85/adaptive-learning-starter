@@ -78,6 +78,6 @@ Keep these states apart in every record: agent inspected the source, material pr
 - `assets/examples/lessons/`: `0001` calm long-form reading, `0002` focused stepped 3D lab, `0003` side-by-side comparison lab.
 - `assets/examples/practice/`: reading-and-writing practice with a catalog, separate typed and handwritten work, recall mode, and saved-state recovery. Read its `README.md` before adapting it.
 - `assets/image-preview/`, `assets/reader-chrome/`, `assets/bilingual-reader/`, and `assets/bookshelf/`: ready-built components; integrate them through their references.
-- `assets/crop-audit/` (crop checks → `references/media-workflow.md`, step 6), `assets/ocr/` (OCR drafts → `references/book-learning.md`, "Reading Editions"), and `assets/layout-review/` (layout review and survey → `references/layout-review.md`): checking and drafting tools for book projects.
+- `assets/crop-audit/` (crop checks → `references/media-workflow.md`, step 6), `assets/ocr/` (OCR drafts → `references/book-learning.md`, "Reading Editions"), `assets/layout-review/` (layout review and survey → `references/layout-review.md`), and `assets/note-zones/` (notes of a hand-annotated picture as zones on it: script, styles and the tool that finds the boxes → `references/layout-review.md`, "Notes on the picture"): checking and drafting tools for book projects.
 
 Examples are patterns. Remove their topic-specific content and keep only the structure that fits the new lesson.

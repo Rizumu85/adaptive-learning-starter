@@ -1,0 +1,52 @@
+/* Note zones: styles for note-zones.js. A picture that carries many notes stays one image; each note is a zone on it,
+   and a card shows the typed text of the note. Flat on purpose: a zone is invisible until it is pointed at, then a
+   light tint; the card is paper with a hairline, no glow and no shadow.
+   Colours and fonts come from custom properties, each with a fallback:
+   --note-accent (or --accent), --note-paper (--paper), --note-ink (--ink), --note-muted (--muted), --note-line (--line),
+   --note-card-line, --note-font (the text in the card), --note-ui-font (count, buttons, the hint line). */
+.note-frame{position:relative}
+.note-frame>a[data-image-preview]{display:block;text-decoration:none}
+.note-frame>a[href^="#"]{z-index:1}
+.note-zone{position:absolute;display:block;margin:0;padding:0;border:0;border-radius:3px;background:transparent;cursor:help;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.note-zone.is-on,.note-zone.is-lit,.note-zone:focus-visible{background:color-mix(in srgb,var(--note-accent,var(--accent,#147d8f)) 20%,transparent)}
+.note-zone:focus-visible{outline:2px solid var(--note-accent,var(--accent,#147d8f));outline-offset:2px}
+/* the same zones over the enlarged picture in the shared image preview; the viewer keeps every gesture */
+.note-layer{position:absolute;pointer-events:none}
+.note-layer[hidden]{display:none}
+/* wide screens: a card floating beside the zone */
+.note-card{position:fixed;z-index:19;left:0;top:0;box-sizing:border-box;width:max-content;max-width:min(340px,calc(100vw - 16px));padding:8px 13px 9px;background:var(--note-paper,var(--paper,#fff));color:var(--note-ink,var(--ink,#18181b));border:1px solid var(--note-card-line,#b9b5a6);border-radius:6px;font-family:var(--note-font,inherit);text-align:left;pointer-events:none;animation:note-card-in .12s ease-out}
+@keyframes note-card-in{from{opacity:0}to{opacity:1}}
+.note-card:not(.is-sheet) :is(.note-grip,.note-crop,.note-nav){display:none}
+.note-text>*{margin:0;font-family:inherit;font-size:17px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere}
+.note-text .source{font-size:16px;line-height:1.75;color:var(--note-muted,var(--muted,#6d706a))}
+.note-text .target{font-size:18px;color:var(--note-ink,var(--ink,#18181b))}
+body[data-view=source] .note-text .source{font-size:18px;color:var(--note-ink,var(--ink,#18181b))}
+/* narrow screens: a sheet at the bottom with an enlarged view of the place, the text, previous / next */
+.note-card.is-sheet{z-index:26;inset:auto 0 0 0;display:flex;flex-direction:column;gap:10px;width:auto;max-width:none;max-height:58vh;padding:7px 16px max(12px,env(safe-area-inset-bottom));border-width:1px 0 0;border-radius:14px 14px 0 0;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;animation:note-sheet-in .16s ease-out}
+@keyframes note-sheet-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.note-grip{flex:none;width:36px;height:4px;margin:0 auto;border-radius:2px;background:var(--note-line,var(--line,#d9d6cb))}
+.note-crop{flex:none;position:relative;height:min(24vh,200px);overflow:hidden;border:1px solid var(--note-line,var(--line,#d9d6cb));border-radius:6px}
+.note-crop-art{position:absolute}
+.note-crop-art img{position:absolute;top:0;height:100%;max-width:none;max-height:none}
+.note-crop-mark{position:absolute;border-radius:3px;background:color-mix(in srgb,var(--note-accent,var(--accent,#147d8f)) 14%,transparent)}
+.is-sheet .note-text{min-height:0;overflow:auto}
+.note-nav{flex:none;display:flex;align-items:center;gap:8px}
+.note-card .note-step,.note-card .note-whole{height:40px;border:1px solid var(--note-line,var(--line,#d9d6cb));border-radius:6px;background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.note-card .note-step{display:grid;place-items:center;width:46px;padding:0;color:var(--note-ink,var(--ink,#18181b))}
+.note-card .note-step:disabled{color:color-mix(in srgb,var(--note-ink,var(--ink,#18181b)) 25%,transparent)}
+.note-count{min-width:58px;text-align:center;font:600 14px/1 var(--note-ui-font,system-ui,sans-serif);color:var(--note-muted,var(--muted,#6d706a));font-variant-numeric:tabular-nums}
+.note-card .note-whole{margin-left:auto;padding:0 14px;font:600 14px/1 var(--note-ui-font,system-ui,sans-serif);color:var(--note-accent,var(--accent,#147d8f))}
+.al-image-preview .note-whole{display:none}
+.note-card[hidden]{display:none}
+/* the list under the picture, once every note has a zone: one line that says what to do and opens the list.
+   <details class="note-details"><summary class="note-hint"><span>hint</span><span class="note-toggle" data-closed="…" data-open="…"></span></summary>entries</details> */
+.note-hint{margin:0;font:600 13px/1.6 var(--note-ui-font,system-ui,sans-serif);color:var(--note-muted,var(--muted,#6d706a));text-align:center}
+.note-details>summary{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 14px;list-style:none;cursor:pointer}
+.note-details>summary::-webkit-details-marker{display:none}
+.note-toggle{color:var(--note-accent,var(--accent,#147d8f))}
+.note-toggle::after{content:attr(data-closed)}
+.note-details[open] .note-toggle::after{content:attr(data-open)}
+.note-details[open]>summary,.note-details:not(:last-child){margin-bottom:14px}
+/* the entry of the note whose card is open */
+.note-on{background:color-mix(in srgb,var(--note-accent,var(--accent,#147d8f)) 10%,transparent);outline:5px solid color-mix(in srgb,var(--note-accent,var(--accent,#147d8f)) 10%,transparent);border-radius:1px}
+@media(prefers-reduced-motion:reduce){.note-card,.note-card.is-sheet{animation:none}}

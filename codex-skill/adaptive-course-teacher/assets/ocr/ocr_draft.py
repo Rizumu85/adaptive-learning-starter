@@ -16,6 +16,10 @@ The text matches RapidOCR's to within a few characters a page; "score" is null, 
 does not report a confidence between 0 and 1. When it cannot run, the reason is printed and RapidOCR
 does the pages instead.
 
+Both engines write one box per line. The fast engine can also estimate a box per character; that is
+not written out yet. Add it in simd/Program.cs (see the note at its top) when something needs a
+position finer than a line, such as a hotspot over a few characters of a hand-written note.
+
 Writes one JSON per page: {"page", "width", "height", "lines": [{"text", "score", "box"}]}, with
 `box` [x0, y0, x1, y1] on a page 1000 units wide (the same scale as crops.json), in the order the
 engine returns them. Reading order across columns, ruby, text over drawings, light text on dark

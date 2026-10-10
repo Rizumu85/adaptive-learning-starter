@@ -7,6 +7,12 @@
 // shape ocr_draft.py documents, with boxes on a page 1000 units wide. "score" is null: the library
 // reports a raw recognition value, not a confidence between 0 and 1.
 // OCR_FAST_BACKEND=cpu|vulkan|metal overrides the automatic choice.
+//
+// Not written yet: a box per character. When a caller needs a position finer than a line (a hotspot over a
+// few characters of a hand-written note), call ocr.Run(..., returnCtcAlignment: true) and add to each line
+// a "chars" list from line.EstimateCharacterBoxes() (text plus the four corners, scaled by k like the line
+// box). The boxes are estimates from the recognizer's alignment, with blanks split at their midpoint, so
+// check them on the page before relying on them. ocr_draft.py and its tests document the JSON: update both.
 using System.Diagnostics;
 using System.Text.Json;
 using Sdcb.SimdPaddleOCR;

@@ -20,6 +20,8 @@ if (!(window as any)[initialized]) {
   const dialog = document.createElement('dialog');
   dialog.className = 'al-image-preview';
   dialog.setAttribute('aria-label', labels.title);
+  // The dialog itself takes focus on opening (see open()), so it must be focusable from script in every browser.
+  dialog.tabIndex = -1;
   dialog.innerHTML = `<div class="al-viewer-backdrop"></div>`
     + `<div class="al-viewer-stage"><div class="al-viewer-canvas"><img class="al-viewer-image" alt="" draggable="false"></div><p class="al-viewer-status" role="status"></p></div>`
     + `<div class="al-viewer-top">${button('close', 'back', `<span>${labels.back}</span>`)}<span class="al-viewer-count"></span></div>`
@@ -143,7 +145,9 @@ if (!(window as any)[initialized]) {
     closing = false;
     document.documentElement.classList.add('al-preview-open');
     dialog.showModal();
-    control('close').focus();
+    // Focus goes to the dialog, not to a control: the keys work at once and no button is left wearing a focus ring
+    // that the reader did not ask for (opening by touch or mouse showed one on the back button). Tab reaches the back button first.
+    dialog.focus();
     fade([backdrop], true, 280);
     fade(chrome, true, 280, 120);
     show(links.indexOf(link), { opening: true });

@@ -550,11 +550,16 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     if (event.key === 'Escape' && !card.hidden) { const link = current; close(); if (link) link.focus(); }
   });
   addEventListener('scroll', () => { if (!card.hidden && !card.matches(':hover')) close(); }, { passive: true });
-  // 有的手机浏览器（旧一些的 Safari、Firefox 和各种内置浏览器）的 click 事件不带 pointerType，
-  // 所以在按下时就记住这一次是手指、笔、鼠标还是键盘，点击时拿它补上
+  // 按下的那一刻记两件事，点击时用它们判断，不看点击那一刻的状态：
+  // 一是这一次是手指、笔、鼠标还是键盘——有的手机浏览器（旧一些的 Safari、Firefox 和各种内置浏览器）的 click 事件不带 pointerType；
+  // 二是卡片是不是已经为这条引用开着——有的浏览器在按下和点击之间会先触发悬停或聚焦，把卡片提前打开，
+  // 那样第一次轻点就会被当成“再点一次”而直接跳走
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
   let pressed = '';
-  addEventListener('pointerdown', (event) => { pressed = event.pointerType || ''; }, true);
-  addEventListener('touchstart', () => { pressed = 'touch'; }, { capture: true, passive: true });
+  let openAtPress = null;
+  const press = (kind) => { pressed = kind; openAtPress = card.hidden ? null : current; };
+  addEventListener('pointerdown', (event) => press(event.pointerType || ''), true);
+  addEventListener('touchstart', () => press('touch'), { capture: true, passive: true });
   addEventListener('keydown', () => { pressed = 'key'; }, true);
   document.addEventListener('click', (event) => {
     const pic = event.target.closest('.rc-peek-img');
@@ -580,9 +585,12 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       if (el && from) { event.preventDefault(); jump(from, el); }
       return;
     }
-    // 指向几处时没有唯一的去处，点引用只打开卡片；触屏第一次轻点也只预览，再点才跳
+    // 指向几处时没有唯一的去处，点引用只打开卡片；触屏第一次轻点也只预览，再点才跳。
+    // 键盘直接跳（聚焦时卡片已经开着）；鼠标也直接跳，但只在主要输入确实是鼠标的设备上——
+    // 认不出是什么、或者手机把轻点报成鼠标时，按触屏处理
     const kind = event.pointerType || pressed;
-    const touch = kind && kind !== 'mouse' && kind !== 'key' && current !== link;
+    const direct = kind === 'key' || ((kind === 'mouse' || !kind) && fine.matches);
+    const touch = !direct && openAtPress !== link;
     if (targetsOf(link).length > 1 || touch) {
       event.preventDefault();
       open(link).then((shown) => { if (!shown) location.assign(link.href); });

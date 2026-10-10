@@ -3,6 +3,8 @@
 html.al-preview-open{overflow:hidden;scrollbar-gutter:stable}
 .al-image-preview{--al-paper:var(--preview-paper,var(--paper,var(--canvas,#f7f5ef)));--al-ink:var(--preview-ink,var(--ink,#18181b));--al-line:var(--preview-line,var(--line,#d7dbe2));--al-accent:var(--preview-accent,var(--accent,#147d8f));--al-muted:var(--preview-muted,var(--muted,#62666c));--al-font:var(--preview-font,UIOption,Inter,system-ui,"Segoe UI","Microsoft YaHei",sans-serif);position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;overflow:hidden;background:transparent;color:var(--al-ink);font-family:var(--al-font);letter-spacing:0;box-sizing:border-box}
 .al-image-preview[open]{display:block}
+/* The dialog fills the screen, so a focus ring on the dialog itself would only frame the viewport. Its controls keep their rings. */
+.al-image-preview:focus,.al-image-preview:focus-visible{outline:0}
 .al-image-preview::backdrop{background:transparent}
 .al-image-preview *{box-sizing:border-box}
 .al-viewer-backdrop{position:absolute;inset:0;background:var(--al-paper)}
@@ -15,7 +17,7 @@ html.al-preview-open{overflow:hidden;scrollbar-gutter:stable}
 
 .al-viewer-top{position:absolute;z-index:2;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));pointer-events:none}
 .al-viewer-top>*{pointer-events:auto}
-.al-viewer-count{font:600 14px/1 var(--al-font);font-variant-numeric:tabular-nums;color:var(--al-muted)}
+.al-viewer-count{flex:none;font:600 14px/1 var(--al-font);font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--al-muted)}
 .al-viewer-bottom{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px max(16px,env(safe-area-inset-bottom));pointer-events:none}
 .al-viewer-caption{max-width:min(64ch,100%);margin:0;text-align:center;font:400 13px/1.65 var(--al-font);color:var(--al-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;pointer-events:auto}
 .al-viewer-caption:empty{display:none}

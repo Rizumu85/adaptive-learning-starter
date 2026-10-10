@@ -643,3 +643,141 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     save([...new Set([...record.seen, ...ids])]);
   }).catch(() => {});
 })();
+
+// 标记这张：放大看图时，右上角页码旁有一个“标记这张”。读者看到哪张图有问题（裁歪了、底色不对、缺译文）就点一下，
+// 服务器按登录邮箱和书记下这张图在哪一页、是哪个文件；再点一次取消。标了以后旁边多一个“加说明”，可以写一句哪里不对，不写也行。
+// 清单留给做书的人照着去修，正文里不显示任何标记。
+// 需要已登录的私有站点提供 /api/flags/<书在站点上的文件夹名>；没有这个接口（本地打开、别的站点）时按钮不出现。
+// 网址加 ?preview-flag 时不连服务器，只用来看样子，刷新后不保留。
+(() => {
+  const demo = new URLSearchParams(location.search).has('preview-flag');
+  if (!demo && !/^https?:$/.test(location.protocol)) return;
+  const start = () => {
+    // 控件放进共用图片预览的顶栏（image-preview 的 .al-viewer-top），靠它的图片地址知道正在看哪一张
+    const dialog = document.querySelector('dialog.al-image-preview');
+    const count = dialog && dialog.querySelector('.al-viewer-count');
+    const image = dialog && dialog.querySelector('.al-viewer-image');
+    if (!count || !image) return;
+    // 页面和图片都记成书的文件夹（网址第一段）里的相对路径；写法和服务器接受的一致，不合的不提供标记
+    const folder = location.pathname.split('/').filter(Boolean)[0] || '';
+    const inside = (href) => {
+      const path = new URL(href, location.href).pathname.replace(/\/$/, '/index.html');
+      const rest = path.startsWith(`/${folder}/`) ? path.slice(folder.length + 2) : '';
+      return /^[A-Za-z0-9._~%\/-]{1,300}$/.test(rest) && !/(^|\/)\./.test(rest) ? rest : '';
+    };
+    const api = `/api/flags/${encodeURIComponent(folder)}`;
+    const make = (tag, className, html = '') => {
+      const el = document.createElement(tag);
+      el.className = className;
+      el.hidden = true;
+      el.innerHTML = html;
+      return el;
+    };
+    const group = make('span', 'rc-flag-group');
+    const noteButton = make('button', 'rc-flag-note', '<span></span>');
+    const button = make('button', 'rc-flag', '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg><span></span>');
+    const editor = make('div', 'rc-flag-edit', '<input type="text" maxlength="200" enterkeyhint="done" autocomplete="off" aria-label="这张图哪里不对" placeholder="哪里不对？可以不写">');
+    noteButton.type = 'button';
+    button.type = 'button';
+    group.append(noteButton, button);
+    count.before(group);
+    count.parentElement.append(editor);
+    const input = editor.firstElementChild;
+    const label = button.lastElementChild;
+
+    let flags = null;   // 图片路径 → 记录。读到服务器的清单之前是 null，控件不出现
+    let asked = false;
+    let current = null; // 正在看的这张：{ page, image, figure }
+    let editing = '';   // 正在写说明的那张图的路径
+    let noteTimer = 0;
+    const render = (text) => {
+      const flag = flags && current ? flags.get(current.image) : null;
+      group.hidden = button.hidden = !(flags && current);
+      button.setAttribute('aria-pressed', String(!!flag));
+      label.textContent = text || (flag ? '已标记' : '标记这张');
+      button.title = flag ? '取消标记' : '标记这张图有问题，留到之后修';
+      noteButton.hidden = !flag;
+      noteButton.firstElementChild.textContent = flag && flag.note ? flag.note : '加说明';
+      noteButton.title = flag && flag.note ? '改说明' : '写一句哪里不对，可以不写';
+      noteButton.classList.toggle('has-note', !!(flag && flag.note));
+    };
+    const read = () => (demo ? Promise.resolve({ flags: [] }) : fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)))
+      .then((record) => { flags = record && Array.isArray(record.flags) ? new Map(record.flags.map((f) => [f.image, f])) : null; })
+      .catch(() => { flags = null; });
+    let saving = Promise.resolve();
+    const save = () => {
+      clearTimeout(noteTimer);
+      render();
+      if (demo) return;
+      const body = JSON.stringify({ flags: [...flags.values()] });
+      // 没存上时以服务器上的清单为准重新显示，并说一声，免得读者以为记下了
+      saving = saving.then(() => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body }))
+        .then((r) => { if (!r.ok) throw new Error(String(r.status)); })
+        .catch(() => read().then(() => { render(flags ? '没存上，再点一次' : ''); noteTimer = setTimeout(render, 2400); }));
+    };
+    // 收起说明输入框；keep 为真时把写的内容记到那张图的标记上（空着就是去掉说明）
+    const closeEditor = (keep) => {
+      if (editor.hidden) return;
+      const flag = flags && flags.get(editing);
+      const note = input.value.replace(/\s+/g, ' ').trim();
+      editor.hidden = true;
+      editing = '';
+      if (!keep || !flag || note === (flag.note || '')) return;
+      const { note: old, at, ...rest } = flag;
+      flags.set(flag.image, note ? { ...rest, note, at } : { ...rest, at });
+      save();
+    };
+    const look = () => {
+      closeEditor(true);
+      const link = image.getAttribute('src') && [...document.querySelectorAll('a[data-image-preview]')].find((a) => a.href === image.src);
+      const page = inside(location.href);
+      const path = link ? inside(link.href) : '';
+      const id = link ? (link.closest('figure') || link).id : '';
+      current = page.endsWith('.html') && path ? { page, image: path, figure: /^[\w.:-]{1,120}$/.test(id) ? id : '' } : null;
+      if (current && !asked) { asked = true; read().then(() => render()); }
+      render();
+    };
+    new MutationObserver(look).observe(image, { attributes: true, attributeFilter: ['src'] });
+
+    button.addEventListener('click', () => {
+      if (!flags || !current) return;
+      closeEditor(false);
+      const { page, image: path, figure } = current;
+      if (flags.has(path)) flags.delete(path);
+      else flags.set(path, figure ? { page, image: path, figure, at: Date.now() } : { page, image: path, at: Date.now() });
+      save();
+    });
+    noteButton.addEventListener('click', () => {
+      const flag = flags && current && flags.get(current.image);
+      if (!flag) return;
+      if (!editor.hidden) { closeEditor(true); return; }
+      editing = flag.image;
+      input.value = flag.note || '';
+      editor.hidden = false;
+      input.focus();
+      input.select();
+    });
+    // 输入时的按键不交给图片预览（它用 + - 0 和方向键缩放、翻图）；回车记下，Esc 放弃这次改动而不是关掉预览
+    // 收起后把焦点交还给预览窗口本身，方向键等照常可用，也不在哪个按钮上留下焦点框；浏览器不让窗口本身得到焦点时退回到“加说明”
+    const leave = (keep) => {
+      closeEditor(keep);
+      dialog.focus();
+      if (document.activeElement !== dialog) noteButton.focus();
+    };
+    input.addEventListener('keydown', (event) => {
+      event.stopPropagation();
+      if (event.isComposing) return;
+      if (event.key === 'Enter') { event.preventDefault(); leave(true); }
+      if (event.key === 'Escape') { event.preventDefault(); leave(false); }
+    });
+    // 点到别处就记下并收起；点的是“加说明”本身时交给它自己的点击去收，免得刚收起又被打开。
+    // 图片区域会拦下按下的默认动作，输入框不会因此失去焦点，所以按下时自己收
+    input.addEventListener('blur', (event) => { if (event.relatedTarget !== noteButton) closeEditor(true); });
+    dialog.addEventListener('pointerdown', (event) => {
+      if (!editor.hidden && !event.target.closest('.rc-flag-edit, .rc-flag-note')) closeEditor(true);
+    }, true);
+  };
+  // 图片预览的脚本可能排在这个脚本后面，等页面的脚本都跑完再找它
+  if (document.readyState === 'complete') start();
+  else addEventListener('load', start, { once: true });
+})();

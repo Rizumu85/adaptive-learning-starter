@@ -183,3 +183,23 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 @media print{.rc-scrub{display:none}}
 @media print{.rc-rail{display:none}}
 @media (prefers-reduced-motion:reduce){.rc-rail-marker,.rc-rail .rc-tick::before,.rc-rail .rc-tick-label,.rc-scrub-handle,.rc-scrub-label,.rc-scrub-ticks,.rc-scrub-grip,.rc-scrub-grip::before,.rc-scrub-grip::after{transition:none}.rc-flash{animation:none}.rc-peek{transition:none}.rc-bar,.rc-bar .rc-toc>summary svg,.rc-bar .rc-segmented button::after,.rc-bar .rc-toggle::after{transition:none}}
+
+/* 标记这张：放大看图时顶栏页码旁的文字按钮，和“返回”同一种写法——只有线条图标和字，没有外框、底色和阴影。
+   没标时用次要色，不抢图；标了以后转成强调色，小旗填实，左边多一个“加说明”（写了就显示那句话，太长截断）。
+   预览的按钮样式自带 display，所以隐藏要单独写回来 */
+.al-image-preview .al-viewer-top .rc-flag-group{display:flex;align-items:center;gap:2px;min-width:0;margin-left:auto}
+.al-image-preview .al-viewer-top .rc-flag-group[hidden],.al-image-preview .al-viewer-top .rc-flag[hidden],.al-image-preview .al-viewer-top .rc-flag-note[hidden],.al-image-preview .al-viewer-top .rc-flag-edit[hidden]{display:none}
+.al-image-preview .al-viewer-top .rc-flag{width:auto;padding:0 10px;gap:6px;color:var(--al-muted);font-size:14px;white-space:nowrap}
+.al-image-preview .al-viewer-top .rc-flag svg{width:16px;height:16px}
+.al-image-preview .al-viewer-top .rc-flag:hover:not(:disabled),.al-image-preview .al-viewer-top .rc-flag-note:hover:not(:disabled){background:none;color:var(--al-ink)}
+.al-image-preview .al-viewer-top .rc-flag[aria-pressed="true"]{color:var(--al-accent)}
+.al-image-preview .al-viewer-top .rc-flag[aria-pressed="true"] svg path:first-child{fill:currentColor}
+.al-image-preview .al-viewer-top .rc-flag-note{flex:0 1 auto;width:auto;min-width:0;max-width:18em;padding:0 10px;color:var(--al-muted);font-size:14px;font-weight:400}
+.al-image-preview .al-viewer-top .rc-flag-note>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-image-preview .al-viewer-top .rc-flag-note.has-note{color:var(--al-ink)}
+/* 说明输入框：点“加说明”才出现，浮在顶栏下面靠右，不挤动图片。纸色底、细边，和文中引用的预览卡片同一种浮层 */
+.al-image-preview .al-viewer-top .rc-flag-edit{position:absolute;top:100%;right:max(16px,env(safe-area-inset-right));width:min(340px,calc(100vw - 32px));margin-top:4px;background:var(--al-paper);border:1px solid var(--al-line);border-radius:8px;box-shadow:0 1px 2px rgb(0 0 0 / .05),0 10px 28px rgb(0 0 0 / .08)}
+.al-image-preview .al-viewer-top .rc-flag-edit:focus-within{border-color:var(--al-accent)}
+.al-image-preview .al-viewer-top .rc-flag-edit input{display:block;width:100%;height:44px;margin:0;padding:0 14px;border:0;border-radius:8px;outline:0;background:transparent;color:var(--al-ink);font:400 15px/1.4 var(--al-font)}
+.al-image-preview .al-viewer-top .rc-flag-edit input::placeholder{color:var(--al-muted);opacity:1}
+@media(max-width:720px){.al-image-preview .al-viewer-top .rc-flag-note{max-width:6em;padding:0 6px}.al-image-preview .al-viewer-top .rc-flag{padding:0 6px}.al-image-preview .al-viewer-top .rc-flag-edit input{font-size:16px}}

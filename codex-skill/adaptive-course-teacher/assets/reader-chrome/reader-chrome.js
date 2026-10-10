@@ -550,6 +550,12 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     if (event.key === 'Escape' && !card.hidden) { const link = current; close(); if (link) link.focus(); }
   });
   addEventListener('scroll', () => { if (!card.hidden && !card.matches(':hover')) close(); }, { passive: true });
+  // 有的手机浏览器（旧一些的 Safari、Firefox 和各种内置浏览器）的 click 事件不带 pointerType，
+  // 所以在按下时就记住这一次是手指、笔、鼠标还是键盘，点击时拿它补上
+  let pressed = '';
+  addEventListener('pointerdown', (event) => { pressed = event.pointerType || ''; }, true);
+  addEventListener('touchstart', () => { pressed = 'touch'; }, { capture: true, passive: true });
+  addEventListener('keydown', () => { pressed = 'key'; }, true);
   document.addEventListener('click', (event) => {
     const pic = event.target.closest('.rc-peek-img');
     if (pic && current) {
@@ -575,7 +581,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       return;
     }
     // 指向几处时没有唯一的去处，点引用只打开卡片；触屏第一次轻点也只预览，再点才跳
-    const touch = event.pointerType && event.pointerType !== 'mouse' && current !== link;
+    const kind = event.pointerType || pressed;
+    const touch = kind && kind !== 'mouse' && kind !== 'key' && current !== link;
     if (targetsOf(link).length > 1 || touch) {
       event.preventDefault();
       open(link).then((shown) => { if (!shown) location.assign(link.href); });

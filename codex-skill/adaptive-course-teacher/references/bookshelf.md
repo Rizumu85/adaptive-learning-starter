@@ -39,6 +39,12 @@ On a signed-in private site, when a book whose contents page embeds the reader c
 
 The shelf follows the paper presets: flat colors, a real cover on the front face, a vertical title on the spine, a thin paper-colored page edge and top, a soft contact shadow on the cover plus a fainter shadow on the wall behind the book. Opening a book lays a translucent paper veil over the shelf and lets the page transition fade; it does not enlarge the cover. The centered book's contents page is prepared in the background after it stays centered for 600 ms. Wheel, drag, arrow keys, and Tab move between books.
 
+Nothing on the shelf may move because of which book is centered or because the page has just appeared:
+
+- The title block above a row reserves the height of the tallest title-and-byline in that row at the current width (measure every book of the row, write the result as the block's `min-height`, never below the stylesheet's floor, and measure again when the width, the fonts or a "new chapters" note change). Otherwise centering a book whose byline wraps to a second line pushes that row and every row below it down.
+- When the rows are first placed, and again when the shelf is shown after a visit to a book, each book appears already in its place: choose each row's centered book with transitions switched off for that moment. A layout read between building the rows and choosing the centered book otherwise starts a transition from the "no book centered" state.
+- Arriving at the shelf from another page skips the cross-page view transition (`pagereveal` → `viewTransition.skipTransition()`, registered in the page head so it runs before the first frame). The transition shows a flat snapshot of the page; on iPhone the row's perspective is missing from that snapshot, so the side books look upright until the transition ends. The rows already wait for their covers and fade in, so the page needs no transition of its own. Leaving the shelf keeps the transition.
+
 The page's tab icon is the bookshelf icon in `index.html` (three spines in teal, slate, and gold); reading editions use the single-book icon from the reader chrome (see "Tab icon" in `reader-chrome.md`). Do not give a book page the shelf icon.
 
 Typography uses the learner's reading preset when the fonts are installed and falls back to system fonts otherwise. Keep the page free of welcome text and cards.

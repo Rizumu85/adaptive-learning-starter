@@ -387,6 +387,19 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     return copy.textContent.replace(/\s+/g, ' ').trim();
   };
   const line = (className, textContent) => Object.assign(document.createElement('p'), { className, textContent });
+  // 目标是空的定位标记（比如只标页码的锚点）时，要预览的是它后面的内容：一直到下一个同类标记为止
+  const following = (el) => {
+    if (el.childElementCount || el.textContent.trim()) return [];
+    const kind = el.classList[0];
+    const walker = el.ownerDocument.createTreeWalker(el.ownerDocument.body, NodeFilter.SHOW_ELEMENT);
+    walker.currentNode = el;
+    const found = [];
+    for (let node = walker.nextNode(); node && found.length < 600; node = walker.nextNode()) {
+      if (kind ? node.classList.contains(kind) : node.id) break;
+      found.push(node);
+    }
+    return found;
+  };
 
   let current = null;
   let token = 0;
@@ -439,11 +452,25 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
           if (row.childElementCount) parts.push(row);
         }
       } else {
-        const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4');
+        const after = following(el);
+        const first = (selector) => after.find((node) => node.matches(selector)) || null;
+        const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4') || first('h1,h2,h3,h4');
         const lang = document.body.dataset.view ? (sourceOnly() ? 'p.source' : 'p.target') : null;
-        const para = el.matches('p') ? el : (lang && el.querySelector(lang)) || [...el.querySelectorAll('p')].find((p) => plain(p).length > 12);
+        const para = el.matches('p') ? el : (lang && (el.querySelector(lang) || first(lang)))
+          || [...el.querySelectorAll('p'), ...after.filter((node) => node.matches('p'))].find((p) => plain(p).length > 12);
         if (heading) parts.push(line('rc-peek-title', plain(heading)));
         if (para) parts.push(line('rc-peek-text', plain(para)));
+        // 那一处只有图（没有标题和成段文字）时，预览第一张图
+        const picture = !heading && !para && first('figure img');
+        if (picture) {
+          const pic = document.createElement('img');
+          pic.className = 'rc-peek-img';
+          pic.src = samePage ? (picture.currentSrc || picture.src) : new URL(picture.getAttribute('src'), url).href;
+          pic.alt = picture.alt;
+          pic.dataset.target = href;
+          pic.addEventListener('load', () => { if (current === link) place(link); }, { once: true });
+          parts.push(pic);
+        }
       }
       const go = Object.assign(document.createElement('a'), { className: 'rc-peek-go', href: url.href, textContent: img ? '在文中看这张图 →' : '跳到这里 →' });
       go.dataset.target = href;

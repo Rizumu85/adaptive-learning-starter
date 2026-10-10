@@ -381,7 +381,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   const plain = (node) => {
     const copy = node.cloneNode(true);
     copy.querySelectorAll('rt, rp, .ja').forEach((n) => n.remove());
-    if (document.body.dataset.view && copy.querySelector('.source, .target')) {
+    if (document.body.dataset.view && copy.querySelector('.source, .target, .source-heading, .target-heading')) {
       copy.querySelectorAll(sourceOnly() ? '.target, .target-heading' : '.source, .source-heading').forEach((n) => n.remove());
     }
     return copy.textContent.replace(/\s+/g, ' ').trim();

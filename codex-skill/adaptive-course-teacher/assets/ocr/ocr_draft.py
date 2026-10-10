@@ -7,6 +7,14 @@ the book's text.
     pip install "rapidocr>=3.9.2" onnxruntime pymupdf   # an older RapidOCR falls back to PP-OCRv5
     python ocr_draft.py book.pdf 11-35 work/ocr/          # PDF pages 11 to 35 (1-based)
     python ocr_draft.py "work/source/p0*.jpg" work/ocr/   # page images
+    python ocr_draft.py --fast book.pdf 1-200 work/ocr/   # same model through the .NET program in simd/
+
+--fast needs the .NET 10 SDK. The first run builds simd/ once into ~/.cache/adaptive-course-teacher
+(or OCR_FAST_CACHE), which downloads its packages and the model. It uses the GPU through Vulkan or Metal when the machine has a capable one (about 0.15 s a
+page on a recent desktop card, against about 9 s through RapidOCR) and the CPU otherwise (about 3 s).
+The text matches RapidOCR's to within a few characters a page; "score" is null, because the library
+does not report a confidence between 0 and 1. When it cannot run, the reason is printed and RapidOCR
+does the pages instead.
 
 Writes one JSON per page: {"page", "width", "height", "lines": [{"text", "score", "box"}]}, with
 `box` [x0, y0, x1, y1] on a page 1000 units wide (the same scale as crops.json), in the order the
@@ -18,13 +26,20 @@ where the two differ.
 """
 import glob
 import json
+import os
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 DPI = 200  # render resolution for PDF pages; small captions read better at 200 than at 150
+FAST = Path(__file__).with_name('simd')  # source of the .NET program behind --fast
+# where it is built: outside the skill, so build files (which record local paths) never sit in it
+CACHE = Path(os.environ.get('OCR_FAST_CACHE') or Path.home() / '.cache' / 'adaptive-course-teacher' / 'ocr-fast')
 
 
 def engine():
@@ -60,14 +75,56 @@ def pages(source, spec):
                 yield Path(path).stem, image.convert('RGB')
 
 
+def fast(source, spec, out):
+    """Run the pages through the .NET program. False, after saying why, when it cannot run."""
+    def no(reason):
+        print(f'--fast: {reason}; using RapidOCR instead', file=sys.stderr)
+        return False
+    dotnet = shutil.which('dotnet')
+    if not dotnet:
+        return no('the .NET 10 SDK is not installed (no dotnet command)')
+    version = subprocess.run([dotnet, '--version'], capture_output=True, text=True).stdout.strip()
+    if not version.split('.')[0].isdigit() or int(version.split('.')[0]) < 10:
+        return no(f'needs the .NET 10 SDK, found {version or "none"}')
+    def built_program():
+        found = sorted((CACHE / 'bin').glob('**/ocr-fast.dll')) if (CACHE / 'bin').is_dir() else []
+        return found[0] if found else None
+    program = built_program()
+    newest = max(path.stat().st_mtime for path in FAST.glob('*') if path.is_file())
+    if program is None or program.stat().st_mtime < newest:
+        print(f'--fast: building the engine in {CACHE} (downloads its packages and the model)', file=sys.stderr)
+        built = subprocess.run([dotnet, 'build', str(FAST), '-c', 'Release', '--artifacts-path', str(CACHE)], capture_output=True, text=True)
+        program = built_program()
+        if built.returncode or program is None:
+            return no('the build failed: ' + (built.stdout.strip().splitlines() or ['no output'])[-1])
+    with tempfile.TemporaryDirectory() as tmp:
+        listing = []
+        if source.lower().endswith('.pdf'):
+            for label, image in pages(source, spec):
+                path = Path(tmp) / f'{label}.png'
+                image.save(path, compress_level=1)
+                listing.append(f'{label}\t{path}')
+        else:
+            listing = [f'{Path(path).stem}\t{Path(path).resolve()}' for path in sorted(glob.glob(source))]
+        pages_file = Path(tmp) / 'pages.txt'
+        pages_file.write_text('\n'.join(listing), encoding='utf-8')
+        done = subprocess.run([dotnet, str(program), str(pages_file), str(out)])
+    return done.returncode == 0 or no(f'the engine stopped with exit code {done.returncode}')
+
+
 def main():
-    pdf = len(sys.argv) > 1 and sys.argv[1].lower().endswith('.pdf')
-    if len(sys.argv) < (4 if pdf else 3):
+    args = [a for a in sys.argv[1:] if a != '--fast']
+    pdf = len(args) > 0 and args[0].lower().endswith('.pdf')
+    if len(args) < (3 if pdf else 2):
         sys.exit(__doc__)
-    source = sys.argv[1]
-    spec, out = (sys.argv[2], sys.argv[3]) if pdf else ('', sys.argv[2])
+    source = args[0]
+    spec, out = (args[1], args[2]) if pdf else ('', args[1])
+    if not pdf and not glob.glob(source):
+        sys.exit(f'no page images match {source}')
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
+    if '--fast' in sys.argv[1:] and fast(source, spec, out):
+        return
     ocr = engine()
     for label, image in pages(source, spec):
         result = ocr(np.asarray(image))

@@ -139,6 +139,72 @@ def test_missing_arguments_print_the_usage(monkeypatch, argv):
         run_main(monkeypatch, *argv)
     assert stop.value.code == ocr_draft.__doc__
 
+# --fast: the glue around the .NET program (the program itself is not run here) ------------------
+
+def one_page(tmp_path):
+    image = tmp_path / 'p1.png'
+    Image.new('RGB', (100, 50), 'white').save(image)
+    return image
+
+
+def test_fast_falls_back_to_rapidocr_when_dotnet_is_missing(tmp_path, monkeypatch, capsys):
+    one_page(tmp_path)
+    make, _ = fake_engine(types.SimpleNamespace(boxes=None, txts=None, scores=None))
+    monkeypatch.setattr(ocr_draft, 'engine', make)
+    monkeypatch.setattr(ocr_draft.shutil, 'which', lambda name: None)
+    monkeypatch.setattr(sys, 'argv', ['ocr_draft.py', '--fast', str(tmp_path / '*.png'), str(tmp_path / 'out')])
+    ocr_draft.main()
+    assert (tmp_path / 'out' / 'p1.json').exists()
+    assert 'using RapidOCR instead' in capsys.readouterr().err
+
+
+def test_fast_falls_back_when_the_sdk_is_older_than_10(tmp_path, monkeypatch, capsys):
+    one_page(tmp_path)
+    make, _ = fake_engine(types.SimpleNamespace(boxes=None, txts=None, scores=None))
+    monkeypatch.setattr(ocr_draft, 'engine', make)
+    monkeypatch.setattr(ocr_draft.shutil, 'which', lambda name: 'dotnet')
+    monkeypatch.setattr(ocr_draft.subprocess, 'run', lambda cmd, **kw: types.SimpleNamespace(returncode=0, stdout='9.0.305\n'))
+    monkeypatch.setattr(sys, 'argv', ['ocr_draft.py', '--fast', str(tmp_path / '*.png'), str(tmp_path / 'out')])
+    ocr_draft.main()
+    assert (tmp_path / 'out' / 'p1.json').exists()
+    assert 'found 9.0.305' in capsys.readouterr().err
+
+
+def test_fast_hands_the_pages_to_the_program_and_never_loads_rapidocr(tmp_path, monkeypatch):
+    image = one_page(tmp_path)
+    source = tmp_path / 'simd'
+    source.mkdir()
+    (source / 'Program.cs').write_text('// source', encoding='utf-8')
+    program = tmp_path / 'cache' / 'bin' / 'simd' / 'release'
+    program.mkdir(parents=True)
+    (program / 'ocr-fast.dll').write_bytes(b'')  # written after the source, so no rebuild is due
+    monkeypatch.setattr(ocr_draft, 'FAST', source)
+    monkeypatch.setattr(ocr_draft, 'CACHE', tmp_path / 'cache')
+    monkeypatch.setattr(ocr_draft, 'engine', lambda: pytest.fail('RapidOCR must not load'))
+    monkeypatch.setattr(ocr_draft.shutil, 'which', lambda name: 'dotnet')
+    seen = {}
+
+    def run(cmd, **kw):
+        if cmd[1:] == ['--version']:
+            return types.SimpleNamespace(returncode=0, stdout='10.0.100\n')
+        seen['cmd'] = cmd
+        seen['listing'] = Path(cmd[2]).read_text(encoding='utf-8')
+        return types.SimpleNamespace(returncode=0, stdout='')
+    monkeypatch.setattr(ocr_draft.subprocess, 'run', run)
+    monkeypatch.setattr(sys, 'argv', ['ocr_draft.py', str(tmp_path / '*.png'), '--fast', str(tmp_path / 'out')])
+    ocr_draft.main()
+    assert seen['cmd'][1] == str(program / 'ocr-fast.dll') and seen['cmd'][3] == str(tmp_path / 'out')
+    assert seen['listing'] == f'p1\t{image.resolve()}'
+
+
+def test_a_glob_that_matches_nothing_stops_with_a_message(tmp_path, monkeypatch):
+    monkeypatch.setattr(ocr_draft, 'engine', lambda: pytest.fail('the model must not load'))
+    monkeypatch.setattr(sys, 'argv', ['ocr_draft.py', str(tmp_path / '*.png'), str(tmp_path / 'out')])
+    with pytest.raises(SystemExit) as stop:
+        ocr_draft.main()
+    assert 'no page images match' in str(stop.value)
+
+
 
 # the real model (downloads it on first use) ----------------------------------------------------
 

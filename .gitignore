@@ -8,3 +8,6 @@ codex-skill/*-workspace/
 # External skill evaluation snapshots and outputs.
 codex-skill/*-workspace/
 __pycache__/
+# build output of the optional fast OCR program (packages and model are downloaded at build time)
+codex-skill/adaptive-course-teacher/assets/ocr/simd/bin/
+codex-skill/adaptive-course-teacher/assets/ocr/simd/obj/

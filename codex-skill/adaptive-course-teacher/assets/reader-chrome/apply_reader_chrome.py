@@ -144,7 +144,9 @@ def foot(cfg, page_url, prev, nxt, credits='', page=None):
             return '<span class="rc-none"></span>'
         title = chapter['title']
         if here and chapter.get('volume') and chapter['volume'] != here:
-            label, title = across, f'{chapter["volume"]} · {title}'
+            # 有的书章名里已经带着册名，不再重复
+            label = across
+            title = title if title.startswith(chapter['volume']) else f'{chapter["volume"]} · {title}'
         return (f'<a class="{cls}" href="{rel(page_url, chapter["url"])}"><small>{label}</small>'
                 f'<span>{escape(title)}</span></a>')
     credit = f'<p class="rc-credit">{credits}</p>' if credits else ''

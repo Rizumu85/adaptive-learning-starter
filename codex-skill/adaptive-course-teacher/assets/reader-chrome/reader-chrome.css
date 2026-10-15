@@ -230,7 +230,12 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-volume-chapters a,.rc-volume-chapters .rc-pending,.rc-volume-chapters summary{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:10px 0;text-decoration:none;color:var(--rc-ink)}
 .rc-volume-chapters a:hover .rc-volume-chapter-title,.rc-volume-chapters a:focus-visible .rc-volume-chapter-title{text-decoration:underline;text-decoration-color:var(--rc-accent);text-underline-offset:3px}
 .rc-volume-chapters a:focus-visible,.rc-volume-chapters summary:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px}
-.rc-volume-chapter-title{min-width:0}
+.rc-volume-chapter-title{flex:1 1 auto;min-width:0}
+/* 双语书：章名下面一行灰色原文标题 */
+.rc-volume-chapter-title small{display:block;margin-top:2px;font-size:.78em;line-height:1.5;color:var(--rc-muted)}
+/* 以图为主、每章一个场景的书（画集、设定集）：章节行前面可以放一张小方图 */
+.rc-volume-chapters a:has(> .rc-volume-chapter-thumb){align-items:center}
+.rc-volume-chapter-thumb{flex:none;display:block;width:72px;height:72px;object-fit:cover}
 .rc-volume-chapter-pages,.rc-volume-chapters .rc-pending small{flex:none;font:600 12px/1.4 var(--rc-font);color:var(--rc-muted)}
 .rc-volume-chapters .rc-pending{color:var(--rc-muted)}
 /* 一册里章节很多时可以按部分折叠（details）：部分名一行，右边是节数和 + / − */
@@ -247,4 +252,5 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
   .rc-volume-strip{gap:14px}
   .rc-volume-strip a{width:76px}
   .rc-volume-strip img{width:76px;height:108px}
+  .rc-volume-chapter-thumb{width:56px;height:56px}
 }

@@ -93,19 +93,39 @@
       + '</span></span>';
   }
 
-  // 一本书 = 正面封面 + 左侧书脊 + 右侧书页切口 + 顶面，按真实比例搭成 3D 盒子
+  // 一本书的 3D 盒子：正面封面 + 左侧书脊 + 右侧书页切口 + 顶面，按真实比例搭成
+  function boxFaces(book, src, title, D, H) {
+    return '<span class="bface front">'
+      + (src ? `<img src="${esc(src)}" alt="" draggable="false">` : '')
+      + '<span class="hinge"></span></span>'
+      + `<span class="bface spine-face">${spineHtml({ ...book, title }, D, H)}</span>`
+      + '<span class="bface fore-face"></span><span class="bface top-face"></span><span class="bface wall-shadow"></span>';
+  }
+
+  // 一本书一格。多册的系列（books.json 的 volumes，最前面那册在第一个）也只占一格：几册叠在一起，
+  // 后面几册往右后方错开露出一截，停到中间时散开一点。左右滑动、滚轮、键盘都按格走，整套只算一次切换
   function bookHtml(book) {
     const { W, H, D } = bookMetrics(book);
     const cover = book.cover || {};
-    const style = [`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';');
-    const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), book.originalTitle, book.author].filter(Boolean).join('，');
-    return `<li class="slot"><a class="book" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`
-      + '<span class="bface front">'
-      + (cover.src ? `<img src="${esc(cover.src)}" alt="" draggable="false">` : '')
-      + '<span class="hinge"></span></span>'
-      + `<span class="bface spine-face">${spineHtml(book, D, H)}</span>`
-      + '<span class="bface fore-face"></span><span class="bface top-face"></span><span class="bface wall-shadow"></span>'
-      + '</a></li>';
+    const volumes = book.volumes?.length > 1 ? book.volumes : null;
+    const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), volumes ? `${volumes.length} 册` : '',
+      book.originalTitle, book.author].filter(Boolean).join('，');
+    const open = (style, extra = '') => `<li class="slot"><a class="book${extra}" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`;
+    if (!volumes) {
+      return open([`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';'))
+        + boxFaces(book, cover.src, book.title, D, H) + '</a></li>';
+    }
+    const widths = volumes.map((v) => Math.round(H * (v.ratio || W / H)));
+    const widest = Math.max(...widths);
+    // 合起来的厚度按册数分到每册，但不薄到看不出侧面
+    const d = Math.max(14, Math.round(D / Math.sqrt(volumes.length)));
+    const spread = Math.round(widest * 0.22);
+    const style = [`--cw:${widest + (volumes.length - 1) * spread}px`, `--ch:${H}px`, `--rest:${Math.round(widest * 0.14)}px`,
+      `--spread:${spread}px`, `--mid:${(volumes.length - 1) / 2}`, colorVars(book)].join(';');
+    return open(style, ' series') + volumes.map((v, i) => {
+      const vs = [`--cw:${widths[i]}px`, `--ch:${H}px`, `--cd:${d}px`, `--i:${i}`, `--depth:${d + 6}px`, coverVars(cover)].join(';');
+      return `<span class="vol" style="${esc(vs)}">${boxFaces(book, v.cover, v.title || book.title, d, H)}</span>`;
+    }).join('') + '</a></li>';
   }
 
   /* ---------- 书架页：一排正面封面，像 Paper 的手帐列表 ---------- */
@@ -126,8 +146,8 @@
 
   function matches(book, q: string) {
     if (!q) return true;
-    const hay = fold([book.title, book.subtitle, book.originalTitle, book.author, book.translator, book.category, book.edition]
-      .filter(Boolean).join(' '));
+    const hay = fold([book.title, book.subtitle, book.originalTitle, book.author, book.translator, book.category, book.edition,
+      ...(book.volumes || []).map((v) => v.title)].filter(Boolean).join(' '));
     return fold(q).split(/\s+/).filter(Boolean).every((word) => hay.includes(word));
   }
 
@@ -316,7 +336,10 @@
     const now = group.querySelector('.now');
     if (book && now && changed) {
       now.firstElementChild.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
-      now.lastElementChild.textContent = [book.originalTitle, book.author ? `${book.author} 著` : ''].filter(Boolean).join(' · ');
+      // 原名和作者相同（画集常这样）时只写一次
+      const original = book.originalTitle === book.author ? '' : book.originalTitle;
+      now.lastElementChild.textContent = [book.volumes?.length > 1 ? `${book.volumes.length} 册一套` : '', original,
+        book.author ? `${book.author} 著` : ''].filter(Boolean).join(' · ');
       showNew(bookEl);
       if (!reduceMotion.matches) now.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: EASE });
     }

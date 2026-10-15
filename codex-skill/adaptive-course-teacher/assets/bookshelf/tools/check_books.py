@@ -38,6 +38,24 @@ def main():
             if src and not (ROOT / src).is_file():
                 errors.append(f"{name}: {label} 文件不存在：{src}")
 
+        # 多册系列：至少两册，最前那册用书本身的封面；第二册起是 covers/<id>-v2.webp …
+        volumes = book.get("volumes")
+        if volumes is not None:
+            if not isinstance(volumes, list) or len(volumes) < 2 or len(volumes) > 9:
+                errors.append(f"{name}: volumes 要列 2–9 册")
+            else:
+                for n, volume in enumerate(volumes, start=1):
+                    expected = (book.get("cover") or {}).get("src") if n == 1 else f"covers/{book.get('id')}-v{n}.webp"
+                    if volume.get("cover") != expected:
+                        errors.append(f"{name}: 第 {n} 册封面应为 {expected}")
+                    elif not (ROOT / volume["cover"]).is_file():
+                        errors.append(f"{name}: 第 {n} 册封面文件不存在：{volume['cover']}")
+                    ratio = volume.get("ratio")
+                    if not isinstance(ratio, (int, float)) or not 0.3 <= ratio <= 3:
+                        errors.append(f"{name}: 第 {n} 册缺少合理的 ratio（封面宽÷高）")
+                    if n > 1 and not volume.get("title"):
+                        errors.append(f"{name}: 第 {n} 册缺少 title")
+
         base = readers.get(book.get("id"))
         for chapter in book.get("chapters", []):
             title = chapter.get("title", "?")

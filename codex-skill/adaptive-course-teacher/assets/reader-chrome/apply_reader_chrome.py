@@ -135,15 +135,21 @@ def bar(cfg, page_url, toc='', tools='', here=False, width=None, extra=''):
             f'<span class="rc-sep" aria-hidden="true">/</span>{title}</nav>{right}</div></div>{extra}<!--/rc:bar-->')
 
 
-def foot(cfg, page_url, prev, nxt, credits=''):
-    def cell(cls, chapter, label):
+def foot(cfg, page_url, prev, nxt, credits='', page=None):
+    # 几册合成一本时，章节可以带 "volume"（册名）：邻章在另一册时写“上一册 / 下一册”，标题前加册名
+    here = (page or {}).get('volume')
+
+    def cell(cls, chapter, label, across):
         if not chapter:
             return '<span class="rc-none"></span>'
+        title = chapter['title']
+        if here and chapter.get('volume') and chapter['volume'] != here:
+            label, title = across, f'{chapter["volume"]} · {title}'
         return (f'<a class="{cls}" href="{rel(page_url, chapter["url"])}"><small>{label}</small>'
-                f'<span>{escape(chapter["title"])}</span></a>')
+                f'<span>{escape(title)}</span></a>')
     credit = f'<p class="rc-credit">{credits}</p>' if credits else ''
     return (f'<!--rc:foot--><footer class="rc-foot"{style(cfg)}><nav class="rc-pager" aria-label="章节">'
-            f'{cell("rc-prev", prev, "← 上一章")}{cell("rc-next", nxt, "下一章 →")}</nav>'
+            f'{cell("rc-prev", prev, "← 上一章", "← 上一册")}{cell("rc-next", nxt, "下一章 →", "下一册 →")}</nav>'
             f'{credit}</footer><!--/rc:foot-->')
 
 
@@ -190,7 +196,7 @@ def decorate(s, cfg, file, toc='', tools='', credits=''):
     prev, nxt = neighbours(cfg, page)
     s = FOOT.sub('', BAR.sub('', s))
     s = insert_bar(s, bar(cfg, page['url'], toc or sections_from(s), tools, extra=catalog(cfg, page['url'], page)))
-    s = insert_foot(s, foot(cfg, page['url'], prev, nxt, credits))
+    s = insert_foot(s, foot(cfg, page['url'], prev, nxt, credits, page))
     return with_assets(s, cfg, page)
 
 

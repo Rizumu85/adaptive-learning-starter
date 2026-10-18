@@ -330,7 +330,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 })();
 
 // 文中引用（a.rc-ref）：指向一张图或别处一段文字。描述和图隔得远时不必来回滚动——
-// 鼠标悬停或键盘聚焦时就地浮出预览卡片（图显示小图和图注，文字显示标题和开头几行）；触屏第一次轻点预览、再点跳转。
+// 鼠标悬停或键盘聚焦时就地浮出预览卡片（图显示小图和图注，文字显示标题和第一段说明，只指向别处的句子不放）；触屏第一次轻点预览、再点跳转。
 // 一个引用也可以指向几处（data-refs 按文中顺序列出）：卡片里依次列出每一处，各自可以跳过去；点引用本身只是打开卡片。
 // 跳过去后目标闪一下，左下角留“回到原文”，点它回到刚才读的位置。跨页引用在能读取同站页面时同样预览。
 (() => {
@@ -400,6 +400,80 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     }
     return found;
   };
+  // 卡片里的文字只放说明本身：整句只是指向别处的引用（“参考第141页。”“（→p.233）”“233ページ参照。”“See p. 12.”）
+  // 在卡片里没有用，略去；括号里只有页码或图号的指路也略去。写进句子里的引用（“……，几乎不动，参考第142页。”）原样保留
+  const NUMS = String.raw`\d+(?:\s*[-–—~～]\s*\d+)?(?:\s*(?:[、,，&]|和|与|及|and)\s*\d+(?:\s*[-–—~～]\s*\d+)?)*`;
+  const PLACE = String.raw`(?:第\s*${NUMS}\s*[页頁]|${NUMS}\s*(?:ページ|頁)|(?:pp?\.?|pages?)\s*${NUMS}|(?:[图圖図]|fig(?:ure)?s?\.?)\s*\d+(?:[-–.]\d+)*)(?:\s*(?:的|の)?\s*[图圖図]\s*\d+(?:[-–.]\d+)*)?`;
+  const POINTER = new RegExp(`^(?:${[
+    String.raw`(?:→|⇒|->)\s*${PLACE}(?:\s*参照)?`,
+    String.raw`(?:(?:关于|有关|至于|对于)[^，,。；;]{0,30}?(?:(?:详细|具体|更多)?(?:介绍|说明|解释|内容|图示|图解|讨论))?[，,]?\s*)?(?:请|可|可以|也可|还可|另请|另|详|亦)?(?:参考|参见|参阅|参照|见|详见)\s*${PLACE}(?:\s*的?(?:内容|说明|介绍|图示|图解))?`,
+    String.raw`(?:(?:詳しく|詳細|くわしく)は\s*)?${PLACE}\s*(?:を|も)?\s*(?:参照|参考)(?:のこと|してください|して下さい|ください|されたい)?`,
+    String.raw`(?:(?:for|on)\s+(?:more|details|further)[^,]{0,60},\s*)?(?:please\s+)?(?:see|refer to|cf\.?|compare)(?:\s+also)?\s+${PLACE}(?:\s+for\s+(?:more|details|further)[\w\s]{0,30})?`,
+  ].join('|')})$`, 'i');
+  const BARE_PLACE = new RegExp(`^${PLACE}$`, 'i');
+  const bare = (text) => {
+    let t = text.trim().replace(/[\s。．.！!？?；;，,]+$/, '');
+    for (let m; (m = t.match(/^[（(【[]\s*([\s\S]*?)\s*[）)】\]]$/));) t = m[1].replace(/[\s。．.！!？?；;，,]+$/, '');
+    return t;
+  };
+  const pointerOnly = (text, inBrackets) => {
+    const t = bare(text);
+    return POINTER.test(t) || (inBrackets && BARE_PLACE.test(t));
+  };
+  // 按句切开：中日文按 。！？，西文按句末的 . ! ? 加空格，p. / fig. / cf. 这类缩写后面不断句
+  const sentencesOf = (text) => {
+    const out = [];
+    let start = 0;
+    for (const m of text.matchAll(/[。！？]+|[.!?]+(?=\s|$)/g)) {
+      if (m[0] === '.' && /(?:^|[\s(（])(?:p|pp|cf|figs?|vol|ch|no|e\.g|i\.e|vs)$/i.test(text.slice(start, m.index))) continue;
+      const close = text.slice(m.index + m[0].length).match(/^[」』”’"')）]*/)[0];
+      const stop = m.index + m[0].length + close.length;
+      out.push(text.slice(start, stop));
+      start = stop;
+    }
+    if (start < text.length) out.push(text.slice(start));
+    return out;
+  };
+  // 段首的“名称（原文）：”是词条名；名称后面只剩指路时整段算空
+  const TERM = /^\s*([^：:（(。！？!?]{1,40}?)\s*(?:[（(][^）)]*[）)])?\s*[：:]/;
+  const previewText = (node) => {
+    const text = plain(node);
+    const head = text.match(TERM);
+    const prefix = head ? head[0] : '';
+    const rest = text.slice(prefix.length);
+    const body = sentencesOf(rest)
+      .map((s) => {
+        const kept = s.replace(/\s*[（(]([^（）()]{1,60})[）)]/g, (all, inner) => (pointerOnly(inner, true) ? '' : all));
+        return kept === s || /[\p{L}\p{N}]/u.test(kept) ? kept : '';
+      })
+      .filter((s) => !pointerOnly(s, false))
+      .join('');
+    if (body === rest) return text;
+    return body.trim() ? `${prefix}${body}`.replace(/\s+/g, ' ').trim() : '';
+  };
+  // 一段定义的词条名：段首“名称：”，或段里标成 <dfn> 的名称
+  const fold = (s) => (s || '').replace(/\s*[（(][^）)]*[）)]\s*$/, '').trim().toLowerCase();
+  const termsOf = (node) => {
+    if (!node) return [];
+    const head = plain(node).match(TERM);
+    return [head && head[1], ...[...node.querySelectorAll('dfn')].map(plain)].map(fold).filter(Boolean);
+  };
+  // 一段文字目标预览哪一段：目标本身是段落时就是它；否则在目标（或空锚点之后那一截）里找。
+  // 双语页只在当前语言的段落里找；单语时跳过 12 字以内的短段。引用所在段落的词条名（或引用文字本身）
+  // 和某一段的词条名相同时，优先那一段，而不是开头第一段
+  const excerptOf = (el, after, link, lang) => {
+    if (el.matches('p')) {
+      const text = previewText(el);
+      return text ? { node: el, text } : null;
+    }
+    const all = (selector) => [...el.querySelectorAll(selector), ...after.filter((node) => node.matches(selector))];
+    const inLang = lang ? all(lang) : [];
+    const min = inLang.length ? 0 : 12;
+    const pool = (inLang.length ? inLang : all('p'))
+      .map((node) => ({ node, text: previewText(node) })).filter(({ text }) => text.length > min);
+    const wanted = link ? [...termsOf(link.closest('p')), fold(plain(link))].filter(Boolean) : [];
+    return (wanted.length && pool.find(({ node }) => termsOf(node).some((t) => wanted.includes(t)))) || pool[0] || null;
+  };
 
   let current = null;
   let token = 0;
@@ -456,10 +530,9 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
         const first = (selector) => after.find((node) => node.matches(selector)) || null;
         const heading = el.matches('h1,h2,h3,h4') ? el : el.querySelector('h1,h2,h3,h4') || first('h1,h2,h3,h4');
         const lang = document.body.dataset.view ? (sourceOnly() ? 'p.source' : 'p.target') : null;
-        const para = el.matches('p') ? el : (lang && (el.querySelector(lang) || first(lang)))
-          || [...el.querySelectorAll('p'), ...after.filter((node) => node.matches('p'))].find((p) => plain(p).length > 12);
+        const para = excerptOf(el, after, link, lang);
         if (heading) parts.push(line('rc-peek-title', plain(heading)));
-        if (para) parts.push(line('rc-peek-text', plain(para)));
+        if (para) parts.push(line('rc-peek-text', para.text));
         // 那一处只有图（没有标题和成段文字）时，预览第一张图
         const picture = !heading && !para && first('figure img');
         if (picture) {

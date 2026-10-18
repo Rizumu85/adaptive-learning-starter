@@ -169,6 +169,13 @@ A whole-library audit found the same four faults in most books, each of which ma
 
 Find them with data first (caption boxes inside crop boxes near an edge; figures on one page whose rows overlap; paragraphs that start with a marker letter next to a figure; blocks with two or more bullet marks or line breaks), then look at the pictures and the rendered page. Software screenshots are not marker figures: interface text is explained by the steps.
 
+Related faults the same audit found, and how to catch them:
+
+- **Pictures that need zones but have no notes bound to them.** Counting caption blocks per figure misses most of them. Run OCR on every page (2300 px wide or more) and list figures with four or more source-language lines inside them; then look for long captions that run several printed labels together ("A：…、…。B：…" summarising a flowchart, or a list of names separated by ／), which should become one note per label with the reviewed wording kept; and for short label blocks just outside a figure's box, which means the labels were cropped off — recut the crop to include them (and sort them in the order of the drawings) instead of listing them below.
+- **Text already in the reader's language.** When the edition is already in the reader's language (a translated edition read as is), text printed on a picture — speech bubbles, labels, notes with arrows — stays on the picture. Never cut it out and retype it as paragraphs: the bubbles and arrows are left pointing at blank space. Keep the transcription in the page for search, folded under the picture with the shared note-list pattern. Only text that merely overlaps the crop box (body text in a neighbouring column) stays out.
+- **Facing pages.** A painting printed across the gutter is one picture: join the two halves without a gap at their true proportions. A two-page sequence (storyboard pages, before and after) sits side by side on wide screens and stacks on phones. Tell which page is the left one from the folio, not from the page numbers alone.
+- **How to group side-by-side pictures.** Group by overlap of the printed rows, with a picture printed directly under a group member joining that group as a column; a tall picture beside a column of variants becomes picture + column; a grid keeps its rows with shared column widths; widths follow the printed widths; each picture's own caption stays under it, and a caption that belongs to the whole row goes under the row; figure letters keep their order.
+
 ## When nothing fits
 
 A typeset composition that no existing layout keeps needs a new named layout in the generator. Who may add one:

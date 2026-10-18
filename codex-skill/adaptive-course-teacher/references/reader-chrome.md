@@ -110,7 +110,7 @@ A JSON file in the book project, for example `tools/reader-chrome.json`:
 ```
 
 - `file` is on disk relative to `root`; `url` is the published path. Links are computed from `url`, so a deployment layout may differ from the project layout.
-- `volume` (optional, only in a book made of several volumes): the title of the volume the chapter belongs to; see Series contents.
+- `volume` (optional, only in a book made of several volumes): the title of the volume the chapter belongs to; see Series contents. The parts of a single book (第一部, Part I, 准备篇) are not volumes: setting `volume` for them makes the footer say 下一册 inside one book. Group a single book's contents page by its parts from the book's own data instead.
 - `legacy` names an adapter that removes a book's earlier navigation when the post-build step first runs (the adapters are listed in `LEGACY` in the script); omit it for new books.
 - In the post-build step, section links for the dropdown come from a prior run, the legacy adapter, or the page's sections. Only `#` links survive.
 - Reruns are idempotent: inserted chrome sits between `<!--rc:bar-->` / `<!--rc:foot-->` markers and is replaced.

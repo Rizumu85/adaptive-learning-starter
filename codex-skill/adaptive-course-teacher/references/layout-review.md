@@ -156,6 +156,19 @@ Only for typeset "around" compositions. Lines cannot follow a layout that reflow
 
 Place each marker where the printed line starts, as a percentage of the picture's width and height. Measure on a copy of the picture with a 10% grid drawn over it, then check the screenshot: every marker must sit on its line's origin. Entries keep the book's order and side.
 
+## Four faults to check in every edition
+
+A whole-library audit found the same four faults in most books, each of which makes the reader match or hunt. Check them before publishing, and fix them in the generator so they hold for the whole book:
+
+| Fault | What the reader sees | Fix |
+| --- | --- | --- |
+| A printed caption or label cropped into the picture and also given as text | The same words twice, and the original still in the picture in the translation-only view | Clear it from the picture: record the box as an exclusion in the crop data and clear it to transparency or the surrounding paper colour. Labels that belong to the drawing stay |
+| Pictures printed side by side, stacked on the web page | A small inset alone under the big picture's caption; a before/after or a 2×3 grid read as unrelated pictures | Group pictures whose rows overlap and that sit beside each other into one row, left to right, wrapping on narrow screens. Decide by overlap, not by tops lining up within a threshold. A group of three must not wrap 2+1 in a two-column grid |
+| Lettered or numbered markers whose key is a body paragraph or a list elsewhere | The reader sees "F" on the picture and scrolls to find F's entry | Make each marker a note zone that opens its key text; the key stays in place. One key printed in several places gets one zone per place |
+| A list printed one item per line, run into one paragraph | "●a ●b ●c" as one sentence, often only in the translation | Keep one item per line in every language view (line breaks or list markup), with the text itself unchanged |
+
+Find them with data first (caption boxes inside crop boxes near an edge; figures on one page whose rows overlap; paragraphs that start with a marker letter next to a figure; blocks with two or more bullet marks or line breaks), then look at the pictures and the rendered page. Software screenshots are not marker figures: interface text is explained by the steps.
+
 ## When nothing fits
 
 A typeset composition that no existing layout keeps needs a new named layout in the generator. Who may add one:

@@ -53,6 +53,12 @@ For a spread, a note's box is in the coordinates of the half the note is bound t
 - The interface words in the card follow the page language (Chinese when `<html lang>` starts with `zh`, English otherwise); the hint line and its two toggle labels are written by the generator.
 - `<body data-note-narrow="720">` moves the width at which the bottom sheet replaces the floating card.
 
+## A long note
+
+The floating card never grows past the room it has. When a note is too long to fit whole beside its zone, the card takes the place with the most room (usually right or left of the zone, the full height of the window below any fixed top bar), is cut there with a quiet fade, and one line under the text says how to read on ("Click the note to read it all", or "Press Enter to read it all" when the zone has keyboard focus). Clicking the zone, or Enter on it, pins the card: it then takes the pointer and its text scrolls with the wheel or a finger, and with the arrow keys, Page Up / Down, Home and End, because Enter (and a click) moves focus into the text. Pointing at other notes on the way to the card does not replace it. Escape, a click outside, or a second click on the zone closes it, and focus goes back to the zone; Tab closes it and goes on from the zone. A tap on a wide touch screen pins it straight away. Short notes are untouched: same place, same card, no pinning on click. The bottom sheet on a phone already scrolls and is unchanged.
+
+The rule for "too long": the card fits in none of the four places at its full height. Below 120 px of room anywhere it falls back to the old rule (on screen, over or under the note), which only happens in a very small window. The classes the script sets on the card are `is-clipped` (cut to fit), `is-held` (pinned, takes the pointer), and `is-more` / `is-above` (more text below / above, which places the fade); a reader that restyles the card should leave `max-height` and `pointer-events` to them.
+
 ## A spread wider than the column
 
 A style rule of the reader, not of `note-zones.css`, because it depends on how the reader lays out a spread:

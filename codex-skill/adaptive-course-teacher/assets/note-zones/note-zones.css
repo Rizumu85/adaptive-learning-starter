@@ -17,6 +17,19 @@
 .note-card{position:fixed;z-index:19;left:0;top:0;box-sizing:border-box;width:max-content;max-width:min(340px,calc(100vw - 16px));padding:8px 13px 9px;background:var(--note-paper,var(--paper,#fff));color:var(--note-ink,var(--ink,#18181b));border:1px solid var(--note-card-line,#b9b5a6);border-radius:6px;font-family:var(--note-font,inherit);text-align:left;pointer-events:none;animation:note-card-in .12s ease-out}
 @keyframes note-card-in{from{opacity:0}to{opacity:1}}
 .note-card:not(.is-sheet) :is(.note-grip,.note-crop,.note-nav){display:none}
+/* a long note: the script caps the card at the room beside its zone (max-height). The text is cut with a quiet fade
+   and one line says how to read on; pinned (is-held) the card takes the pointer and its text scrolls */
+.note-more{display:none}
+.note-card.is-clipped:not(.is-sheet){display:flex;flex-direction:column}
+.note-card.is-clipped:not(.is-sheet) .note-text{min-height:0;overflow:hidden;overscroll-behavior:contain}
+.note-card.is-held:not(.is-sheet){pointer-events:auto}
+.note-card.is-held:not(.is-sheet) .note-text{overflow-y:auto;scrollbar-width:thin;touch-action:pan-y}
+.note-card.is-clipped:not(.is-held):not(.is-sheet) .note-more{display:block;flex:none;contain:inline-size;margin-top:4px;font:600 13px/1.6 var(--note-ui-font,system-ui,sans-serif);color:var(--note-muted,var(--muted,#6d706a))}
+.note-card.is-more:not(.is-sheet) .note-text{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 2.5em),transparent)}
+.note-card.is-above:not(.is-sheet) .note-text{-webkit-mask-image:linear-gradient(to top,#000 calc(100% - 2.5em),transparent);mask-image:linear-gradient(to top,#000 calc(100% - 2.5em),transparent)}
+.note-card.is-more.is-above:not(.is-sheet) .note-text{-webkit-mask-image:linear-gradient(transparent,#000 2.5em,#000 calc(100% - 2.5em),transparent);mask-image:linear-gradient(transparent,#000 2.5em,#000 calc(100% - 2.5em),transparent)}
+.note-card .note-text:focus{outline:none}
+.note-card.is-held:has(.note-text:focus-visible){outline:2px solid var(--note-accent,var(--accent,#147d8f));outline-offset:2px}
 .note-text>*{margin:0;font-family:inherit;font-size:17px;line-height:1.7;white-space:pre-line;overflow-wrap:anywhere}
 .note-text .source{font-size:16px;line-height:1.75;color:var(--note-muted,var(--muted,#6d706a))}
 .note-text .target{font-size:18px;color:var(--note-ink,var(--ink,#18181b))}

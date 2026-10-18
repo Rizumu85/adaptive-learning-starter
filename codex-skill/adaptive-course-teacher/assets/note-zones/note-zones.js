@@ -14,6 +14,7 @@
 //
 // Wide screens: the card floats beside the zone (80 ms after the pointer rests, on keyboard focus, or pinned by a
 // tap); left / right arrows step through the notes in reading order; elsewhere the picture still opens its preview.
+// A note too long for the room beside its zone is cut to that room with a fade; a click or Enter pins it to scroll.
 // Narrow screens (720 px and under, or <body data-note-narrow="…">): nobody has to hit a small target. A tap anywhere
 // on the picture opens the nearest note in a sheet at the bottom, with an enlarged view of the place, previous / next,
 // swipe left / right, and a count. Inside the shared image preview (assets/image-preview) the zones work the same way.
@@ -22,12 +23,13 @@
     if (!frames.length)
         return;
     const labels = /^zh/i.test(document.documentElement.lang)
-        ? { previous: '上一条', next: '下一条', whole: '看整图', sheet: '图上的注记' }
-        : { previous: 'Previous note', next: 'Next note', whole: 'Whole picture', sheet: 'Notes on the picture' };
+        ? { previous: '上一条', next: '下一条', whole: '看整图', sheet: '图上的注记', click: '点一下注记，读全文', enter: '按 Enter 读全文' }
+        : { previous: 'Previous note', next: 'Next note', whole: 'Whole picture', sheet: 'Notes on the picture', click: 'Click the note to read it all', enter: 'Press Enter to read it all' };
     const MIN = 28; // touch on a wide screen: every zone can be hit in an area at least this large (px)
     const SLOP = 6; // touch on a wide screen: how far outside a zone a finger may land
     const DELAY = 80; // how long the pointer rests before the card appears (ms)
     const GAP = 8; // space between the floating card and its zone
+    const ROOM = 120; // a long note: the least height worth showing beside its zone, clipped, before the card may cover it (px)
     const SPREAD = 2.5; // enlarged view: the note's box grown by this factor
     const MAX_ZOOM = 3; // enlarged view: never more than this many screen px per source px (beyond it only blur grows)
     const narrow = matchMedia(`(max-width:${Number(document.body.dataset.noteNarrow) || 720}px)`);
@@ -36,7 +38,7 @@
     card.className = 'note-card';
     card.tabIndex = -1;
     card.hidden = true;
-    card.innerHTML = '<div class="note-grip" aria-hidden="true"></div><div class="note-crop" aria-hidden="true"><div class="note-crop-art"></div></div><div class="note-text"></div>'
+    card.innerHTML = '<div class="note-grip" aria-hidden="true"></div><div class="note-crop" aria-hidden="true"><div class="note-crop-art"></div></div><div class="note-text"></div><div class="note-more" aria-hidden="true"></div>'
         + `<div class="note-nav"><button type="button" class="note-step" data-step="-1" aria-label="${labels.previous}">${icon('m15 18-6-6 6-6')}</button><span class="note-count" aria-live="polite"></span>`
         + `<button type="button" class="note-step" data-step="1" aria-label="${labels.next}">${icon('m9 18 6-6-6-6')}</button><button type="button" class="note-whole">${labels.whole}</button></div>`;
     document.body.append(card);
@@ -44,6 +46,7 @@
     const cropArt = card.querySelector('.note-crop-art');
     const textBox = card.querySelector('.note-text');
     const countBox = card.querySelector('.note-count');
+    const moreBox = card.querySelector('.note-more');
     // the shared image preview, when the page has one: a layer of the same zones is laid over the enlarged picture
     const dialog = document.querySelector('dialog.al-image-preview');
     const stage = dialog ? dialog.querySelector('.al-viewer-stage') : null;
@@ -58,6 +61,7 @@
     let pointer = 'mouse';
     let quiet = 0; // scrolling this script caused does not count as the reader scrolling
     let passing = false; // opening the picture's preview on the reader's behalf
+    let restoring = false; // focus going back to the zone as a card closes does not open the card again
     let lit = null; // the list entry being pointed at
     let stuck = null; // the list entry last tapped (touch has no hover)
     const zonesOf = (id, root = document) => [...root.querySelectorAll(`.note-zone[data-note="${CSS.escape(id)}"]`)];
@@ -89,13 +93,14 @@
         const width = document.documentElement.clientWidth;
         const height = window.innerHeight;
         const w = card.offsetWidth;
-        const h = card.offsetHeight;
+        // the card's full height; while it is clipped, measured from its text, so the place it has scrolled to survives
+        const h = card.classList.contains('is-clipped') ? textBox.scrollHeight + chrome() : card.offsetHeight;
         const top0 = ceiling();
         const clampX = (x) => Math.min(Math.max(x, GAP), Math.max(GAP, width - GAP - w));
-        const clampY = (y) => Math.min(Math.max(y, top0), Math.max(top0, height - GAP - h));
+        const clampY = (y, hh = h) => Math.min(Math.max(y, top0), Math.max(top0, height - GAP - hh));
         const others = [...rootOf(current).querySelectorAll('.note-zone')].filter((other) => other.dataset.note !== current.dataset.note).map((other) => other.getBoundingClientRect());
         // how much of the other notes the card would hide at this place
-        const hidden = (x, y) => others.reduce((sum, r) => sum + Math.max(0, Math.min(r.right, x + w) - Math.max(r.left, x)) * Math.max(0, Math.min(r.bottom, y + h) - Math.max(r.top, y)), 0);
+        const hidden = (x, y, hh = h) => others.reduce((sum, r) => sum + Math.max(0, Math.min(r.right, x + w) - Math.max(r.left, x)) * Math.max(0, Math.min(r.bottom, y + hh) - Math.max(r.top, y)), 0);
         // below, above, right, left: the first that hides no other note; failing that the one that hides least.
         // A place only counts when the card fits there without leaving the screen or covering its own note.
         const places = [
@@ -113,10 +118,96 @@
                 least = area;
             }
         }
-        // nowhere fits (a very small window): keep it on screen under or over the note, whichever has more room
-        if (!best)
-            best = [clampX(zone.left + zone.width / 2 - w / 2), clampY(zone.top - top0 > height - zone.bottom ? zone.top - GAP - h : zone.bottom + GAP)];
+        let tall = 0; // the card's height when it has to be clipped; 0: it shows whole
+        if (!best) {
+            // A long note (or a very small window): nowhere takes the whole card. Of the four places, the one with the most
+            // room takes it at that height, clipped, so it still keeps clear of its note and on the screen; the reader pins
+            // it to scroll. On a tie, the one that hides fewer other notes.
+            const full = height - GAP - top0;
+            const below = zone.bottom + GAP;
+            const sides = [
+                [clampX(zone.left + zone.width / 2 - w / 2), below, Math.min(h, height - GAP - below)],
+                [clampX(zone.left + zone.width / 2 - w / 2), 0, Math.min(h, zone.top - GAP - top0)],
+                [zone.right + GAP, 0, Math.min(h, full)],
+                [zone.left - GAP - w, 0, Math.min(h, full)],
+            ];
+            sides[1][1] = zone.top - GAP - sides[1][2];
+            sides[2][1] = clampY(zone.top + zone.height / 2 - sides[2][2] / 2, sides[2][2]);
+            sides[3][1] = clampY(zone.top + zone.height / 2 - sides[3][2] / 2, sides[3][2]);
+            let most = 0;
+            least = Infinity;
+            for (const [x, y, hh] of sides.filter(([x]) => x >= GAP - 0.5 && x + w <= width - GAP + 0.5)) {
+                const area = hidden(x, y, hh);
+                if (hh > most + 0.5 || (hh > most - 0.5 && area < least - 0.5)) {
+                    best = [x, y];
+                    most = hh;
+                    least = area;
+                }
+            }
+            tall = most >= h - 0.5 ? 0 : Math.floor(most);
+            // too little room anywhere: on screen under or over the note, whichever has more room, as before
+            if (most < Math.min(h, ROOM)) {
+                tall = h > full ? Math.floor(full) : 0;
+                const hh = tall || h;
+                best = [clampX(zone.left + zone.width / 2 - w / 2), clampY(zone.top - top0 > height - zone.bottom ? zone.top - GAP - hh : zone.bottom + GAP, hh)];
+            }
+        }
+        clip(tall);
         card.style.transform = `translate(${Math.round(best[0])}px,${Math.round(best[1])}px)`;
+    }
+    // vertical padding and border of the floating card
+    function chrome() {
+        const style = getComputedStyle(card);
+        return ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'].reduce((sum, key) => sum + (parseFloat(style[key]) || 0), 0);
+    }
+    // A long note: the floating card is cut to `tall` px with a quiet fade and a line that says how to read on. Pinned
+    // (a click, Enter, a tap, an arrow key) it takes the pointer and scrolls: wheel, keys, or a finger.
+    function clip(tall) {
+        const held = tall > 0 && mode === 'pinned';
+        card.classList.toggle('is-clipped', tall > 0);
+        card.classList.toggle('is-held', held);
+        const max = tall > 0 ? `${tall}px` : '';
+        if (card.style.maxHeight !== max)
+            card.style.maxHeight = max;
+        const more = mode === 'focus' ? labels.enter : labels.click;
+        if (tall > 0 && moreBox.textContent !== more)
+            moreBox.textContent = more;
+        if (held || (mode === 'pinned' && card.contains(document.activeElement))) {
+            // a card one can scroll into is a small dialog; otherwise it repeats the zone's own label and stays hidden
+            card.removeAttribute('aria-hidden');
+            card.setAttribute('role', 'dialog');
+            card.setAttribute('aria-label', labels.sheet);
+            textBox.tabIndex = -1;
+        }
+        else {
+            card.setAttribute('aria-hidden', 'true');
+            card.removeAttribute('role');
+            card.removeAttribute('aria-label');
+            if (!card.contains(document.activeElement))
+                textBox.removeAttribute('tabindex');
+        }
+        fade();
+    }
+    // the fade sits on whichever end of the text has more to read
+    function fade() {
+        const clipped = card.classList.contains('is-clipped');
+        card.classList.toggle('is-more', clipped && textBox.scrollTop + textBox.clientHeight < textBox.scrollHeight - 1);
+        card.classList.toggle('is-above', clipped && textBox.scrollTop > 1);
+    }
+    function unclip() {
+        card.classList.remove('is-clipped', 'is-held', 'is-more', 'is-above');
+        card.style.maxHeight = '';
+        textBox.removeAttribute('tabindex');
+        textBox.scrollTop = 0;
+    }
+    // pin a long note's card and, when asked to, take the keyboard into it (Escape gives it back)
+    function hold(zone, beside, focus) {
+        show(zone, 'pinned', beside);
+        if (!focus || !card.classList.contains('is-held'))
+            return;
+        const before = document.activeElement;
+        returnFocus = before instanceof HTMLElement && before !== document.body ? before : (beside || zone);
+        textBox.focus({ preventScroll: true });
     }
     // the enlarged view in the sheet: the note's box grown SPREAD times, widened to the sheet's shape, kept inside the picture
     function crop(zone) {
@@ -223,12 +314,16 @@
         mode = '';
         card.hidden = true;
         card.classList.remove('is-sheet');
+        unclip();
         textBox.replaceChildren();
         // back out of the preview's top layer
         if (card.parentElement !== document.body)
             document.body.append(card);
-        if (restore && restore.isConnected)
+        if (restore && restore.isConnected) {
+            restoring = true;
             restore.focus({ preventScroll: true });
+            restoring = false;
+        }
     }
     function show(zone, how, beside) {
         clearTimeout(timer);
@@ -242,6 +337,7 @@
         current = zone;
         anchor = beside || zone;
         mode = how;
+        unclip();
         textBox.replaceChildren(...[...entry.children].map((node) => {
             const copy = node.cloneNode(true);
             copy.removeAttribute('id');
@@ -299,7 +395,9 @@
         if (mode === 'sheet') {
             show(zone, 'sheet');
         }
-        else if (document.activeElement instanceof Element && document.activeElement.matches('.note-zone')) {
+        else if (document.activeElement instanceof Element && (document.activeElement.matches('.note-zone') || (card.contains(document.activeElement) && zone.matches('button, [tabindex]')))) {
+            // from a zone, or from inside a long note's card the keyboard was taken into: on to the next zone
+            returnFocus = null;
             zone.focus();
             show(zone, 'focus');
         }
@@ -363,7 +461,8 @@
                 return;
             leave();
             hovered = place;
-            if (zone)
+            // a long note pinned to be scrolled stays while the pointer travels over other notes to reach it
+            if (zone && !card.classList.contains('is-held'))
                 timer = setTimeout(() => show(zone, 'hover', place), DELAY);
         });
         surface.addEventListener('pointerleave', (event) => {
@@ -397,14 +496,17 @@
                 return;
             }
             if (event.detail === 0) {
-                // Enter or Space on a zone: focus already showed the card; once more closes it, once more shows it
+                // Enter or Space on a zone: focus already showed the card; once more closes it, once more shows it.
+                // A long note's card, clipped, is pinned instead and takes the keyboard so it can be scrolled.
                 if (!own)
                     return;
                 swallow(event);
-                if (current === own)
+                if (current === own && mode !== 'pinned' && card.classList.contains('is-clipped'))
+                    hold(own, null, true);
+                else if (current === own)
                     hide();
                 else
-                    show(own, 'pinned');
+                    hold(own, null, true);
                 return;
             }
             if (marked) {
@@ -421,8 +523,16 @@
             const zone = pick(root, event.clientX, event.clientY, touch ? MIN : 0, touch ? SLOP : 0);
             if (zone) {
                 swallow(event);
-                if (!touch)
-                    show(zone, 'hover');
+                if (!touch) {
+                    // a click shows the card as pointing does; a long note's card is pinned so it can be scrolled
+                    if (current === zone && card.classList.contains('is-held'))
+                        hide();
+                    else {
+                        show(zone, 'hover');
+                        if (card.classList.contains('is-clipped'))
+                            hold(zone, null, true);
+                    }
+                }
                 else if (current === zone)
                     hide();
                 else
@@ -437,7 +547,7 @@
         if (inPreview)
             return;
         surface.addEventListener('focusin', (event) => {
-            if (narrow.matches || !(event.target instanceof Element) || !event.target.matches(':focus-visible'))
+            if (restoring || narrow.matches || !(event.target instanceof Element) || !event.target.matches(':focus-visible'))
                 return;
             const marked = markOf(event.target);
             const zone = marked ? marked.zone : event.target.closest('.note-zone');
@@ -588,9 +698,27 @@
             swallow(event);
             step(event.key === 'ArrowRight' ? 1 : -1);
         }
+        else if (event.key === 'Tab' && card.classList.contains('is-held') && card.contains(document.activeElement)) {
+            // Tab out of a long note's card: it closes, and Tab goes on from the zone it belongs to
+            hide();
+        }
+        else if (card.classList.contains('is-held') && !card.contains(document.activeElement) && !(event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]'))) {
+            // pinned without the keyboard in it (a tap, an arrow key): the scrolling keys scroll the card, not the page
+            const page = textBox.clientHeight * 0.85;
+            const by = { ArrowDown: 40, ArrowUp: -40, PageDown: page, PageUp: -page, End: textBox.scrollHeight, Home: -textBox.scrollHeight }[event.key];
+            if (by) {
+                swallow(event);
+                textBox.scrollBy({ top: by });
+            }
+        }
     }, true);
     // scrolling closes the floating card; scrolling caused by keyboard focus only moves it; under the sheet the page scrolls freely
-    window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', (event) => {
+        // the long note's own text scrolling
+        if (event.target === textBox) {
+            fade();
+            return;
+        }
         hovered = null;
         if (mode === 'sheet')
             return;

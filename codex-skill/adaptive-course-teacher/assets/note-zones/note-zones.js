@@ -34,6 +34,7 @@
     const icon = (path) => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>`;
     const card = document.createElement('div');
     card.className = 'note-card';
+    card.tabIndex = -1;
     card.hidden = true;
     card.innerHTML = '<div class="note-grip" aria-hidden="true"></div><div class="note-crop" aria-hidden="true"><div class="note-crop-art"></div></div><div class="note-text"></div>'
         + `<div class="note-nav"><button type="button" class="note-step" data-step="-1" aria-label="${labels.previous}">${icon('m15 18-6-6 6-6')}</button><span class="note-count" aria-live="polite"></span>`
@@ -49,6 +50,7 @@
     const big = stage ? stage.querySelector('.al-viewer-image') : null;
     const layer = big ? Object.assign(document.createElement('div'), { className: 'note-layer', hidden: true }) : null;
     let current = null; // the zone the card belongs to
+    let returnFocus = null; // keyboard activation returns here when its sheet closes
     let anchor = null; // what the floating card sits beside (the zone, or a lettered marker)
     let mode = ''; // hover, focus, pinned (tap or arrow key), sheet (narrow screens)
     let hovered = null;
@@ -122,7 +124,10 @@
         const f = root.getBoundingClientRect();
         const z = zone.getBoundingClientRect();
         const images = root === layer ? [big] : [...root.querySelectorAll('img')];
-        const natural = images.reduce((sum, image) => sum + image.naturalWidth, 0) || f.width;
+        // Lazy images already have intrinsic dimensions in the reader HTML. Use those
+        // until decoding finishes, so an early tap never caches a zero-width crop.
+        const widths = images.map((image) => image.naturalWidth || Number(image.getAttribute('width')) || image.getBoundingClientRect().width);
+        const natural = widths.reduce((sum, width) => sum + width, 0) || f.width;
         const W = cropBox.clientWidth;
         const H = cropBox.clientHeight;
         let rw = z.width * SPREAD;
@@ -147,18 +152,18 @@
         cropArt.style.height = `${f.height * k}px`;
         cropArt.style.left = `${(W - rw * k) / 2 - rx * k}px`;
         cropArt.style.top = `${(H - rh * k) / 2 - ry * k}px`;
-        const key = images.map((image) => image.currentSrc || image.src).join(' ');
+        const key = images.map((image, index) => `${image.currentSrc || image.src}:${widths[index]}`).join(' ');
         if (cropArt.dataset.key !== key) {
             cropArt.dataset.key = key;
             let offset = 0;
-            cropArt.replaceChildren(...images.map((image) => {
+            cropArt.replaceChildren(...images.map((image, index) => {
                 const copy = new Image();
                 copy.src = image.currentSrc || image.src;
                 copy.alt = '';
                 copy.draggable = false;
                 copy.style.left = `${offset / natural * 100}%`;
-                copy.style.width = `${image.naturalWidth / natural * 100}%`;
-                offset += image.naturalWidth;
+                copy.style.width = `${widths[index] / natural * 100}%`;
+                offset += widths[index];
                 return copy;
             }), Object.assign(document.createElement('span'), { className: 'note-crop-mark' }));
         }
@@ -167,6 +172,14 @@
         mark.style.top = `${(z.top - f.top) / f.height * 100}%`;
         mark.style.width = `${z.width / f.width * 100}%`;
         mark.style.height = `${z.height / f.height * 100}%`;
+    }
+    for (const image of [...frames.flatMap((frame) => [...frame.querySelectorAll('img')]), ...(big ? [big] : [])]) {
+        image.addEventListener('load', () => {
+            if (current && mode === 'sheet' && rootOf(current).contains(image))
+                crop(current);
+            else if (current && mode === 'sheet' && rootOf(current) === layer && image === big)
+                crop(current);
+        });
     }
     // with the sheet open, the note that is lit on the picture stays visible above it
     function reveal(zone) {
@@ -197,6 +210,8 @@
         clearTimeout(timer);
         if (!current)
             return;
+        const restore = card.contains(document.activeElement) ? returnFocus : null;
+        returnFocus = null;
         unmark();
         if (mode === 'sheet') {
             document.body.style.paddingBottom = '';
@@ -212,6 +227,8 @@
         // back out of the preview's top layer
         if (card.parentElement !== document.body)
             document.body.append(card);
+        if (restore && restore.isConnected)
+            restore.focus({ preventScroll: true });
     }
     function show(zone, how, beside) {
         clearTimeout(timer);
@@ -373,6 +390,10 @@
                     return;
                 swallow(event);
                 show(zone, 'sheet');
+                if (event.detail === 0) {
+                    returnFocus = marked ? marked.mark : own;
+                    card.focus({ preventScroll: true });
+                }
                 return;
             }
             if (event.detail === 0) {
@@ -501,7 +522,8 @@
     });
     let drag = null;
     card.addEventListener('pointerdown', (event) => {
-        drag = mode === 'sheet' ? { x: event.clientX, y: event.clientY } : null;
+        const gestureArea = event.target instanceof Element && event.target.closest('.note-grip, .note-crop');
+        drag = mode === 'sheet' && gestureArea ? { x: event.clientX, y: event.clientY } : null;
     });
     card.addEventListener('pointerup', (event) => {
         if (!drag)

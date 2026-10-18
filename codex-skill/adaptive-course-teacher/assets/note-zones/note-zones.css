@@ -22,14 +22,15 @@
 .note-text .target{font-size:18px;color:var(--note-ink,var(--ink,#18181b))}
 body[data-view=source] .note-text .source{font-size:18px;color:var(--note-ink,var(--ink,#18181b))}
 /* narrow screens: a sheet at the bottom with an enlarged view of the place, the text, previous / next */
-.note-card.is-sheet{z-index:26;inset:auto 0 0 0;display:flex;flex-direction:column;gap:10px;width:auto;max-width:none;max-height:58vh;padding:7px 16px max(12px,env(safe-area-inset-bottom));border-width:1px 0 0;border-radius:14px 14px 0 0;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;animation:note-sheet-in .16s ease-out}
+.note-card.is-sheet{z-index:26;inset:auto 0 0 0;display:flex;flex-direction:column;gap:10px;width:auto;max-width:none;max-height:58vh;padding:7px 16px max(12px,env(safe-area-inset-bottom));border-width:1px 0 0;border-radius:14px 14px 0 0;pointer-events:auto;touch-action:pan-y;animation:note-sheet-in .16s ease-out}
 @keyframes note-sheet-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .note-grip{flex:none;width:36px;height:4px;margin:0 auto;border-radius:2px;background:var(--note-line,var(--line,#d9d6cb))}
 .note-crop{flex:none;position:relative;height:min(24vh,200px);overflow:hidden;border:1px solid var(--note-line,var(--line,#d9d6cb));border-radius:6px}
 .note-crop-art{position:absolute}
 .note-crop-art img{position:absolute;top:0;height:100%;max-width:none;max-height:none}
 .note-crop-mark{position:absolute;border-radius:3px;background:color-mix(in srgb,var(--note-accent,var(--accent,#147d8f)) 14%,transparent)}
-.is-sheet .note-text{min-height:0;overflow:auto}
+.is-sheet .note-text{min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-y}
+.is-sheet :is(.note-grip,.note-crop){touch-action:none;user-select:none;-webkit-user-select:none}
 .note-nav{flex:none;display:flex;align-items:center;gap:8px}
 .note-card .note-step,.note-card .note-whole{height:40px;border:1px solid var(--note-line,var(--line,#d9d6cb));border-radius:6px;background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .note-card .note-step{display:grid;place-items:center;width:46px;padding:0;color:var(--note-ink,var(--ink,#18181b))}

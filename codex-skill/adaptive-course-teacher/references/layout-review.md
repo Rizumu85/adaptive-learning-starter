@@ -129,7 +129,7 @@ The script, styles, box-finding tool and data fields are in `assets/note-zones/`
 | Mouse | A zone is invisible until the pointer rests on it; then a flat, light tint on the writing and a card beside it. Moving away closes it. Left and right arrows step through the notes in reading order. Elsewhere on the picture a click still opens the preview |
 | Keyboard | Tab reaches every zone in reading order, Escape closes the card |
 | Touch, wide screen | A tap pins the card; a tap elsewhere closes it. Each zone can be hit in an area at least 28 px square; where two overlap, the nearer wins |
-| Phone (720 px and under) | Nobody has to hit a small target: a tap anywhere on the picture opens the nearest note in a sheet at the bottom, with an enlarged view of the place, the text, previous / next and a count; swipe to step, swipe down or tap outside to close |
+| Phone (720 px and under) | Nobody has to hit a small target: a tap anywhere on the picture opens the nearest note in a sheet at the bottom, with an enlarged view of the place, the text, previous / next and a count; swipe on the grip or the enlarged view to step, swipe down there or tap outside to close; a long note scrolls inside the sheet |
 | Enlarged preview | The same zones, the same card and sheet |
 
 The card may not cover the note it belongs to and may not leave the screen. Of the places below, above, right and left of the note it takes the first where it hides no other note, and failing that the one where it hides least. Check this in screenshots of the interactive states, not only of the page at rest: a note at each edge, one at the bottom of the screen, and the two notes that sit closest together.

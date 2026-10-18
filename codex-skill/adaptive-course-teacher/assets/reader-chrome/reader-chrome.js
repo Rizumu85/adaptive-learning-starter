@@ -435,7 +435,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
         pic.dataset.target = href;
         pic.addEventListener('load', () => { if (current === link) place(link); }, { once: true });
         parts.push(pic);
-        const caption = el.querySelector('figcaption');
+        const caption = (el.matches('img') ? el.closest('figure') : el)?.querySelector('figcaption');
         const text = caption ? plain(caption) : img.alt;
         if (text) parts.push(line('rc-peek-caption', text));
         // 图下面标了 data-rc-actions 的操作（比如在线填写、下载空白表），卡片里也列出来
@@ -566,7 +566,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     if (pic && current) {
       // 卡片里的小图直接打开图片预览（同页且那张图可预览时），否则跳过去看
       const el = local(pic.dataset.target);
-      const viewer = el && el.querySelector('a[data-image-preview]');
+      const viewer = el && (el.matches('img') ? el.closest('a[data-image-preview]') : el.querySelector('a[data-image-preview]'));
       const link = current;
       close();
       if (viewer) viewer.click();

@@ -1,6 +1,6 @@
 # Bookshelf Homepage: Integration Contract
 
-Use when a learner has several reading editions and wants one entry point. The shelf shows real book covers in a row like a paper notebook app; the centered book is raised, others lean back slightly; clicking the centered book opens its contents. It only helps find a book and a chapter; it does not add introductions, statistics, or promotion.
+Use when a learner has several reading editions and wants one entry point. The shelf shows real book covers in a row like a paper notebook app; the centered book is raised, others lean back slightly; clicking the centered book opens its contents in a new browser tab, so the shelf stays where it was. It only helps find a book and a chapter; it does not add introductions, statistics, or promotion.
 
 ## Files
 
@@ -38,7 +38,7 @@ On a signed-in private site, when a book whose contents page embeds the reader c
 
 ## Look and Motion
 
-The shelf follows the paper presets: flat colors, a real cover on the front face, a vertical title on the spine, a thin paper-colored page edge and top, a soft contact shadow on the cover plus a fainter shadow on the wall behind the book. Opening a book lays a translucent paper veil over the shelf and lets the page transition fade; it does not enlarge the cover. The centered book's contents page is prepared in the background after it stays centered for 600 ms. Wheel, drag, arrow keys, and Tab move between books.
+The shelf follows the paper presets: flat colors, a real cover on the front face, a vertical title on the spine, a thin paper-colored page edge and top, a soft contact shadow on the cover plus a fainter shadow on the wall behind the book. A book with its own contents page (`directoryUrl`) opens in a new tab (the link carries `target="_blank"`; the script opens it with `window.open` and only navigates the shelf's own tab when the browser blocks the new tab, laying the paper veil in that case); a book whose contents the shelf renders itself opens in place. The cover is never enlarged. The centered book's contents page is prefetched after it stays centered for 600 ms (not prerendered: a prerendered page only serves a navigation in the same tab). Wheel, drag, arrow keys, and Tab move between books.
 
 Nothing on the shelf may move because of which book is centered or because the page has just appeared:
 

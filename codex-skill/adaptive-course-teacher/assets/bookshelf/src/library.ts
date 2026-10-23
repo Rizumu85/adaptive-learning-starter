@@ -110,7 +110,7 @@
     const volumes = book.volumes?.length > 1 ? book.volumes : null;
     const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), volumes ? `${volumes.length} 册` : '',
       book.originalTitle, book.author].filter(Boolean).join('，');
-    const open = (style, extra = '') => `<li class="slot"><a class="book${extra}" href="${esc(book.directoryUrl || bookHash(book.id))}" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`;
+    const open = (style, extra = '') => `<li class="slot"><a class="book${extra}" href="${esc(book.directoryUrl || bookHash(book.id))}"${book.directoryUrl ? ' target="_blank" rel="noopener"' : ''} data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`;
     if (!volumes) {
       return open([`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';'))
         + boxFaces(book, cover.src, book.title, D, H) + '</a></li>';
@@ -318,8 +318,8 @@
       speculation?.remove();
       speculation = Object.assign(document.createElement('script'), { type: 'speculationrules' });
       speculation.dataset.url = url;
-      // 预渲染不可用时（省电模式、内存紧张等）退回到只预取页面本身
-      speculation.textContent = JSON.stringify({ prerender: [{ urls: [url], eagerness: 'eager' }], prefetch: [{ urls: [url], eagerness: 'eager' }] });
+      // 书在新标签页打开，预渲染只对本标签页的跳转生效，所以只预取目录页
+      speculation.textContent = JSON.stringify({ prefetch: [{ urls: [url], eagerness: 'eager' }] });
       document.head.append(speculation);
     }, 600);
   }
@@ -613,6 +613,12 @@
     const book = byId(id);
     rememberBook(id);
     if (book?.directoryUrl) {
+      // 书在新标签页打开，书架留在原来的标签页；浏览器拦下弹窗时才在本页打开
+      const tab = window.open(book.directoryUrl, '_blank');
+      if (tab) {
+        try { tab.opener = null; } catch { /* 跨源时已无关联 */ }
+        return;
+      }
       leaveTo(book.directoryUrl);
       return;
     }

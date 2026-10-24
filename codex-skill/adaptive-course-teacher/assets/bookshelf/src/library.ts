@@ -156,7 +156,7 @@
     const visible = books.filter((book) => matches(book, query));
     if (!visible.length) return '<p class="shelf-empty">没有找到匹配的书。</p>';
     // 每一排有自己的当前书，书名写在这一排上方（分排时在分类名下面）
-    const row = (list) => '<div class="now"><strong></strong><span></span><a class="now-last" target="_blank" rel="noopener" hidden></a></div>'
+    const row = (list) => '<div class="now"><strong></strong><span></span><a class="now-last" role="link" tabindex="0" hidden></a></div>'
       + `<div class="row"><ul class="track">${list.map(bookHtml).join('')}</ul></div>`;
     if (!large) return `<section class="shelf-group" aria-label="书架">${row(visible)}</section>`;
 
@@ -302,8 +302,8 @@
     last.hidden = !position;
     last.textContent = position ? `上次读到：${position.text}` : '';
     last.dataset.id = book.id;
-    if (position) last.href = position.href;
-    else last.removeAttribute('href');
+    if (position) last.dataset.url = position.href;
+    else delete last.dataset.url;
   }
 
   // 书名区按这一排里最占地方的那本留足高度：转到简介多一行、或者多一行“上次读到”的书时，书排和下面几排都不跟着上下挪。
@@ -741,10 +741,11 @@
       event.preventDefault();
       return;
     }
-    // “上次读到”是普通链接，照常在新标签页打开；记下这本书，回到书架时它还在中间
+    // “上次读到”：在新标签页打开那一章那一节；记下这本书，回到书架时它还在中间
     const last = (event.target as Element).closest<HTMLElement>('a.now-last');
     if (last) {
-      rememberBook(last.dataset.id);
+      event.preventDefault();
+      openLast(last);
       return;
     }
     const jump = (event.target as Element).closest<HTMLElement>('.shelf-index button');
@@ -771,8 +772,30 @@
     openBook(book.dataset.id);
   });
 
-  // 中键点书：在新标签页打开（书不是带地址的链接，浏览器不会自己处理）
+  // 书和“上次读到”都不是带地址的链接（免得指上去时浏览器在左下角显示网址），由脚本打开
+  function openLast(last: HTMLElement) {
+    const url = last.dataset.url;
+    if (!url) return;
+    rememberBook(last.dataset.id || '');
+    const tab = window.open(url, '_blank');
+    if (tab) {
+      try { tab.opener = null; } catch { /* 跨源时已无关联 */ }
+    } else location.assign(url);
+  }
+  app.addEventListener('keydown', (event) => {
+    const last = (event.target as Element).closest<HTMLElement>('a.now-last');
+    if (!last || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    openLast(last);
+  });
+  // 中键点书或“上次读到”：在新标签页打开
   app.addEventListener('auxclick', (event) => {
+    const last = (event.target as Element).closest<HTMLElement>('a.now-last');
+    if (last && event.button === 1) {
+      event.preventDefault();
+      openLast(last);
+      return;
+    }
     const book = (event.target as Element).closest('a.book');
     if (!book || event.button !== 1) return;
     event.preventDefault();

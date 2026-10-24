@@ -109,7 +109,7 @@ def chapter_id(url):
 
 
 def catalog(cfg, page_url, current=None):
-    """The book's published chapters for the "新" marks; only when the config names the book's shelf id."""
+    """The book's published chapters for the "新" marks and the last-read position; only when the config names the book's shelf id."""
     if not cfg.get('id'):
         return ''
     data = {'book': cfg['id'], 'chapters': [

@@ -105,7 +105,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 
   // 章节速览：页面右侧一列细刻度，展示本章结构。本章目录里的节是长刻度，节里的小标题是短刻度；
   // 平时很淡，指过去变清楚，悬停显示标题，点击跳过去；正在读的地方加深。
-  // 刻度放在正文右侧的空白里，空白不够时隐藏；触屏改用下面的拖动条。重新打开页面时浏览器自己会回到上次的滚动位置，这里不另记“上次读到”。
+  // 刻度放在正文右侧的空白里，空白不够时隐藏；触屏改用下面的拖动条。重新打开页面时浏览器自己会回到上次的滚动位置，刻度上不另标“上次读到”
+  // （读到哪一章哪一节另由下面的“上次读到”记在服务器上，给目录页和书架用）。
   const main = document.querySelector('main');
   const headingText = (node) => {
     const copy = node.cloneNode(true);
@@ -126,6 +127,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     // 页面里自带的导航（比如章内小目录）里的标题不算本章结构
     .filter((el) => main.contains(el) && !el.closest('nav'))
     .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1)) : [];
+  // 页面自己带 id 的标题（下面给刻度补的 id 不算）：本章没有目录时，“上次读到”记到这些标题上
+  const anchored = new Set(spots.filter((spot) => spot.id));
   let ticks = [];
   let rail = null;
   let marker = null;
@@ -304,6 +307,20 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     let here = -1;
     spots.forEach((spot, i) => { if (spot.getBoundingClientRect().top <= line) here = i; });
     ticks.forEach((tick, i) => tick.toggleAttribute('aria-current', i === here));
+    // 正在读的这一节记在顶栏上（data-rc-section / data-rc-section-title），变了就在顶栏上派发 rc-section，给“上次读到”用。
+    // 用本章目录里的节；本章没有目录时用页面自己带 id 的标题。还没读到第一节时为空
+    let section = null;
+    if (links.length) {
+      if (current >= 0 && targets[current] && targets[current].id) section = [targets[current].id, links[current].textContent.replace(/\s+/g, ' ').trim()];
+    } else {
+      for (let i = here; i >= 0 && !section; i--) if (anchored.has(spots[i])) section = [spots[i].id, headingText(spots[i])];
+    }
+    const [sectionId, sectionTitle] = section || ['', ''];
+    if (bar.dataset.rcSection !== sectionId) {
+      bar.dataset.rcSection = sectionId;
+      bar.dataset.rcSectionTitle = sectionTitle;
+      bar.dispatchEvent(new Event('rc-section'));
+    }
     if (scrubLabel) {
       const spot = spots[Math.max(0, here)];
       scrubLabel.textContent = majors.get(spot) || headingText(spot);
@@ -674,47 +691,160 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   });
 })();
 
+// 目录页和章节页里嵌着本书已上架章节的列表（#rc-chapters，配置写了书架 id 时才有）。下面两件事都靠它，都需要已登录的私有站点。
+//
 // 新章节：读者上次在目录页看到之后新加的章节，在目录页的章名后标一个小小的“新”。
 // 服务器按登录邮箱记着每本书“已经在目录页看到过”的章节；目录页显示出“新”的同时就记为看到过，刷新后不再显示。
 // 第一次来时把现有章节都记为看到过，什么都不标。章节页不写记录。
 // 网址加 ?preview-new 时，假装最后一章是新加的，只用来预览样子，不写入记录。本地打开文件或没有接口时什么都不做。
+//
+// 上次读到：章节页记下读者读到哪一章、哪一节；目录页在页头下给一行“继续阅读 · 章名 · 节名”，并在那一章的章名后标“上次”；
+// 书架在当前那本书下面写“上次读到：…”。服务器按登录邮箱给每位读者存一份，里面每本书一条（GET /api/position 取全部，
+// PUT /api/position/<书架 id> 记一本）。只记章和节，不记滚动位置：重新打开同一章时浏览器自己会回到原来的滚动位置。
+// 正在读的节（顶栏记着的那一节）变了，停 2 秒后记下；离开页面或切到别的标签页时立刻记下。第一次读取成功后才开始记，
+// 所以本地打开文件或没有这个接口时什么都不做。这一次打开页面后还没读到过任何一节时，停在本章开头不覆盖同一章里更深的位置。
+// 网址加 ?preview-position 时，目录页假装上次读到第一章，只看样子，不连服务器；章节页这时什么都不记。
 (() => {
   const data = document.getElementById('rc-chapters');
   if (!data) return;
   let info;
   try { info = JSON.parse(data.textContent); } catch { return; }
   const ids = info.chapters.map((c) => c.id);
+  const onContents = !info.current;
+  const params = new URLSearchParams(location.search);
+  const online = /^https?:$/.test(location.protocol);
   const same = (href) => href.split('#')[0].split('?')[0].replace(/index\.html$/, '');
   const titleOf = (link, title) => link.querySelector('[class$="-title"],[class$="-name"],[class="title"],[class="name"]')
     || [...link.querySelectorAll('span,strong,em,b')].find((el) => !el.children.length && el.textContent.trim() === title)
     || link;
-  const mark = (fresh) => {
-    info.chapters.forEach((chapter) => {
-      if (!fresh.has(chapter.id)) return;
-      const target = same(new URL(chapter.url, location.href).href);
-      document.querySelectorAll('a[href]').forEach((link) => {
-        if (link.closest('.rc-bar, .rc-foot') || same(link.href) !== target || link.querySelector('.rc-new')) return;
-        const tag = document.createElement('span');
-        tag.className = 'rc-new';
-        tag.textContent = '新';
-        titleOf(link, chapter.title).append(tag);
-      });
+  // 在目录里指向这一章的链接的章名后加一个小标记（“新”“上次”）。同一章还有指向章内某处的附加链接（比如“复习”）时，只标指向整章的那个
+  const tag = (chapter, className, text) => {
+    const target = same(new URL(chapter.url, location.href).href);
+    const found = [...document.querySelectorAll('a[href]')]
+      .filter((link) => !link.closest('.rc-bar, .rc-foot, .rc-continue') && same(link.href) === target && !link.querySelector(`.${className}`));
+    const whole = found.filter((link) => !link.hash);
+    (whole.length ? whole : found).forEach((link) => {
+      const mark = document.createElement('span');
+      mark.className = className;
+      mark.textContent = text;
+      titleOf(link, chapter.title).append(mark);
     });
   };
-  const onContents = !info.current;
-  if (new URLSearchParams(location.search).has('preview-new')) { if (onContents) mark(new Set(ids.slice(-1))); return; }
-  if (!/^https?:$/.test(location.protocol)) return;
-  const api = `/api/seen/${encodeURIComponent(info.book)}`;
-  const save = (seen) => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => {});
-  fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((record) => {
-    if (!record) return;
-    if (!Array.isArray(record.seen)) { save(ids); return; }
-    if (!onContents) return;
-    const fresh = ids.filter((id) => !record.seen.includes(id));
-    if (!fresh.length) return;
-    mark(new Set(fresh));
-    save([...new Set([...record.seen, ...ids])]);
-  }).catch(() => {});
+
+  function newChapters() {
+    const mark = (fresh) => info.chapters.forEach((chapter) => { if (fresh.has(chapter.id)) tag(chapter, 'rc-new', '新'); });
+    if (params.has('preview-new')) { if (onContents) mark(new Set(ids.slice(-1))); return; }
+    if (!online) return;
+    const api = `/api/seen/${encodeURIComponent(info.book)}`;
+    const save = (seen) => fetch(api, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ seen }) }).catch(() => {});
+    fetch(api, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((record) => {
+      if (!record) return;
+      if (!Array.isArray(record.seen)) { save(ids); return; }
+      if (!onContents) return;
+      const fresh = ids.filter((id) => !record.seen.includes(id));
+      if (!fresh.length) return;
+      mark(new Set(fresh));
+      save([...new Set([...record.seen, ...ids])]);
+    }).catch(() => {});
+  }
+
+  // 目录页：页头下的“继续阅读”和章名后的“上次”。position 是这本书的记录，没有或那一章已不在目录里时什么都不显示。
+  // 这一行放在页面的 h1 和紧跟着它的几段文字（原名、作者）后面；书想放在别处时，给那个位置的元素加 data-rc-continue
+  function showContinue(position) {
+    document.querySelectorAll('.rc-continue, .rc-last').forEach((node) => node.remove());
+    const chapter = position && info.chapters.find((c) => c.id === position.chapter);
+    if (!chapter) return;
+    tag(chapter, 'rc-last', '上次');
+    const url = new URL(chapter.url, location.href);
+    if (position.section) url.hash = position.section;
+    const line = document.createElement('p');
+    line.className = 'rc-continue';
+    const link = document.createElement('a');
+    link.href = url.href;
+    const part = (className, text) => link.append(Object.assign(document.createElement('span'), { className, textContent: text }));
+    part('rc-continue-label', '继续阅读');
+    for (const text of [chapter.title, position.section ? position.sectionTitle : '']) {
+      if (!text) continue;
+      part('rc-continue-sep', '·');
+      part('rc-continue-where', text);
+    }
+    line.append(link);
+    const slot = document.querySelector('[data-rc-continue]');
+    const h1 = [...document.querySelectorAll('h1')].find((el) => !el.closest('.rc-bar'));
+    if (slot) { slot.append(line); return; }
+    if (!h1) return;
+    let after = h1;
+    while (after.nextElementSibling && after.nextElementSibling.matches('p:not(.rc-continue)')) after = after.nextElementSibling;
+    after.after(line);
+  }
+
+  // 要不要把这里（next）记成上次读到的地方。和已记下的（saved）一样就不记；这一次打开页面后还没读到过任何一节（engaged 为假）时，
+  // 停在本章开头不覆盖同一章里已记下的某一节：从另一台设备、或从目录点进同一章时页面在顶上，读者看一眼就走也不丢位置。
+  // 读到过某一节再回到开头，才记成本章开头
+  function worthSaving(next, saved, engaged) {
+    if (saved && saved.url === next.url && saved.chapter === next.chapter && (saved.section || '') === next.section) return false;
+    return !(!engaged && !next.section && saved && saved.chapter === next.chapter && saved.section);
+  }
+
+  function lastRead() {
+    const preview = params.has('preview-position');
+    if (!preview && !online) return;
+    if (onContents) {
+      if (preview) {
+        const first = info.chapters[0];
+        if (first) showContinue({ chapter: first.id, section: 'preview', sectionTitle: '示例小节' });
+        return;
+      }
+      const load = () => fetch('/api/position', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null))
+        .then((record) => { if (record && typeof record === 'object') showContinue(record[info.book]); }).catch(() => {});
+      load();
+      // 从章节页退回到目录页（浏览器从缓存里取回这一页）时重新读一次
+      addEventListener('pageshow', (event) => { if (event.persisted) load(); });
+      return;
+    }
+    const bar = document.querySelector('.rc-bar');
+    const chapter = info.chapters.find((c) => c.id === info.current);
+    // 整理中的章节不在列表里，不记
+    if (preview || !bar || !chapter) return;
+    const api = `/api/position/${encodeURIComponent(info.book)}`;
+    let saved;           // 服务器上这本书的记录；读到之前是 undefined，什么都不记
+    let engaged = false; // 这一次打开页面后读到过某一节
+    let timer = 0;
+    const here = () => ({
+      url: location.pathname, chapter: info.current, chapterTitle: chapter.title.slice(0, 120),
+      section: bar.dataset.rcSection || '', sectionTitle: (bar.dataset.rcSectionTitle || '').slice(0, 200),
+    });
+    const save = (keepalive) => {
+      clearTimeout(timer);
+      if (saved === undefined) return;
+      const next = here();
+      if (!worthSaving(next, saved, engaged)) return;
+      const before = saved;
+      saved = next;
+      // keepalive：页面正在关闭或切走时请求也能发出去；没存上时下一次照常再记
+      fetch(api, { method: 'PUT', keepalive, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) })
+        .then((r) => { if (!r.ok) throw new Error(String(r.status)); })
+        .catch(() => { if (saved === next) saved = before; });
+    };
+    const later = () => { clearTimeout(timer); timer = setTimeout(() => save(false), 2000); };
+    bar.addEventListener('rc-section', () => {
+      if (bar.dataset.rcSection) engaged = true;
+      later();
+    });
+    addEventListener('pagehide', () => save(true));
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(true); });
+    // 浏览器恢复滚动位置、跳到网址里的小节都在页面加载完时发生，那之后再开始
+    const start = () => fetch('/api/position', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((record) => {
+      if (!record || typeof record !== 'object') return;
+      saved = record[info.book] || null;
+      later();
+    }).catch(() => {});
+    if (document.readyState === 'complete') start();
+    else addEventListener('load', start, { once: true });
+  }
+
+  newChapters();
+  lastRead();
 })();
 
 // 标记这张：放大看图时，右上角页码旁有一个“标记这张”。读者看到哪张图有问题（裁歪了、底色不对、缺译文）就点一下，

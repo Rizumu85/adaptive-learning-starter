@@ -138,7 +138,7 @@
         if (!visible.length)
             return '<p class="shelf-empty">没有找到匹配的书。</p>';
         // 每一排有自己的当前书，书名写在这一排上方（分排时在分类名下面）
-        const row = (list) => '<div class="now"><strong></strong><span></span></div>'
+        const row = (list) => '<div class="now"><strong></strong><span></span><a class="now-last" target="_blank" rel="noopener" hidden></a></div>'
             + `<div class="row"><ul class="track">${list.map(bookHtml).join('')}</ul></div>`;
         if (!large)
             return `<section class="shelf-group" aria-label="书架">${row(visible)}</section>`;
@@ -269,6 +269,63 @@
             return null;
         }
     }
+    // 书名区的几行字：书名；原名 · 作者，有没看过的新章节时后面多一句“新增：…”；读过的书最后再加一行“上次读到：…”
+    function fillNow(now, book) {
+        const [title, line, last] = [...now.children];
+        title.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
+        // 原名和作者相同（画集常这样）时只写一次
+        const original = book.originalTitle === book.author ? '' : book.originalTitle;
+        line.textContent = [book.volumes?.length > 1 ? `${book.volumes.length} 册一套` : '', original, book.author ? `${book.author} 著` : '']
+            .filter(Boolean).join(' · ');
+        const titles = freshTitles.get(book.id);
+        if (titles?.length) {
+            const em = document.createElement('em');
+            em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
+            line.append(em);
+        }
+        if (!(last instanceof HTMLAnchorElement))
+            return;
+        const position = positions.get(book.id);
+        last.hidden = !position;
+        last.textContent = position ? `上次读到：${position.text}` : '';
+        last.dataset.id = book.id;
+        if (position)
+            last.href = position.href;
+        else
+            last.removeAttribute('href');
+    }
+    // 书名区按这一排里最占地方的那本留足高度：转到简介多一行、或者多一行“上次读到”的书时，书排和下面几排都不跟着上下挪。
+    // 窗口宽度、字体、“新增：…”或“上次读到”变了就重新量
+    function reserve() {
+        app.querySelectorAll('.shelf-group').forEach((group) => {
+            const now = group.querySelector('.now');
+            if (!now)
+                return;
+            const probe = now.cloneNode(true);
+            probe.setAttribute('aria-hidden', 'true');
+            probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;min-height:0;margin:0;width:${now.clientWidth}px`;
+            now.after(probe);
+            let tallest = 0;
+            group.querySelectorAll('.book').forEach((bookEl) => {
+                const book = byId(bookEl.dataset.id);
+                if (!book)
+                    return;
+                fillNow(probe, book);
+                tallest = Math.max(tallest, probe.offsetHeight);
+            });
+            probe.remove();
+            // 只往高了留：样式表里的 min-height 是底线，量出来比它矮时不动它
+            now.style.minHeight = '';
+            if (tallest > parseFloat(getComputedStyle(now).minHeight))
+                now.style.minHeight = `${tallest}px`;
+        });
+    }
+    let reserveFrame = 0;
+    window.addEventListener('resize', () => {
+        cancelAnimationFrame(reserveFrame);
+        reserveFrame = requestAnimationFrame(reserve);
+    });
+    document.fonts?.ready.then(reserve);
     // 每一排选出当前书：返回时是刚才那本；否则是上次打开的那本；都不在这一排时随机选一本
     function settle(preferred) {
         const last = lastOpenedBook();
@@ -278,6 +335,7 @@
             if (current)
                 setCurrent(current, { scroll: 'instant' });
         });
+        reserve();
         // 后台准备的目录页：最可能打开的那本（刚才那本或上次打开的那本）
         const likely = preferred || last;
         if (likely)
@@ -323,12 +381,7 @@
         prepare(book);
         const now = group.querySelector('.now');
         if (book && now && changed) {
-            now.firstElementChild.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
-            // 原名和作者相同（画集常这样）时只写一次
-            const original = book.originalTitle === book.author ? '' : book.originalTitle;
-            now.lastElementChild.textContent = [book.volumes?.length > 1 ? `${book.volumes.length} 册一套` : '', original,
-                book.author ? `${book.author} 著` : ''].filter(Boolean).join(' · ');
-            showNew(bookEl);
+            fillNow(now, book);
             if (!reduceMotion.matches)
                 now.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: EASE });
         }
@@ -484,19 +537,7 @@
     // “已经在目录页看到过”的章节（和阅读控件共用 /api/seen）。还有没看到过的新章节时，转到这本书时作者后面多一句“新增：…”；
     // 进了那本书的目录页就消失。没进去看也不会一直挂着：第一次出现 3 小时后自动消失，那几章算看到过；又有新章节时重新计时。
     // 第一次来时把现有章节都记为看到过。网址加 ?preview-new 时假装每本书最后一章是新加的，只预览、不写入。
-    const fresh_titles = new Map();
-    function showNew(bookEl) {
-        const line = bookEl.closest('.shelf-group')?.querySelector('.now span');
-        if (!line)
-            return;
-        line.querySelector('em')?.remove();
-        const titles = fresh_titles.get(bookEl.dataset.id);
-        if (!titles?.length)
-            return;
-        const em = document.createElement('em');
-        em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
-        line.append(em);
-    }
+    const freshTitles = new Map();
     async function checkNew(book) {
         if (!book.directoryUrl || !/^https?:$/.test(location.protocol))
             return;
@@ -536,13 +577,70 @@
             const titles = info.chapters.filter((c) => fresh.includes(c.id)).map((c) => c.title);
             if (!titles.length)
                 return;
-            fresh_titles.set(book.id, titles);
+            freshTitles.set(book.id, titles);
             const current = app.querySelector(`.book.is-current[data-id="${CSS.escape(book.id)}"]`);
-            if (current)
-                showNew(current);
+            const now = current?.closest('.shelf-group')?.querySelector('.now');
+            if (now)
+                fillNow(now, book);
+            reserve();
         }
         catch { /* 读不到就不提示 */ }
     }
+    /* ---------- 上次读到：书名区最后一行 ---------- */
+    // 阅读控件在章节页记下读者每本书读到哪一章、哪一节（/api/position，服务器按登录邮箱每人一份，见 reader-chrome 的“上次读到”）。
+    // 转到读过的书时，书名区最后多一行“上次读到：章名 · 节名”，点它在新标签页打开那一章那一节，和打开书一样，书架留在原处。
+    // 书上不加任何标记。书架打开时读一次；读完书回到书架这个标签页时再读一次（最多每 10 秒一次）。
+    // 读不到（本地预览、没有这个接口）时什么都不显示。网址加 ?preview-position 时不连服务器，每本书给一行示例，只看样子。
+    const positions = new Map();
+    let positionsAt = 0;
+    async function loadPositions() {
+        const preview = new URLSearchParams(location.search).has('preview-position');
+        if (!preview && !/^https?:$/.test(location.protocol))
+            return;
+        positionsAt = Date.now();
+        let found = null;
+        if (preview) {
+            found = new Map(books.map((book) => [book.id, {
+                    href: new URL(book.directoryUrl || bookHash(book.id), location.href).href, text: '第 3 章 示例章节 · 示例小节',
+                }]));
+        }
+        else {
+            const record = await fetch('/api/position', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+            if (!record || typeof record !== 'object')
+                return;
+            found = new Map();
+            books.forEach((book) => {
+                const position = record[book.id];
+                if (!position || typeof position.url !== 'string' || typeof position.chapterTitle !== 'string')
+                    return;
+                let url;
+                try {
+                    url = new URL(position.url, location.href);
+                }
+                catch {
+                    return;
+                }
+                if (url.origin !== location.origin)
+                    return;
+                if (position.section)
+                    url.hash = position.section;
+                found.set(book.id, { href: url.href, text: [position.chapterTitle, position.section ? position.sectionTitle : ''].filter(Boolean).join(' · ') });
+            });
+        }
+        positions.clear();
+        found.forEach((value, id) => positions.set(id, value));
+        app.querySelectorAll('.book.is-current').forEach((bookEl) => {
+            const now = bookEl.closest('.shelf-group')?.querySelector('.now');
+            const book = byId(bookEl.dataset.id);
+            if (now && book)
+                fillNow(now, book);
+        });
+        reserve();
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && positionsAt && Date.now() - positionsAt > 10000)
+            loadPositions();
+    });
     /* ---------- 书页 ---------- */
     function renderBook(id) {
         const book = byId(id);
@@ -656,6 +754,12 @@
             event.preventDefault();
             return;
         }
+        // “上次读到”是普通链接，照常在新标签页打开；记下这本书，回到书架时它还在中间
+        const last = event.target.closest('a.now-last');
+        if (last) {
+            rememberBook(last.dataset.id);
+            return;
+        }
         const jump = event.target.closest('.shelf-index button');
         if (jump) {
             // 第一排回到页面顶上，分类目录和查找还在视野里；其他排滚到分类名贴近顶部
@@ -705,6 +809,7 @@
         books = validate(data.books || []);
         render();
         books.forEach(checkNew);
+        loadPositions();
     })
         .catch((error) => {
         const hint = location.protocol === 'file:'

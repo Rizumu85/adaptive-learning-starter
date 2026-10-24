@@ -110,7 +110,7 @@
     const volumes = book.volumes?.length > 1 ? book.volumes : null;
     const label = [book.title + (book.subtitle ? ` ${book.subtitle}` : ''), volumes ? `${volumes.length} 册` : '',
       book.originalTitle, book.author].filter(Boolean).join('，');
-    const open = (style, extra = '') => `<li class="slot"><a class="book${extra}" href="${esc(book.directoryUrl || bookHash(book.id))}"${book.directoryUrl ? ' target="_blank" rel="noopener"' : ''} data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`;
+    const open = (style, extra = '') => `<li class="slot"><a class="book${extra}" role="link" tabindex="0" data-id="${esc(book.id)}" aria-label="${esc(label)}" draggable="false" style="${esc(style)}">`;
     if (!volumes) {
       return open([`--cw:${W}px`, `--ch:${H}px`, `--cd:${D}px`, colorVars(book), coverVars(cover)].join(';'))
         + boxFaces(book, cover.src, book.title, D, H) + '</a></li>';
@@ -415,6 +415,13 @@
   app.addEventListener('keydown', (event) => {
     const book = (event.target as Element).closest?.('a.book');
     if (!book) return;
+    // 书不是带地址的链接（免得指上去时浏览器在左下角显示网址），回车和空格在这里处理，和点击一样
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (!book.classList.contains('is-current')) setCurrent(book, { scroll: 'smooth' });
+      else openBook(book.getAttribute('data-id') || '');
+      return;
+    }
     // ↑ ↓：到上一排或下一排的当前书
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       const groups = [...app.querySelectorAll('.shelf-group')];
@@ -750,13 +757,26 @@
       return;
     }
     const book = (event.target as Element).closest<HTMLElement>('a.book');
-    if (!book || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (!book || event.button !== 0) return;
     event.preventDefault();
+    // Ctrl / ⌘ / Shift 点书：直接打开（书在新标签页打开），不先转到中间
+    if (event.metaKey || event.ctrlKey || event.shiftKey) {
+      openBook(book.getAttribute('data-id') || '');
+      return;
+    }
     if (!book.classList.contains('is-current')) {
       setCurrent(book, { scroll: 'smooth' });
       return;
     }
     openBook(book.dataset.id);
+  });
+
+  // 中键点书：在新标签页打开（书不是带地址的链接，浏览器不会自己处理）
+  app.addEventListener('auxclick', (event) => {
+    const book = (event.target as Element).closest('a.book');
+    if (!book || event.button !== 1) return;
+    event.preventDefault();
+    openBook(book.getAttribute('data-id') || '');
   });
 
   // 浏览器前进后退、点“← 书架”：本页目录与书架之间淡入淡出

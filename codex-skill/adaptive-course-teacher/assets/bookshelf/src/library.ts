@@ -608,7 +608,7 @@
         try { url = new URL(position.url, location.href); } catch { return; }
         if (url.origin !== location.origin) return;
         if (position.section) url.hash = position.section;
-        found.set(book.id, { href: url.href, text: [position.chapterTitle, position.section ? position.sectionTitle : ''].filter(Boolean).join(' · ') });
+        found.set(book.id, { href: url.href, text: [position.chapterTitle, position.section && position.sectionTitle !== position.chapterTitle ? position.sectionTitle : ''].filter(Boolean).join(' · ') });
       });
     }
     positions.clear();

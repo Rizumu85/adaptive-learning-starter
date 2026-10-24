@@ -763,7 +763,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     link.href = url.href;
     const part = (className, text) => link.append(Object.assign(document.createElement('span'), { className, textContent: text }));
     part('rc-continue-label', '继续阅读');
-    for (const text of [chapter.title, position.section ? position.sectionTitle : '']) {
+    // 没有小节目录的章，记下的“小节”就是章名本身，只显示一次
+    for (const text of [chapter.title, position.section && ![chapter.title, position.chapterTitle].includes(position.sectionTitle) ? position.sectionTitle : '']) {
       if (!text) continue;
       part('rc-continue-sep', '·');
       part('rc-continue-where', text);

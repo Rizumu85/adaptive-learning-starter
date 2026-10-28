@@ -264,3 +264,20 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
   .rc-volume-strip img{width:76px;height:108px}
   .rc-volume-chapter-thumb{width:56px;height:56px}
 }
+/* 折叠阅读（只在带这些标记的页面上起作用）：要点句是作者原句，淡淡的荧光笔底；速读时每段只留要点句，点开看全文。
+   本节/本章概括是 AI 写的：放在单独的框里，换无衬线字，ⓘ 说明出处 */
+.rc-brief{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.rc-skim p[data-fold]:not(.rc-open) .rc-rest{display:none}
+.rc-skim p[data-fold]:not(.rc-open) .rc-brief{background:none}
+.rc-skim p[data-fold]:not(.rc-open){cursor:pointer}
+.rc-skim p[data-fold]:not(.rc-open)::after{content:" ⋯";color:var(--rc-muted)}
+.rc-skim p[data-fold].rc-open{border-left:2px solid color-mix(in srgb,var(--rc-accent) 45%,transparent);margin-left:-14px;padding-left:12px}
+.rc-gist{margin:1.1em 0 1.7em;padding:.75em 1em .8em;border-left:3px solid color-mix(in srgb,var(--rc-accent) 55%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--rc-ink) 4%,transparent);font-family:var(--rc-font)}
+.rc-gist-line{margin:0;font-size:.95em;line-height:1.65;color:var(--rc-ink)}
+.rc-topics{display:flex;flex-wrap:wrap;gap:6px;margin:.55em 0 0;padding:0;list-style:none}
+.rc-topics li{margin:0;padding:1px 9px;border-radius:999px;font-size:.78em;line-height:1.7;color:var(--rc-muted);background:color-mix(in srgb,var(--rc-ink) 7%,transparent)}
+.rc-ai{position:relative;display:inline-block;margin-left:.4em;font-size:.82em;line-height:1;color:var(--rc-muted);cursor:help;outline-offset:2px}
+.rc-ai::after{content:attr(data-tip);position:absolute;z-index:5;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:16em;padding:5px 9px;border-radius:6px;background:var(--rc-ink);color:var(--rc-paper);font-size:12px;line-height:1.5;opacity:0;pointer-events:none;transition:opacity 150ms ease-out}
+.rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
+.toc-chapter .rc-gist{margin:.3em 0 .9em}
+@media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}}

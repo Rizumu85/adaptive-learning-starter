@@ -985,3 +985,36 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   if (document.readyState === 'complete') start();
   else addEventListener('load', start, { once: true });
 })();
+// 速读：正文里标了要点句（.rc-brief，作者原句一字不改）的页面，顶栏多一个“速读”开关。打开后每段只显示要点句，
+// 段末一个省略号；点一段在原地展开全文，再点收回。开关状态记在本机，换一章也保持。没有要点句的页面不出现
+(() => {
+  const tools = document.querySelector('.rc-bar .rc-tools');
+  if (!tools || !document.querySelector('p[data-fold]')) return;
+  const root = document.documentElement;
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'rc-toggle rc-skim-toggle';
+  toggle.setAttribute('role', 'switch');
+  toggle.textContent = '速读';
+  toggle.title = '每段只看要点句，点一段展开全文';
+  const apply = (on) => {
+    root.classList.toggle('rc-skim', on);
+    toggle.setAttribute('aria-checked', String(on));
+    if (!on) for (const p of document.querySelectorAll('p[data-fold].rc-open')) p.classList.remove('rc-open');
+  };
+  let saved = false;
+  try { saved = localStorage.getItem('rc-skim') === '1'; } catch { /* 存不了就每次从全文开始 */ }
+  apply(saved);
+  tools.prepend(toggle);
+  // 顶栏的点击处理已经翻转了 aria-checked 并派发 change
+  toggle.addEventListener('change', () => {
+    const on = toggle.getAttribute('aria-checked') === 'true';
+    apply(on);
+    try { localStorage.setItem('rc-skim', on ? '1' : '0'); } catch { /* 同上 */ }
+  });
+  document.addEventListener('click', (event) => {
+    if (!root.classList.contains('rc-skim') || event.target.closest('a, button, .note-zone')) return;
+    const p = event.target.closest('p[data-fold]');
+    if (p && !getSelection().toString()) p.classList.toggle('rc-open');
+  });
+})();

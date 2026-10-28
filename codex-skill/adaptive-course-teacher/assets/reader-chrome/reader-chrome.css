@@ -279,5 +279,6 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-ai{position:relative;display:inline-block;margin-left:.4em;font-size:.82em;line-height:1;color:var(--rc-muted);cursor:help;outline-offset:2px}
 .rc-ai::after{content:attr(data-tip);position:absolute;z-index:5;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:16em;padding:5px 9px;border-radius:6px;background:var(--rc-ink);color:var(--rc-paper);font-size:12px;line-height:1.5;opacity:0;pointer-events:none;transition:opacity 150ms ease-out}
 .rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
+header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.3em 0 .9em}
 @media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}}

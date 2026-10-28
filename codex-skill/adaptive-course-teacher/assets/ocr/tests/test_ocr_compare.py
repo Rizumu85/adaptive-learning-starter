@@ -85,7 +85,7 @@ def test_main_writes_one_report_per_page_and_a_summary(tmp_path, monkeypatch, ca
     assert [line['text'] for line in report['first_only']] == ['Page 7']
     assert report['first_only'][0]['box'] == [10, 900, 80, 920]
     summary = json.loads((out / 'summary.json').read_text(encoding='utf-8'))
-    assert summary == {'pages': 1, 'agree': 0, 'differ': 1, 'second-only': 0, 'first-only lines': 1, 'risk marks': 0}
+    assert summary == {'pages': 1, 'agree': 0, 'differ': 1, 'second-only': 0, 'first-only lines': 1, 'risk marks': 0, 'suggested': 0}
     assert 'p0002 has no first draft' in capsys.readouterr().out
 
 
@@ -105,3 +105,17 @@ def test_table_markup_never_reaches_the_comparison():
     table = ocr_second.blocks('<fcel>alpha beta gamma<fcel>delta epsilon<nl>')
     sentences, nowhere = ocr_compare.compare(['alpha beta gamma', 'delta epsilon'], table)
     assert all(s['status'] == 'agree' for s in sentences) and nowhere == []
+
+
+def test_b_p_disagreements_are_suggested_from_the_first_engine():
+    second = blocks('[指先]ツールにばかしプラシをのせます。')
+    first = ['[指先]ツールにばかしブラシをのせます。']
+    sentences, _ = ocr_compare.compare(first, second)
+    assert sentences[0]['status'] == 'differ'
+    assert sentences[0]['suggest'] == '[指先]ツールにばかしブラシをのせます。'
+
+
+def test_other_differences_get_no_suggestion():
+    sentences, _ = ocr_compare.compare(['アイレべルの設定'], blocks('アイレベルの設定'))
+    assert sentences[0]['status'] == 'differ'
+    assert 'suggest' not in sentences[0]

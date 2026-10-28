@@ -10,6 +10,9 @@ The first folder holds ocr_draft.py output (lines with boxes), the second ocr_se
                   differ       they read it differently; "first" lists each difference as
                                "context[second reading -> first reading]"
                   second-only  the first engine has nothing here
+                "suggest" (on some differ sentences): the sentence with each katakana or hiragana
+                b/p disagreement taken from the first engine, which was right on those about nine
+                times in ten against Unlimited OCR 2 (see VOICING); still check it against the scan
                 and "risk": characters both engines tend to get wrong in the same way (see RISKS),
                 listed even when the engines agree
     first_only  lines only the first engine read, with their boxes: usually captions, labels inside
@@ -37,6 +40,11 @@ RISKS = [
     ('ya, yu or yo that may be small', re.compile(r'[きしちにひみりぎじぢびぴキシチニヒミリギジヂビピ][やゆよヤユヨ]')),
     ('long mark or the numeral one', re.compile(r'[ァ-ヺ]一|一[ァ-ヺ]|[一-龥]ー')),
 ]
+# b against p in the h-row (ブ/プ, ば/ぱ ...). Across a 212-page Japanese book Unlimited OCR 2 swapped
+# them far more often than PP-OCRv6 (ブラシ as プラシ 44 times, パース as バース, パレット as バレット):
+# where the engines disagree on this, the first engine's reading was right about nine times in ten,
+# so it goes into "suggest".
+VOICING = dict(zip('ばびぶべぼバビブベボぱぴぷぺぽパピプペポ', 'ぱぴぷぺぽパピプペポばびぶべぼバビブベボ'))
 
 
 def norm(text):
@@ -111,6 +119,21 @@ def place(lines, target):
     return read, sorted(nowhere)
 
 
+def suggest(text, target, mine):
+    """`text` (one second-draft sentence) with each b/p disagreement taken from the first engine, or
+    None when there is none. `target` is the sentence normalized, `mine` the first engine's reading
+    of each of its characters."""
+    raw = [i for i, ch in enumerate(text) if len(norm(ch)) == 1]
+    if ''.join(norm(text[i]) for i in raw) != target:  # normalization changed the length: leave it
+        return None
+    chars = list(text)
+    for k, v in enumerate(mine):
+        if v is not None and len(v) == 1 and VOICING.get(target[k]) == v:
+            chars[raw[k]] = v
+    fixed = ''.join(chars)
+    return fixed if fixed != text else None
+
+
 def risks(text):
     return [{'kind': kind, 'at': text[max(0, m.start() - 2):m.end() + 2]} for kind, pattern in RISKS for m in pattern.finditer(text)]
 
@@ -140,6 +163,9 @@ def compare(first_lines, second_blocks):
             s['status'] = 'differ'
             s['first'] = [f'{target[max(start, start + i - 2):start + i]}[{target[start + i]}->{v if v is not None else "(nothing)"}]'
                           for i, v in enumerate(mine) if v != target[start + i]]
+            better = suggest(s['text'], target[start:end], mine)
+            if better:
+                s['suggest'] = better
         found = risks(s['text'])
         if found:
             s['risk'] = found
@@ -151,7 +177,7 @@ def main():
         sys.exit(__doc__)
     first, second, out = (Path(p) for p in sys.argv[1:4])
     out.mkdir(parents=True, exist_ok=True)
-    total = {'agree': 0, 'differ': 0, 'second-only': 0, 'first-only lines': 0, 'risk marks': 0}
+    total = {'agree': 0, 'differ': 0, 'second-only': 0, 'first-only lines': 0, 'risk marks': 0, 'suggested': 0}
     pages = 0
     for path in sorted(second.glob('*.json')):
         draft = first / path.name
@@ -168,6 +194,7 @@ def main():
             total[key] += value
         total['first-only lines'] += len(nowhere)
         total['risk marks'] += marks
+        total['suggested'] += sum(1 for s in sentences if 'suggest' in s)
         pages += 1
         print(f"{path.stem}: {counts['agree']} agree, {counts['differ']} differ, {counts['second-only']} second-only, "
               f"{len(nowhere)} first-only lines, {marks} risk marks")

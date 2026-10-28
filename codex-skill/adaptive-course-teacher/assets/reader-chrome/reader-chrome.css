@@ -15,6 +15,7 @@
   /* 临界阻尼弹簧（response 0.3s），与书架动效同一手感 */
   --rc-spring:linear(0,0.067,0.205,0.358,0.499,0.619,0.715,0.79,0.848,0.89,0.921,0.944,0.96,0.972,0.981,0.986,0.991,0.993,0.995,0.997,0.998,0.999,1);
   --rc-spring-time:480ms;
+  --rc-ease-out:cubic-bezier(0.23,1,0.32,1);
   --rc-font:UIOption,Inter,system-ui,"Segoe UI","Microsoft YaHei",sans-serif;
 }
 html{scroll-padding-top:72px}
@@ -282,3 +283,61 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.3em 0 .9em}
 @media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}}
+/* 目录页导图：每章一棵树。根卡片在左，曲线（SVG）连到各节卡片；一章进入视野时线从根上长出来、卡片依次滑入。
+   指着卡片：它浮起，它的线加深，别的线变淡，下方显示这一节的一句话。窄屏是一叠卡片 */
+.rc-map{display:none}
+.rc-mapview .rc-map{display:block}
+/* 导图比正文栏宽：大屏上向两边展开到 1080px，居中 */
+@media (min-width:761px){.rc-map{width:min(1080px,calc(100vw - 48px));margin-left:calc(50% - min(540px,50vw - 24px))}}
+.rc-mapview [data-rc-list]{display:none}
+.rc-map-chapter{position:relative;display:grid;grid-template-columns:minmax(170px,240px) minmax(0,1fr);column-gap:64px;align-items:center;padding:30px 0}
+.rc-map-chapter+.rc-map-chapter{border-top:1px solid var(--rc-line)}
+.rc-map-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.rc-map-link{fill:none;stroke:color-mix(in srgb,var(--rc-accent) 42%,transparent);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke 150ms ease,stroke-width 150ms ease,opacity 200ms ease}
+.rc-map-dot{fill:var(--rc-accent)}
+.rc-map-chapter.has-hot .rc-map-link{opacity:.35}
+.rc-map-chapter.has-hot .rc-map-link.is-hot{opacity:1;stroke:var(--rc-accent);stroke-width:2.25}
+.rc-map-root{position:relative;z-index:1;padding:16px 18px 15px;border:1px solid color-mix(in srgb,var(--rc-accent) 28%,transparent);border-radius:16px;background:color-mix(in srgb,var(--rc-accent) 9%,var(--rc-paper));box-shadow:0 1px 0 color-mix(in srgb,var(--rc-ink) 4%,transparent)}
+.rc-map-root h2{margin:0;font-size:1.12em;line-height:1.4;color:var(--rc-ink)}
+.rc-map-gist{margin:.5em 0 0;font-family:var(--rc-font);font-size:.8em;line-height:1.65;color:var(--rc-muted)}
+.rc-map-root .rc-topics{display:none}
+.rc-map-branches{position:relative;z-index:1;display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.rc-map-node{position:relative;margin:0;padding:0}
+.rc-map-node:hover,.rc-map-node:focus-within{z-index:5}
+.rc-map-card{position:relative;display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px;max-width:100%;padding:8px 13px;border:1px solid var(--rc-line);border-radius:12px;background:var(--rc-paper);font-family:var(--rc-font);transition:transform 220ms var(--rc-ease-out),border-color 150ms ease,box-shadow 220ms var(--rc-ease-out)}
+.rc-map-title{font-size:.95em;font-weight:600;color:var(--rc-ink);text-decoration:none}
+.rc-map-title::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.rc-map-title:focus-visible{outline:none}
+.rc-map-card:focus-within{border-color:var(--rc-accent)}
+.rc-map-card .rc-topics{margin:0}
+.rc-map-takeaway{position:absolute;z-index:6;left:0;top:calc(100% + 8px);width:max-content;max-width:min(26em,60vw);margin:0;padding:8px 12px;border-radius:9px;background:var(--rc-ink);color:var(--rc-paper);font-size:.8em;line-height:1.6;opacity:0;transform:translateY(-4px);transform-origin:top left;pointer-events:none;transition:opacity 150ms var(--rc-ease-out),transform 180ms var(--rc-ease-out)}
+.rc-map-card:focus-within .rc-map-takeaway{opacity:1;transform:none}
+@media (hover:hover) and (pointer:fine){
+  .rc-map-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--rc-accent) 65%,transparent);box-shadow:0 6px 18px -8px color-mix(in srgb,var(--rc-ink) 35%,transparent)}
+  .rc-map-card:hover .rc-map-takeaway{opacity:1;transform:none}
+}
+/* 生长：线条从根上画出来，卡片依次从左滑入（弹簧曲线）；每章进入视野时放一次 */
+@keyframes rc-map-grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes rc-map-in{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes rc-map-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes rc-map-root-in{from{opacity:0;transform:translateX(-8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes rc-map-fade{from{opacity:0}to{opacity:1}}
+.rc-map.is-revealing .rc-map-chapter:not(.is-shown) :is(.rc-map-root,.rc-map-node,.rc-map-links){opacity:0}
+.rc-map-chapter.is-shown .rc-map-root{animation:rc-map-root-in 320ms var(--rc-ease-out) backwards}
+.rc-map-chapter.is-shown .rc-map-link{animation:rc-map-grow 520ms var(--rc-ease-out) backwards;animation-delay:calc(140ms + var(--i) * 40ms)}
+.rc-map-chapter.is-shown .rc-map-dot{animation:rc-map-fade 200ms ease-out 100ms backwards}
+.rc-map-chapter.is-shown .rc-map-node{animation:rc-map-in var(--rc-spring-time) var(--rc-spring) backwards;animation-delay:calc(220ms + var(--i) * 40ms)}
+@media (max-width:760px){
+  .rc-map-chapter{display:block;padding:22px 0}
+  .rc-map-links{display:none}
+  .rc-map-root .rc-topics{display:flex;margin-top:.6em}
+  .rc-map-branches{margin-top:12px;gap:8px}
+  .rc-map-card{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:11px 13px}
+  .rc-map-takeaway{position:static;width:auto;max-width:none;padding:0;background:none;color:var(--rc-muted);opacity:1;transform:none;font-size:.82em}
+  .rc-map-chapter.is-shown .rc-map-node{animation-name:rc-map-rise;animation-delay:calc(120ms + var(--i) * 40ms)}
+}
+@media (prefers-reduced-motion:reduce){
+  .rc-map-chapter.is-shown :is(.rc-map-root,.rc-map-node,.rc-map-dot,.rc-map-link){animation:rc-map-fade 200ms ease backwards}
+  .rc-map-card,.rc-map-takeaway{transition:border-color 150ms ease,opacity 150ms ease}
+  .rc-map-card:hover,.rc-map-takeaway{transform:none}
+}

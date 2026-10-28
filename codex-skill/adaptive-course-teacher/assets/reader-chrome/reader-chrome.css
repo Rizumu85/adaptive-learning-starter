@@ -265,24 +265,35 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
   .rc-volume-strip img{width:76px;height:108px}
   .rc-volume-chapter-thumb{width:56px;height:56px}
 }
-/* 折叠阅读（只在带这些标记的页面上起作用）：要点句是作者原句，淡淡的荧光笔底；速读时每段只留要点句，点开看全文。
-   本节/本章概括是 AI 写的：放在单独的框里，换无衬线字，ⓘ 说明出处 */
+/* 折叠阅读（只在带这些标记的页面上起作用）：要点句是作者原句，淡淡的荧光笔底；折叠时每段只留要点句，点开看全文。
+   展开收回时要点句逐字滑动（脚本临时把字包进 .rc-tok），荧光笔底跟着字一起走 */
 .rc-brief{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .rc-skim p[data-fold]:not(.rc-open) .rc-rest{display:none}
 .rc-skim p[data-fold]:not(.rc-open) .rc-brief{background:none}
 .rc-skim p[data-fold]:not(.rc-open){cursor:pointer}
 .rc-skim p[data-fold]:not(.rc-open)::after{content:" ⋯";color:var(--rc-muted)}
-.rc-skim p[data-fold].rc-open{border-left:2px solid color-mix(in srgb,var(--rc-accent) 45%,transparent);margin-left:-14px;padding-left:12px}
-.rc-gist{margin:1.1em 0 1.7em;padding:.75em 1em .8em;border-left:3px solid color-mix(in srgb,var(--rc-accent) 55%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--rc-ink) 4%,transparent);font-family:var(--rc-font)}
-.rc-gist-line{margin:0;font-size:.95em;line-height:1.65;color:var(--rc-ink)}
+.rc-skim p[data-fold].rc-open{box-shadow:-14px 0 0 -12px color-mix(in srgb,var(--rc-accent) 45%,transparent)}
+.rc-tok{display:inline-block;white-space:pre}
+.rc-folding{overflow:clip}
+.rc-folding .rc-brief{background:none}
+:root:not(.rc-skim) .rc-folding .rc-tok,.rc-skim .rc-open.rc-folding .rc-tok{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%)}
+/* 本节/本章概括（AI 写的）：一张夹在书页里的纸条，右上角折起一角；一句话用正文的字体，主题词像书后索引一样排成一行。
+   纸条随页面放下时轻轻落定一次。ⓘ 说明出处 */
+.rc-gist{position:relative;margin:1.1em 0 1.7em;padding:15px 44px 14px 20px;border-radius:4px 2px 4px 4px;background:color-mix(in srgb,var(--rc-paper) 40%,#fff);box-shadow:0 1px 1px color-mix(in srgb,var(--rc-ink) 6%,transparent),0 10px 26px -18px color-mix(in srgb,var(--rc-ink) 40%,transparent);animation:rc-slip-in var(--rc-spring-time) var(--rc-spring) backwards}
+.rc-gist::before{content:"";position:absolute;top:0;right:0;width:22px;height:22px;border-bottom-left-radius:4px;background:linear-gradient(225deg,var(--rc-paper) 50%,color-mix(in srgb,var(--rc-paper) 78%,var(--rc-ink)) 50%);box-shadow:-2px 2px 3px -1px color-mix(in srgb,var(--rc-ink) 14%,transparent)}
+.rc-gist-line{margin:0;font-size:1.02em;line-height:1.75;color:var(--rc-ink)}
+.rc-gist .rc-topics{display:block;margin:.45em 0 0;padding:0;list-style:none;font:600 12.5px/1.7 var(--rc-font);letter-spacing:.04em;color:var(--rc-muted)}
+.rc-gist .rc-topics li{display:inline;margin:0;padding:0;background:none;font-size:inherit;color:inherit}
+.rc-gist .rc-topics li+li::before{content:"";display:inline-block;width:4px;height:4px;margin:0 .7em;border-radius:50%;background:color-mix(in srgb,var(--rc-accent) 70%,transparent);vertical-align:.2em}
+@keyframes rc-slip-in{from{opacity:0;transform:translateY(-6px) rotate(-.5deg)}to{opacity:1;transform:none}}
 .rc-topics{display:flex;flex-wrap:wrap;gap:6px;margin:.55em 0 0;padding:0;list-style:none}
 .rc-topics li{margin:0;padding:1px 9px;border-radius:999px;font-size:.78em;line-height:1.7;color:var(--rc-muted);background:color-mix(in srgb,var(--rc-ink) 7%,transparent)}
 .rc-ai{position:relative;display:inline-block;margin-left:.4em;font-size:.82em;line-height:1;color:var(--rc-muted);cursor:help;outline-offset:2px}
-.rc-ai::after{content:attr(data-tip);position:absolute;z-index:5;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:16em;padding:5px 9px;border-radius:6px;background:var(--rc-ink);color:var(--rc-paper);font-size:12px;line-height:1.5;opacity:0;pointer-events:none;transition:opacity 150ms ease-out}
+.rc-ai::after{content:attr(data-tip);position:absolute;z-index:5;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);width:max-content;max-width:16em;padding:5px 9px;border-radius:6px;background:var(--rc-ink);color:var(--rc-paper);font:12px/1.5 var(--rc-font);opacity:0;pointer-events:none;transition:opacity 150ms ease-out}
 .rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
 header>.rc-gist{margin:18px 0 0}
-.toc-chapter .rc-gist{margin:.3em 0 .9em}
-@media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}}
+.toc-chapter .rc-gist{margin:.4em 0 1em;animation:none}
+@media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}.rc-gist{animation:none}}
 /* 目录页导图：每章一棵树。根卡片在左，曲线（SVG）连到各节卡片；一章进入视野时线从根上长出来、卡片依次滑入。
    指着卡片：它浮起，它的线加深，别的线变淡，下方显示这一节的一句话。窄屏是一叠卡片 */
 .rc-map{display:none}

@@ -986,36 +986,129 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   else addEventListener('load', start, { once: true });
 })();
 // 折叠：正文里标了要点句（.rc-brief，作者原句一字不改）的页面，顶栏多一个“折叠”开关。折叠时每段只显示要点句，
-// 段末一个省略号；点一段在原地展开全文，再点收回。默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现
+// 段末一个省略号；点一段在原地展开全文，再点收回。默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现。
+// 展开和收回的动效（学 TextFold）：要点句里看得见的字各自从旧位置滑到新位置，折起来的句子从微微模糊里浮现，
+// 段落高度跟着平滑变化，下面的内容不跳。只动视野里的段落；减少动态效果时只淡入淡出
 (() => {
   const tools = document.querySelector('.rc-bar .rc-tools');
   if (!tools || !document.querySelector('p[data-fold]')) return;
   const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const spring = getComputedStyle(root).getPropertyValue('--rc-spring').trim() || 'cubic-bezier(0.23,1,0.32,1)';
+  const easeOut = 'cubic-bezier(0.23,1,0.32,1)';
+  // 一个西文词、一串空白，或一个字：动画时按这个切开要点句，词不会从中间断行
+  const TOKEN = /[\p{Script=Latin}\d'’.\-]+|\s+|./gsu;
+
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'rc-toggle rc-skim-toggle';
   toggle.setAttribute('role', 'switch');
   toggle.textContent = '折叠';
   toggle.title = '每段只显示作者原文里的要点句，点一段展开全文';
-  const apply = (on) => {
+
+  const wrap = (p) => {
+    for (const brief of p.querySelectorAll('.rc-brief')) {
+      const walker = document.createTreeWalker(brief, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      for (const node of nodes) {
+        const pieces = document.createDocumentFragment();
+        for (const [piece] of node.data.matchAll(TOKEN)) {
+          if (/^\s+$/.test(piece)) { pieces.append(piece); continue; }
+          const token = document.createElement('span');
+          token.className = 'rc-tok';
+          token.textContent = piece;
+          pieces.append(token);
+        }
+        node.replaceWith(pieces);
+      }
+    }
+    return [...p.querySelectorAll('.rc-tok')];
+  };
+  const unwrap = (p) => {
+    for (const token of p.querySelectorAll('.rc-tok')) token.replaceWith(token.textContent);
+    p.normalize();
+    p.classList.remove('rc-folding');
+    p.style.height = '';
+  };
+  const visible = (p) => {
+    const r = p.getBoundingClientRect();
+    return r.bottom > 0 && r.top < innerHeight;
+  };
+
+  // change() 改变折叠状态（一段的 rc-open，或整页的 rc-skim）；paragraphs 是要动起来的段落
+  const fold = (paragraphs, change, opening) => {
+    const moving = paragraphs.filter(visible).slice(0, 16);
+    // 动画没放完又点了一次：先停下并把字放回原样，再从当前状态开始
+    for (const p of moving) {
+      (p.rcAnimations || []).forEach((a) => a.cancel());
+      p.rcAnimations = null;
+      unwrap(p);
+    }
+    if (reduce.matches || !moving.length) {
+      change();
+      if (opening) for (const p of moving) for (const rest of p.querySelectorAll('.rc-rest')) rest.animate({ opacity: [0, 1] }, { duration: 200, easing: 'ease' });
+      return;
+    }
+    const run = () => {
+      const before = moving.map((p) => {
+        const tokens = wrap(p);
+        p.classList.add('rc-folding');
+        return { p, tokens, rects: tokens.map((t) => t.getBoundingClientRect()), height: p.getBoundingClientRect().height };
+      });
+      change();
+      for (const { p, tokens, rects, height } of before) {
+        const after = p.getBoundingClientRect().height;
+        const animations = [];
+        tokens.forEach((token, i) => {
+          const now = token.getBoundingClientRect();
+          const dx = rects[i].left - now.left;
+          const dy = rects[i].top - now.top;
+          if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+          animations.push(token.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] },
+            { duration: 560, easing: spring, delay: Math.min(i, 80) * 3 }));
+        });
+        animations.push(p.animate({ height: [`${height}px`, `${after}px`] }, { duration: 460, easing: easeOut }));
+        if (p.matches('.rc-open, :root:not(.rc-skim) p')) {
+          for (const rest of p.querySelectorAll('.rc-rest')) {
+            animations.push(rest.animate({ opacity: [0, 1], filter: ['blur(4px)', 'blur(0)'] },
+              { duration: 420, delay: 140, easing: easeOut, fill: 'backwards' }));
+          }
+        }
+        p.rcAnimations = animations;
+        Promise.allSettled(animations.map((a) => a.finished)).then(() => { if (p.rcAnimations === animations) unwrap(p); });
+      }
+    };
+    if (opening) { run(); return; }
+    // 收回：先让要折起来的句子淡出，再让要点句滑回去
+    const fading = moving.flatMap((p) => [...p.querySelectorAll('.rc-rest')].map((rest) =>
+      rest.animate({ opacity: [1, 0], filter: ['blur(0)', 'blur(3px)'] }, { duration: 140, easing: 'ease', fill: 'forwards' })));
+    Promise.allSettled(fading.map((a) => a.finished)).then(() => { run(); fading.forEach((a) => a.cancel()); });
+  };
+
+  const setSkim = (on) => {
     root.classList.toggle('rc-skim', on);
     toggle.setAttribute('aria-checked', String(on));
     if (!on) for (const p of document.querySelectorAll('p[data-fold].rc-open')) p.classList.remove('rc-open');
   };
   let saved = true;
   try { saved = localStorage.getItem('rc-skim') !== '0'; } catch { /* 存不了就每次按默认折叠 */ }
-  apply(saved);
+  setSkim(saved);
   tools.prepend(toggle);
   // 顶栏的点击处理已经翻转了 aria-checked 并派发 change
   toggle.addEventListener('change', () => {
     const on = toggle.getAttribute('aria-checked') === 'true';
-    apply(on);
+    toggle.setAttribute('aria-checked', String(!on));  // 先复原，由 setSkim 在动画里改
+    const targets = [...document.querySelectorAll('p[data-fold]')].filter((p) => !p.classList.contains('rc-open'));
+    fold(targets, () => setSkim(on), !on);
     try { localStorage.setItem('rc-skim', on ? '1' : '0'); } catch { /* 同上 */ }
   });
   document.addEventListener('click', (event) => {
     if (!root.classList.contains('rc-skim') || event.target.closest('a, button, .note-zone')) return;
     const p = event.target.closest('p[data-fold]');
-    if (p && !getSelection().toString()) p.classList.toggle('rc-open');
+    if (!p || getSelection().toString()) return;
+    const opening = !p.classList.contains('rc-open');
+    fold([p], () => p.classList.toggle('rc-open', opening), opening);
   });
 })();
 // 目录页的导图：页面带 #rc-map（各章、各节的标题、链接、一句话和主题词）时，顶栏多一个“目录 | 导图”切换。

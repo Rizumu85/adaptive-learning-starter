@@ -985,8 +985,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   if (document.readyState === 'complete') start();
   else addEventListener('load', start, { once: true });
 })();
-// 速读：正文里标了要点句（.rc-brief，作者原句一字不改）的页面，顶栏多一个“速读”开关。打开后每段只显示要点句，
-// 段末一个省略号；点一段在原地展开全文，再点收回。开关状态记在本机，换一章也保持。没有要点句的页面不出现
+// 折叠：正文里标了要点句（.rc-brief，作者原句一字不改）的页面，顶栏多一个“折叠”开关。折叠时每段只显示要点句，
+// 段末一个省略号；点一段在原地展开全文，再点收回。默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现
 (() => {
   const tools = document.querySelector('.rc-bar .rc-tools');
   if (!tools || !document.querySelector('p[data-fold]')) return;
@@ -995,15 +995,15 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   toggle.type = 'button';
   toggle.className = 'rc-toggle rc-skim-toggle';
   toggle.setAttribute('role', 'switch');
-  toggle.textContent = '速读';
-  toggle.title = '每段只看要点句，点一段展开全文';
+  toggle.textContent = '折叠';
+  toggle.title = '每段只显示作者原文里的要点句，点一段展开全文';
   const apply = (on) => {
     root.classList.toggle('rc-skim', on);
     toggle.setAttribute('aria-checked', String(on));
     if (!on) for (const p of document.querySelectorAll('p[data-fold].rc-open')) p.classList.remove('rc-open');
   };
-  let saved = false;
-  try { saved = localStorage.getItem('rc-skim') === '1'; } catch { /* 存不了就每次从全文开始 */ }
+  let saved = true;
+  try { saved = localStorage.getItem('rc-skim') !== '0'; } catch { /* 存不了就每次按默认折叠 */ }
   apply(saved);
   tools.prepend(toggle);
   // 顶栏的点击处理已经翻转了 aria-checked 并派发 change

@@ -76,7 +76,7 @@ Series contents (several volumes in one book project, such as a four-volume set)
 - Use the original cover of each volume, as a compressed copy at twice the displayed size (120 px wide on desktop, 72 px on phones). The page head (series title, original title, author) stays the book's own; the stylesheet is in `reader-chrome.css`, so the book adds no rules of its own for these classes.
 - In the chrome config, give every chapter a `volume` with its volume's title. The footer then says `下一册 →` / `← 上一册` with `册名 · 章名` where the neighbouring chapter is in another volume, so crossing into the next volume is never a surprise. Chapter pages may also name the volume in their eyebrow (`第 2 册 · …`).
 
-The contents page's `继续阅读` (from the last-read record) is an action, so it is a small bookmark button under the page head (ribbon mark, accent label, arrow that nudges on hover), not another heading line.
+The contents page's `继续阅读` (from the last-read record) is an action, so it sits at the right of the top bar in the bar's own type (ribbon mark, accent label, chapter and section in ink, truncated when long, arrow that nudges on hover; phones show the ribbon and the chapter only), not as another line in the page head. Only a page without the top bar puts it under the head.
 
 Folded reading (after TextFold, github.com/chenxiachan/textfold; trial on one book from 2026-10-28): a book may mark, for each paragraph of two or more sentences, the one to three sentences that carry its point, and give each chapter or section a one-line takeaway with a few topics. It is optional and per book; pages without the markup show nothing of it.
 

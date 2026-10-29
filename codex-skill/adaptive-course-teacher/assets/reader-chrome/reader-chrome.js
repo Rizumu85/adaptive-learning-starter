@@ -748,8 +748,9 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     }).catch(() => {});
   }
 
-  // 目录页：页头下的“继续阅读”和章名后的“上次”。position 是这本书的记录，没有或那一章已不在目录里时什么都不显示。
-  // 这一行放在页面的 h1 和紧跟着它的几段文字（原名、作者）后面；书想放在别处时，给那个位置的元素加 data-rc-continue
+  // 目录页：顶栏右边的“继续阅读”和章名后的“上次”。position 是这本书的记录，没有或那一章已不在目录里时什么都不显示。
+  // “继续阅读”是一个动作，放在顶栏右边（和顶栏控件同一种字），不占页头的层级；没有顶栏的页面才放在 h1 和紧跟着它的几段文字后面
+  // （书想放在别处时，给那个位置的元素加 data-rc-continue）
   function showContinue(position) {
     document.querySelectorAll('.rc-continue, .rc-last').forEach((node) => node.remove());
     const chapter = position && info.chapters.find((c) => c.id === position.chapter);
@@ -768,6 +769,19 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       if (!text) continue;
       part('rc-continue-sep', '·');
       part('rc-continue-where', text);
+    }
+    const inner = document.querySelector('.rc-bar .rc-bar-inner');
+    if (inner && !document.querySelector('[data-rc-continue]')) {
+      let tools = inner.querySelector('.rc-tools');
+      if (!tools) {
+        tools = document.createElement('div');
+        tools.className = 'rc-tools';
+        inner.append(tools);
+      }
+      link.className = 'rc-continue';
+      link.title = link.textContent.replace(/·/g, ' · ');
+      tools.prepend(link);
+      return;
     }
     line.append(link);
     const slot = document.querySelector('[data-rc-continue]');

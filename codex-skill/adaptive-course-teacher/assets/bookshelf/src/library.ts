@@ -156,7 +156,7 @@
     const visible = books.filter((book) => matches(book, query));
     if (!visible.length) return '<p class="shelf-empty">没有找到匹配的书。</p>';
     // 每一排有自己的当前书，书名写在这一排上方（分排时在分类名下面）
-    const row = (list) => '<div class="now"><strong></strong><span></span><a class="now-last" role="link" tabindex="0" hidden></a></div>'
+    const row = (list) => '<div class="now"><strong></strong><span></span></div>'
       + `<div class="row"><ul class="track">${list.map(bookHtml).join('')}</ul></div>`;
     if (!large) return `<section class="shelf-group" aria-label="书架">${row(visible)}</section>`;
 
@@ -283,9 +283,9 @@
     }
   }
 
-  // 书名区的几行字：书名；原名 · 作者，有没看过的新章节时后面多一句“新增：…”；读过的书最后再加一行“上次读到：…”
+  // 书名区的几行字：书名；原名 · 作者，有没看过的新章节时后面多一句“新增：…”
   function fillNow(now: Element, book: any) {
-    const [title, line, last] = [...now.children] as HTMLElement[];
+    const [title, line] = [...now.children] as HTMLElement[];
     title.textContent = book.title + (book.subtitle ? ` ${book.subtitle}` : '');
     // 原名和作者相同（画集常这样）时只写一次
     const original = book.originalTitle === book.author ? '' : book.originalTitle;
@@ -296,18 +296,10 @@
       const em = document.createElement('em');
       em.textContent = titles.length === 1 ? `新增：${titles[0]}` : `新增 ${titles.length} 章：${titles[0]} 等`;
       line.append(em);
-    }
-    if (!(last instanceof HTMLAnchorElement)) return;
-    const position = positions.get(book.id);
-    last.hidden = !position;
-    last.textContent = position ? `上次读到：${position.text}` : '';
-    last.dataset.id = book.id;
-    if (position) last.dataset.url = position.href;
-    else delete last.dataset.url;
-  }
+    }  }
 
-  // 书名区按这一排里最占地方的那本留足高度：转到简介多一行、或者多一行“上次读到”的书时，书排和下面几排都不跟着上下挪。
-  // 窗口宽度、字体、“新增：…”或“上次读到”变了就重新量
+  // 书名区按这一排里最占地方的那本留足高度：转到简介多一行的书时，书排和下面几排都不跟着上下挪。
+  // 窗口宽度、字体或“新增：…”变了就重新量
   function reserve() {
     app.querySelectorAll('.shelf-group').forEach((group) => {
       const now = group.querySelector<HTMLElement>('.now');
@@ -581,49 +573,6 @@
     } catch { /* 读不到就不提示 */ }
   }
 
-  /* ---------- 上次读到：书名区最后一行 ---------- */
-  // 阅读控件在章节页记下读者每本书读到哪一章、哪一节（/api/position，服务器按登录邮箱每人一份，见 reader-chrome 的“上次读到”）。
-  // 转到读过的书时，书名区最后多一行“上次读到：章名 · 节名”，点它在新标签页打开那一章那一节，和打开书一样，书架留在原处。
-  // 书上不加任何标记。书架打开时读一次；读完书回到书架这个标签页时再读一次（最多每 10 秒一次）。
-  // 读不到（本地预览、没有这个接口）时什么都不显示。网址加 ?preview-position 时不连服务器，每本书给一行示例，只看样子。
-  const positions = new Map<string, { href: string; text: string }>();
-  let positionsAt = 0;
-  async function loadPositions() {
-    const preview = new URLSearchParams(location.search).has('preview-position');
-    if (!preview && !/^https?:$/.test(location.protocol)) return;
-    positionsAt = Date.now();
-    let found = null;
-    if (preview) {
-      found = new Map(books.map((book) => [book.id, {
-        href: new URL(book.directoryUrl || bookHash(book.id), location.href).href, text: '第 3 章 示例章节 · 示例小节',
-      }]));
-    } else {
-      const record = await fetch('/api/position', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-      if (!record || typeof record !== 'object') return;
-      found = new Map();
-      books.forEach((book) => {
-        const position = record[book.id];
-        if (!position || typeof position.url !== 'string' || typeof position.chapterTitle !== 'string') return;
-        let url: URL;
-        try { url = new URL(position.url, location.href); } catch { return; }
-        if (url.origin !== location.origin) return;
-        if (position.section) url.hash = position.section;
-        found.set(book.id, { href: url.href, text: [position.chapterTitle, position.section && position.sectionTitle !== position.chapterTitle ? position.sectionTitle : ''].filter(Boolean).join(' · ') });
-      });
-    }
-    positions.clear();
-    found.forEach((value, id) => positions.set(id, value));
-    app.querySelectorAll<HTMLElement>('.book.is-current').forEach((bookEl) => {
-      const now = bookEl.closest('.shelf-group')?.querySelector('.now');
-      const book = byId(bookEl.dataset.id);
-      if (now && book) fillNow(now, book);
-    });
-    reserve();
-  }
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && positionsAt && Date.now() - positionsAt > 10000) loadPositions();
-  });
-
   /* ---------- 书页 ---------- */
 
   function renderBook(id) {
@@ -741,13 +690,6 @@
       event.preventDefault();
       return;
     }
-    // “上次读到”：在新标签页打开那一章那一节；记下这本书，回到书架时它还在中间
-    const last = (event.target as Element).closest<HTMLElement>('a.now-last');
-    if (last) {
-      event.preventDefault();
-      openLast(last);
-      return;
-    }
     const jump = (event.target as Element).closest<HTMLElement>('.shelf-index button');
     if (jump) {
       // 第一排回到页面顶上，分类目录和查找还在视野里；其他排滚到分类名贴近顶部
@@ -772,30 +714,8 @@
     openBook(book.dataset.id);
   });
 
-  // 书和“上次读到”都不是带地址的链接（免得指上去时浏览器在左下角显示网址），由脚本打开
-  function openLast(last: HTMLElement) {
-    const url = last.dataset.url;
-    if (!url) return;
-    rememberBook(last.dataset.id || '');
-    const tab = window.open(url, '_blank');
-    if (tab) {
-      try { tab.opener = null; } catch { /* 跨源时已无关联 */ }
-    } else location.assign(url);
-  }
-  app.addEventListener('keydown', (event) => {
-    const last = (event.target as Element).closest<HTMLElement>('a.now-last');
-    if (!last || (event.key !== 'Enter' && event.key !== ' ')) return;
-    event.preventDefault();
-    openLast(last);
-  });
-  // 中键点书或“上次读到”：在新标签页打开
+  // 中键点书：在新标签页打开（书不是带地址的链接，浏览器不会自己处理）
   app.addEventListener('auxclick', (event) => {
-    const last = (event.target as Element).closest<HTMLElement>('a.now-last');
-    if (last && event.button === 1) {
-      event.preventDefault();
-      openLast(last);
-      return;
-    }
     const book = (event.target as Element).closest('a.book');
     if (!book || event.button !== 1) return;
     event.preventDefault();
@@ -831,7 +751,6 @@
       books = validate(data.books || []);
       render();
       books.forEach(checkNew);
-      loadPositions();
     })
     .catch((error) => {
       const hint = location.protocol === 'file:'

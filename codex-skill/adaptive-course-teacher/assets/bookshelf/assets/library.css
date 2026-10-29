@@ -78,9 +78,6 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .now span{display:block;margin-top:4px;font-size:14px;color:var(--muted)}
 /* 上次读到：书名区最后一行小字链接（强调色，标出读者读到的地方），在新标签页打开那一章那一节；放不下时截成一行，不换行。
    书排的上沿压着这一行的下边，所以把它抬到书排上面一层，才点得到 */
-.now .now-last{position:relative;z-index:1;display:block;width:fit-content;max-width:100%;margin:0 auto;padding:4px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 13px/1.6 var(--ui-font);color:var(--accent);text-decoration:none}
-.now .now-last[hidden]{display:none}
-.now .now-last:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
 
 /* 一排正面封面。整排共用一个透视相机，视点在当前书的上方：
    当前书正对视线、稍微抬起；右边的书露出书脊，左边的书露出书页切口，都看得到顶面 */
@@ -242,4 +239,4 @@ a.chapter:hover{color:var(--accent)}
 @media (prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .page-veil{position:fixed;inset:0;z-index:20;background:var(--paper);opacity:0;pointer-events:none}
 /* 书由脚本打开，不是带地址的链接，鼠标形状单独给 */
-.book,.now .now-last{cursor:pointer}
+.book,

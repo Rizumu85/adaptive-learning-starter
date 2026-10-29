@@ -124,12 +124,13 @@ test('whole script in a headless browser: saving on a chapter page, 继续阅读
     assert.ok(puts.every((p) => p.url === '/demo/ch2.html' && p.chapterTitle === '第二章 远方'));
 
     const dom = await run(browsers[0], `${origin}/demo/index.html`, join(dir, 'b'));
-    const line = dom.match(/<p class="rc-continue">([\s\S]*?)<\/p>/);
-    assert.ok(line, 'no 继续阅读 line');
+    const line = dom.match(/<a ([^>]*class="rc-continue"[^>]*)>([\s\S]*?)<\/a>/);
+    assert.ok(line, 'no 继续阅读 link');
     assert.match(line[1], new RegExp(`href="${origin}/demo/ch2.html#a"`));
-    assert.equal(line[1].replace(/<[^>]+>/g, ''), '继续阅读·第二章 远方·甲节');
-    // placed after the h1 and the paragraph that follows it, inside the page head
-    assert.match(dom, /<p class="original">Original<\/p><p class="rc-continue">/);
+    assert.equal(line[2].replace(/<[^>]+>/g, ''), '继续阅读·第二章 远方·甲节');
+    // an action, so it sits first in the top bar's tools, not as another line in the page head
+    assert.match(dom, /class="rc-tools"[^>]*><a [^>]*class="rc-continue"/);
+    assert.doesNotMatch(dom, /<p class="rc-continue">/);
     // the 上次 mark sits after the chapter title of the whole-chapter link only, not after the 复习 link
     assert.match(dom, /<span class="row-title">第二章 远方<span class="rc-last">上次<\/span><\/span>/);
     assert.equal((dom.match(/class="rc-last"/g) || []).length, 1);

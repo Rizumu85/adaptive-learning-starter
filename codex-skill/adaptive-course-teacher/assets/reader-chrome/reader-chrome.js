@@ -990,7 +990,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 // 默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现。
 // 动效（学 TextFold）：要点句里每个字从旧位置滑到新位置。为了不改动正文排版（改了会让断行跳一下），
 // 不去拆正文，而是量出每个字的位置，在上面一层放这些字的替身飞过去，落定后换回正文；折起来的句子淡入，
-// 段落高度平滑变化，要点句的荧光笔底最后从左到右画出来。只动视野里的段落；减少动态效果时只淡入淡出
+// 段落高度平滑变化；展开后不加任何标记。只动视野里的段落；减少动态效果时只淡入淡出
 (() => {
   const tools = document.querySelector('.rc-bar .rc-tools');
   if (!tools || !document.querySelector('p[data-fold]')) return;
@@ -1012,7 +1012,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     button.className = 'rc-refold';
     button.title = '折回要点';
     button.setAttribute('aria-label', '折回要点');
-    button.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 2.5 8 5.5l3-3M5 13.5l3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    button.innerHTML = '<svg viewBox="0 0 16 12" aria-hidden="true"><path d="M3 9 8 4l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     return button;
   };
   const setOpen = (p, open) => {

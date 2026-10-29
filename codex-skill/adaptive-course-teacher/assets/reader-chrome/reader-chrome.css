@@ -271,25 +271,22 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
   .rc-volume-strip img{width:76px;height:108px}
   .rc-volume-chapter-thumb{width:56px;height:56px}
 }
-/* 折叠阅读（只在带这些标记的页面上起作用）：要点句是作者原句，淡淡的荧光笔底；折叠时每段只留要点句，点开看全文。
-   展开时要点句的替身字飞到新位置（.rc-fly 一层），正文暂时透明；落定后荧光笔底从左到右画出来。
-   展开的段落末尾有一个“折回”小按钮，只有它能收回 */
-.rc-brief{background-image:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%);background-repeat:no-repeat;background-size:100% 100%;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size 460ms var(--rc-ease-out)}
+/* 折叠阅读（只在带这些标记的页面上起作用）：折叠时每段只留要点句（作者原句），段尾一个“⋯”，点开看全文。
+   展开后不加任何标记，就是普通的正文：展开时要点句的替身字飞到新位置（.rc-fly 一层），补出来的句子淡入。
+   展开的段落末尾有一个和字等高的细线小箭头，只有它能折回 */
 .rc-skim p[data-fold]:not(.rc-open) .rc-rest{display:none}
-.rc-skim p[data-fold]:not(.rc-open) .rc-brief{background-size:0% 100%}
 .rc-skim p[data-fold]:not(.rc-open){cursor:pointer}
 .rc-skim p[data-fold]:not(.rc-open)::after{content:"⋯";margin-left:.35em;color:var(--rc-accent);letter-spacing:.05em;transition:opacity 150ms ease}
 @media (hover:hover) and (pointer:fine){.rc-skim p[data-fold]:not(.rc-open):hover::after{opacity:.6}}
 .rc-flying{overflow:clip}
-.rc-flying .rc-brief,.rc-flying .rc-brief *{color:transparent!important;text-decoration-color:transparent!important;transition:none;background-size:0% 100%}
+.rc-flying .rc-brief,.rc-flying .rc-brief *{color:transparent!important;text-decoration-color:transparent!important}
 .rc-fly{position:absolute;left:0;top:0;width:0;height:0;z-index:40;pointer-events:none}
 .rc-fly span{position:absolute;white-space:pre;will-change:transform}
-.rc-refold{display:inline-flex;align-items:center;justify-content:center;width:26px;height:20px;margin:0 0 0 .35em;padding:0;border:0;border-radius:6px;background:color-mix(in srgb,var(--rc-accent) 10%,transparent);color:var(--rc-accent);vertical-align:-.18em;cursor:pointer;animation:rc-refold-in 260ms var(--rc-ease-out) 380ms backwards;transition:background-color 150ms ease,transform 160ms var(--rc-ease-out)}
-.rc-refold svg{display:block}
-.rc-refold:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px}
-@media (hover:hover) and (pointer:fine){.rc-refold:hover{background:color-mix(in srgb,var(--rc-accent) 18%,transparent)}}
-.rc-refold:active{transform:scale(.9)}
-@keyframes rc-refold-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.rc-refold{display:inline-block;width:1.1em;height:.8em;margin:0 0 0 .3em;padding:0;border:0;background:none;color:color-mix(in srgb,var(--rc-ink) 40%,var(--rc-paper));vertical-align:baseline;cursor:pointer;animation:rc-refold-in 240ms ease-out 380ms backwards;transition:color 150ms ease}
+.rc-refold svg{display:block;width:100%;height:100%}
+.rc-refold:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:3px}
+@media (hover:hover) and (pointer:fine){.rc-refold:hover{color:var(--rc-accent)}}
+@keyframes rc-refold-in{from{opacity:0}to{opacity:1}}
 /* 本节/本章概括（AI 写的）：一张夹在书页里的纸条，右上角折起一角；一句话用正文的字体，主题词像书后索引一样排成一行。
    纸条随页面放下时轻轻落定一次。ⓘ 说明出处 */
 .rc-gist{position:relative;margin:1.1em 0 1.7em;padding:15px 44px 14px 20px;border-radius:4px 2px 4px 4px;background:color-mix(in srgb,var(--rc-paper) 40%,#fff);box-shadow:0 1px 1px color-mix(in srgb,var(--rc-ink) 6%,transparent),0 10px 26px -18px color-mix(in srgb,var(--rc-ink) 40%,transparent);animation:rc-slip-in var(--rc-spring-time) var(--rc-spring) backwards}
@@ -306,4 +303,4 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
 header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.4em 0 1em;animation:none}
-@media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-brief,.rc-refold{transition:none}.rc-gist,.rc-refold{animation:none}}
+@media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-refold{transition:none}.rc-gist,.rc-refold{animation:none}}

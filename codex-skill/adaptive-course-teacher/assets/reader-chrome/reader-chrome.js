@@ -986,9 +986,11 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   else addEventListener('load', start, { once: true });
 })();
 // 折叠：正文里标了要点句（.rc-brief，作者原句一字不改）的页面，顶栏多一个“折叠”开关。折叠时每段只显示要点句，
-// 段末一个省略号；点一段在原地展开全文，再点收回。默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现。
-// 展开和收回的动效（学 TextFold）：要点句里看得见的字各自从旧位置滑到新位置，折起来的句子从微微模糊里浮现，
-// 段落高度跟着平滑变化，下面的内容不跳。只动视野里的段落；减少动态效果时只淡入淡出
+// 段末一个省略号；点一段在原地展开全文，展开后段末有一个“折回”小按钮，只有点它才收回（乱点不会收回去）。
+// 默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现。
+// 动效（学 TextFold）：要点句里每个字从旧位置滑到新位置。为了不改动正文排版（改了会让断行跳一下），
+// 不去拆正文，而是量出每个字的位置，在上面一层放这些字的替身飞过去，落定后换回正文；折起来的句子淡入，
+// 段落高度平滑变化，要点句的荧光笔底最后从左到右画出来。只动视野里的段落；减少动态效果时只淡入淡出
 (() => {
   const tools = document.querySelector('.rc-bar .rc-tools');
   if (!tools || !document.querySelector('p[data-fold]')) return;
@@ -996,8 +998,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const spring = getComputedStyle(root).getPropertyValue('--rc-spring').trim() || 'cubic-bezier(0.23,1,0.32,1)';
   const easeOut = 'cubic-bezier(0.23,1,0.32,1)';
-  // 一个西文词、一串空白，或一个字：动画时按这个切开要点句，词不会从中间断行
-  const TOKEN = /[\p{Script=Latin}\d'’.\-]+|\s+|./gsu;
+  const FLY = 520;
 
   const toggle = document.createElement('button');
   toggle.type = 'button';
@@ -1005,91 +1006,113 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   toggle.setAttribute('role', 'switch');
   toggle.textContent = '折叠';
   toggle.title = '每段只显示作者原文里的要点句，点一段展开全文';
+  const refoldButton = () => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'rc-refold';
+    button.title = '折回要点';
+    button.setAttribute('aria-label', '折回要点');
+    button.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 9.5 8 5.5l4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    return button;
+  };
+  const setOpen = (p, open) => {
+    p.classList.toggle('rc-open', open);
+    p.querySelector(':scope > .rc-refold')?.remove();
+    if (open) p.append(refoldButton());
+  };
 
-  const wrap = (p) => {
+  // 要点句里每个看得见的字的位置（只量，不改正文）
+  const glyphs = (p) => {
+    const out = [];
+    const range = document.createRange();
     for (const brief of p.querySelectorAll('.rc-brief')) {
       const walker = document.createTreeWalker(brief, NodeFilter.SHOW_TEXT);
-      const nodes = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode);
-      for (const node of nodes) {
-        const pieces = document.createDocumentFragment();
-        for (const [piece] of node.data.matchAll(TOKEN)) {
-          if (/^\s+$/.test(piece)) { pieces.append(piece); continue; }
-          const token = document.createElement('span');
-          token.className = 'rc-tok';
-          token.textContent = piece;
-          pieces.append(token);
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        // 量的时候就把字体和颜色记成定值：computed style 是活的，正文变透明后再读就成了透明
+        const cs = getComputedStyle(node.parentElement);
+        const style = { fontFamily: cs.fontFamily, fontSize: cs.fontSize, fontWeight: cs.fontWeight, fontStyle: cs.fontStyle, color: cs.color };
+        let i = 0;
+        for (const ch of node.data) {
+          const next = i + ch.length;
+          if (ch.trim()) {
+            range.setStart(node, i);
+            range.setEnd(node, next);
+            const rect = range.getClientRects()[0];
+            if (rect && rect.width) out.push({ ch, rect, style });
+          }
+          i = next;
         }
-        node.replaceWith(pieces);
       }
     }
-    return [...p.querySelectorAll('.rc-tok')];
-  };
-  const unwrap = (p) => {
-    for (const token of p.querySelectorAll('.rc-tok')) token.replaceWith(token.textContent);
-    p.normalize();
-    p.classList.remove('rc-folding');
-    p.style.height = '';
+    return out;
   };
   const visible = (p) => {
     const r = p.getBoundingClientRect();
     return r.bottom > 0 && r.top < innerHeight;
   };
 
-  // change() 改变折叠状态（一段的 rc-open，或整页的 rc-skim）；paragraphs 是要动起来的段落
+  // change() 改变折叠状态；paragraphs 里在视野内的段落会动起来
   const fold = (paragraphs, change, opening) => {
     const moving = paragraphs.filter(visible).slice(0, 16);
-    // 动画没放完又点了一次：先停下并把字放回原样，再从当前状态开始
-    for (const p of moving) {
-      (p.rcAnimations || []).forEach((a) => a.cancel());
-      p.rcAnimations = null;
-      unwrap(p);
-    }
+    for (const p of moving) p.rcStop?.();
     if (reduce.matches || !moving.length) {
       change();
       if (opening) for (const p of moving) for (const rest of p.querySelectorAll('.rc-rest')) rest.animate({ opacity: [0, 1] }, { duration: 200, easing: 'ease' });
       return;
     }
     const run = () => {
-      const before = moving.map((p) => {
-        const tokens = wrap(p);
-        p.classList.add('rc-folding');
-        return { p, tokens, rects: tokens.map((t) => t.getBoundingClientRect()), height: p.getBoundingClientRect().height };
-      });
+      const before = moving.map((p) => ({ p, glyphs: glyphs(p), height: p.getBoundingClientRect().height }));
       change();
-      for (const { p, tokens, rects, height } of before) {
-        const after = p.getBoundingClientRect().height;
+      const layer = document.createElement('div');
+      layer.className = 'rc-fly';
+      layer.setAttribute('aria-hidden', 'true');
+      document.body.append(layer);
+      const sx = scrollX;
+      const sy = scrollY;
+      const all = [];
+      for (const { p, glyphs: from, height } of before) {
+        const to = glyphs(p);
         const animations = [];
-        tokens.forEach((token, i) => {
-          const now = token.getBoundingClientRect();
-          const dx = rects[i].left - now.left;
-          const dy = rects[i].top - now.top;
-          if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
-          animations.push(token.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] },
-            { duration: 560, easing: spring, delay: Math.min(i, 80) * 3 }));
+        p.classList.add('rc-flying');
+        from.forEach((g, i) => {
+          const end = to[i];
+          if (!end || end.ch !== g.ch) return;
+          const twin = document.createElement('span');
+          twin.textContent = g.ch;
+          const s = g.style;
+          Object.assign(twin.style, {
+            left: `${end.rect.left + sx}px`, top: `${end.rect.top + sy}px`, height: `${end.rect.height}px`, lineHeight: `${end.rect.height}px`,
+            fontFamily: s.fontFamily, fontSize: s.fontSize, fontWeight: s.fontWeight, fontStyle: s.fontStyle, color: s.color,
+          });
+          layer.append(twin);
+          const dx = g.rect.left - end.rect.left;
+          const dy = g.rect.top - end.rect.top;
+          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) animations.push(twin.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { duration: FLY, easing: spring }));
         });
-        animations.push(p.animate({ height: [`${height}px`, `${after}px`] }, { duration: 460, easing: easeOut }));
-        if (p.matches('.rc-open, :root:not(.rc-skim) p')) {
-          for (const rest of p.querySelectorAll('.rc-rest')) {
-            animations.push(rest.animate({ opacity: [0, 1], filter: ['blur(4px)', 'blur(0)'] },
-              { duration: 420, delay: 140, easing: easeOut, fill: 'backwards' }));
-          }
-        }
-        p.rcAnimations = animations;
-        Promise.allSettled(animations.map((a) => a.finished)).then(() => { if (p.rcAnimations === animations) unwrap(p); });
+        const after = p.getBoundingClientRect().height;
+        if (Math.abs(after - height) > 1) animations.push(p.animate({ height: [`${height}px`, `${after}px`] }, { duration: 380, easing: easeOut }));
+        if (opening) for (const rest of p.querySelectorAll('.rc-rest')) animations.push(rest.animate({ opacity: [0, 1] }, { duration: 360, delay: 120, easing: easeOut, fill: 'backwards' }));
+        let stopped = false;
+        p.rcStop = () => { if (stopped) return; stopped = true; animations.forEach((a) => a.cancel()); p.classList.remove('rc-flying'); };
+        all.push(...animations);
+        Promise.allSettled(animations.map((a) => a.finished)).then(() => { if (!stopped) { stopped = true; p.classList.remove('rc-flying'); } });
       }
+      Promise.allSettled(all.map((a) => a.finished)).then(() => layer.remove());
+      // 保险：动画迟迟没放完（页面在后台被放慢等）时，换回正文、收掉替身，不留空白
+      setTimeout(() => { for (const { p } of before) p.rcStop?.(); layer.remove(); }, FLY + 1500);
     };
     if (opening) { run(); return; }
     // 收回：先让要折起来的句子淡出，再让要点句滑回去
     const fading = moving.flatMap((p) => [...p.querySelectorAll('.rc-rest')].map((rest) =>
-      rest.animate({ opacity: [1, 0], filter: ['blur(0)', 'blur(3px)'] }, { duration: 140, easing: 'ease', fill: 'forwards' })));
+      rest.animate({ opacity: [1, 0] }, { duration: 140, easing: 'ease', fill: 'forwards' })));
     Promise.allSettled(fading.map((a) => a.finished)).then(() => { run(); fading.forEach((a) => a.cancel()); });
   };
 
   const setSkim = (on) => {
     root.classList.toggle('rc-skim', on);
     toggle.setAttribute('aria-checked', String(on));
-    if (!on) for (const p of document.querySelectorAll('p[data-fold].rc-open')) p.classList.remove('rc-open');
+    for (const p of document.querySelectorAll('p[data-fold].rc-open')) setOpen(p, false);
   };
   let saved = true;
   try { saved = localStorage.getItem('rc-skim') !== '0'; } catch { /* 存不了就每次按默认折叠 */ }
@@ -1104,11 +1127,17 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     try { localStorage.setItem('rc-skim', on ? '1' : '0'); } catch { /* 同上 */ }
   });
   document.addEventListener('click', (event) => {
-    if (!root.classList.contains('rc-skim') || event.target.closest('a, button, .note-zone')) return;
-    const p = event.target.closest('p[data-fold]');
+    if (!root.classList.contains('rc-skim')) return;
+    const refold = event.target.closest('.rc-refold');
+    if (refold) {
+      const p = refold.closest('p[data-fold]');
+      fold([p], () => setOpen(p, false), false);
+      return;
+    }
+    if (event.target.closest('a, button, .note-zone')) return;
+    const p = event.target.closest('p[data-fold]:not(.rc-open)');
     if (!p || getSelection().toString()) return;
-    const opening = !p.classList.contains('rc-open');
-    fold([p], () => p.classList.toggle('rc-open', opening), opening);
+    fold([p], () => setOpen(p, true), true);
   });
 })();
 // 目录页的导图：页面带 #rc-map（各章、各节的标题、链接、一句话和主题词）时，顶栏多一个“目录 | 导图”切换。

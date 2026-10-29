@@ -118,13 +118,19 @@ a.rc-ref:hover{text-decoration-style:solid}
 /* 上次读到：目录页章名后的“上次”，以及页头下一行“继续阅读 · 章名 · 节名”。像印在纸上的一行小字：没有底色、边框和阴影，
    “继续阅读”用强调色（标出读者所在的地方），章名、节名是墨色，悬停时加一道强调色细下划线。选择器多一层，压过书自己对页头 p、a 的通用规则 */
 .rc-last{margin-left:8px;font:600 12px/1 var(--rc-font);color:var(--rc-accent);letter-spacing:0;vertical-align:.15em;white-space:nowrap}
-p.rc-continue{margin:14px 0 0;padding:0;font:600 14px/1.6 var(--rc-font);letter-spacing:0;text-transform:none}
-p.rc-continue a{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;max-width:100%;padding:6px 0;color:var(--rc-ink);text-decoration:none}
+/* 目录页的“继续阅读”是一个动作，不是又一层标题：做成一枚书签按钮，紧贴在页头最后一行下面。
+   左边一枚小书签，“继续阅读”用强调色，章节名用正文色但同样字号，末尾箭头指上去时往前走一点 */
+p.rc-continue{margin:12px 0 0;padding:0;font:600 13.5px/1.5 var(--rc-font);letter-spacing:0;text-transform:none}
+p.rc-continue a{display:inline-flex;align-items:center;gap:0 8px;max-width:100%;padding:7px 14px 7px 12px;border:1px solid color-mix(in srgb,var(--rc-accent) 24%,transparent);border-radius:999px;background:color-mix(in srgb,var(--rc-accent) 8%,var(--rc-paper));color:var(--rc-ink);text-decoration:none;transition:background-color 150ms ease,border-color 150ms ease,transform 160ms var(--rc-ease-out)}
+p.rc-continue a::before{content:"";flex:none;width:8px;height:11px;background:var(--rc-accent);clip-path:polygon(0 0,100% 0,100% 100%,50% 72%,0 100%)}
+p.rc-continue a::after{content:"→";flex:none;color:var(--rc-accent);transition:transform 200ms var(--rc-ease-out)}
 p.rc-continue .rc-continue-label{color:var(--rc-accent)}
 p.rc-continue .rc-continue-sep{color:var(--rc-muted);font-weight:400}
-p.rc-continue .rc-continue-where{min-width:0;overflow-wrap:anywhere}
-p.rc-continue a:hover .rc-continue-where{text-decoration:underline;text-decoration-color:var(--rc-accent);text-decoration-thickness:1px;text-underline-offset:4px}
-p.rc-continue a:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:4px}
+p.rc-continue .rc-continue-where{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (hover:hover) and (pointer:fine){p.rc-continue a:hover{background:color-mix(in srgb,var(--rc-accent) 14%,var(--rc-paper));border-color:color-mix(in srgb,var(--rc-accent) 45%,transparent)}p.rc-continue a:hover::after{transform:translateX(3px)}}
+p.rc-continue a:active{transform:scale(.98)}
+p.rc-continue a:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){p.rc-continue a,p.rc-continue a::after{transition:none}}
 /* 要学的名称（rc-key）：学习提示选出的少数名称，在正文里像一道淡淡的马克笔；悬停照样预览原书定义 */
 a.rc-ref.rc-key{color:inherit;text-decoration:none;padding:0 1px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone;background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 30%,transparent) 52% 94%,transparent 94%)}
 a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 45%,transparent) 52% 94%,transparent 94%)}
@@ -266,17 +272,22 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
   .rc-volume-chapter-thumb{width:56px;height:56px}
 }
 /* 折叠阅读（只在带这些标记的页面上起作用）：要点句是作者原句，淡淡的荧光笔底；折叠时每段只留要点句，点开看全文。
-   展开收回时要点句逐字滑动（脚本临时把字包进 .rc-tok），荧光笔底跟着字一起走 */
-.rc-brief{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+   展开时要点句的替身字飞到新位置（.rc-fly 一层），正文暂时透明；落定后荧光笔底从左到右画出来。
+   展开的段落末尾有一个“折回”小按钮，只有它能收回 */
+.rc-brief{background-image:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%);background-repeat:no-repeat;background-size:100% 100%;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size 460ms var(--rc-ease-out)}
 .rc-skim p[data-fold]:not(.rc-open) .rc-rest{display:none}
-.rc-skim p[data-fold]:not(.rc-open) .rc-brief{background:none}
+.rc-skim p[data-fold]:not(.rc-open) .rc-brief{background-size:0% 100%}
 .rc-skim p[data-fold]:not(.rc-open){cursor:pointer}
-.rc-skim p[data-fold]:not(.rc-open)::after{content:" ⋯";color:var(--rc-muted)}
-.rc-skim p[data-fold].rc-open{box-shadow:-14px 0 0 -12px color-mix(in srgb,var(--rc-accent) 45%,transparent)}
-.rc-tok{display:inline-block;white-space:pre}
-.rc-folding{overflow:clip}
-.rc-folding .rc-brief{background:none}
-:root:not(.rc-skim) .rc-folding .rc-tok,.rc-skim .rc-open.rc-folding .rc-tok{background:linear-gradient(transparent 60%,color-mix(in srgb,var(--rc-accent) 20%,transparent) 60%)}
+.rc-skim p[data-fold]:not(.rc-open)::after{content:"⋯";margin-left:.35em;color:var(--rc-accent);letter-spacing:.05em;transition:opacity 150ms ease}
+@media (hover:hover) and (pointer:fine){.rc-skim p[data-fold]:not(.rc-open):hover::after{opacity:.6}}
+.rc-flying{overflow:clip}
+.rc-flying .rc-brief,.rc-flying .rc-brief *{color:transparent!important;text-decoration-color:transparent!important;transition:none;background-size:0% 100%}
+.rc-fly{position:absolute;left:0;top:0;width:0;height:0;z-index:40;pointer-events:none}
+.rc-fly span{position:absolute;white-space:pre;will-change:transform}
+.rc-refold{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 .4em;padding:0;border:1px solid var(--rc-line);border-radius:50%;background:var(--rc-paper);color:var(--rc-muted);vertical-align:-.25em;cursor:pointer;transition:color 150ms ease,border-color 150ms ease,transform 160ms var(--rc-ease-out)}
+.rc-refold:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.rc-refold:hover{color:var(--rc-accent);border-color:color-mix(in srgb,var(--rc-accent) 60%,transparent)}}
+.rc-refold:active{transform:scale(.92)}
 /* 本节/本章概括（AI 写的）：一张夹在书页里的纸条，右上角折起一角；一句话用正文的字体，主题词像书后索引一样排成一行。
    纸条随页面放下时轻轻落定一次。ⓘ 说明出处 */
 .rc-gist{position:relative;margin:1.1em 0 1.7em;padding:15px 44px 14px 20px;border-radius:4px 2px 4px 4px;background:color-mix(in srgb,var(--rc-paper) 40%,#fff);box-shadow:0 1px 1px color-mix(in srgb,var(--rc-ink) 6%,transparent),0 10px 26px -18px color-mix(in srgb,var(--rc-ink) 40%,transparent);animation:rc-slip-in var(--rc-spring-time) var(--rc-spring) backwards}
@@ -293,7 +304,7 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
 header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.4em 0 1em;animation:none}
-@media (prefers-reduced-motion:reduce){.rc-ai::after{transition:none}.rc-gist{animation:none}}
+@media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-brief,.rc-refold{transition:none}.rc-gist{animation:none}}
 /* 目录页导图：每章一棵树。根卡片在左，曲线（SVG）连到各节卡片；一章进入视野时线从根上长出来、卡片依次滑入。
    指着卡片：它浮起，它的线加深，别的线变淡，下方显示这一节的一句话。窄屏是一叠卡片 */
 .rc-map{display:none}

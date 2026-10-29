@@ -1102,11 +1102,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
           layer.append(twin);
           const dx = g.rect.left - end.rect.left;
           const dy = g.rect.top - end.rect.top;
-          // 展开时读过的要点句会变淡：替身在飞的路上从原来的墨色变到落地后的墨色，落地时不跳色
-          const recolor = g.style.color !== end.style.color;
-          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || recolor) {
-            animations.push(twin.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'], color: [g.style.color, end.style.color] }, { duration: FLY, easing: spring }));
-          }
+          // 替身飞的时候保持原来的墨色，只管移动；变色等落定以后再慢慢来（见下面），免得边动边变显得生硬
+          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) animations.push(twin.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { duration: FLY, easing: spring }));
         });
         const after = p.getBoundingClientRect().height;
         if (Math.abs(after - height) > 1) animations.push(p.animate({ height: [`${height}px`, `${after}px`] }, { duration: 380, easing: easeOut }));
@@ -1114,7 +1111,18 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
         let stopped = false;
         p.rcStop = () => { if (stopped) return; stopped = true; animations.forEach((a) => a.cancel()); p.classList.remove('rc-flying'); };
         all.push(...animations);
-        Promise.allSettled(animations.map((a) => a.finished)).then(() => { if (!stopped) { stopped = true; p.classList.remove('rc-flying'); } });
+        // 落定后换回正文；读过的要点句这时才从原来的墨色慢慢退成淡墨（展开），或慢慢回到正文墨色（折回）
+        const fromColor = from[0]?.style.color;
+        const toColor = to[0]?.style.color;
+        Promise.allSettled(animations.map((a) => a.finished)).then(() => {
+          if (stopped) return;
+          stopped = true;
+          p.classList.remove('rc-flying');
+          if (!fromColor || !toColor || fromColor === toColor) return;
+          for (const brief of p.querySelectorAll('.rc-brief')) {
+            brief.animate({ color: [fromColor, toColor] }, { duration: opening ? 900 : 450, delay: opening ? 120 : 0, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'backwards' });
+          }
+        });
       }
       Promise.allSettled(all.map((a) => a.finished)).then(() => layer.remove());
       // 保险：动画迟迟没放完（页面在后台被放慢等）时，换回正文、收掉替身，不留空白

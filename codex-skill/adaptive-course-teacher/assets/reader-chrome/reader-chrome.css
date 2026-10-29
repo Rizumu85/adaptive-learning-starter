@@ -281,7 +281,7 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
    展开的段落末尾有一个和字等高的细线小箭头，只有它能折回 */
 .rc-skim p[data-fold]:not(.rc-open) .rc-rest{display:none}
 /* 点开的段落里，读过的要点句淡一档，眼睛自然落到新出来的句子上，不会把读过的再读一遍；整页看全文时不区分 */
-.rc-skim p[data-fold].rc-open .rc-brief{color:color-mix(in srgb,var(--rc-ink) 45%,var(--rc-paper));transition:color 300ms ease}
+.rc-skim p[data-fold].rc-open .rc-brief{color:color-mix(in srgb,var(--rc-ink) 45%,var(--rc-paper))}
 .rc-skim p[data-fold]:not(.rc-open){cursor:pointer}
 .rc-skim p[data-fold]:not(.rc-open)::after{content:"⋯";margin-left:.35em;color:var(--rc-accent);letter-spacing:.05em;transition:opacity 150ms ease}
 @media (hover:hover) and (pointer:fine){.rc-skim p[data-fold]:not(.rc-open):hover::after{opacity:.6}}

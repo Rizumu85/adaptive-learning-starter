@@ -1004,7 +1004,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
 // 默认折叠；读者关掉后记在本机，换一章也保持关着。没有要点句的页面不出现。
 // 动效（学 TextFold）：要点句里每个字从旧位置滑到新位置。为了不改动正文排版（改了会让断行跳一下），
 // 不去拆正文，而是量出每个字的位置，在上面一层放这些字的替身飞过去，落定后换回正文；折起来的句子淡入，
-// 段落高度平滑变化；展开后不加任何标记。只动视野里的段落；减少动态效果时只淡入淡出
+// 段落高度平滑变化；展开后读过的要点句淡一档（替身在路上就变过去），新出来的句子是正文墨色。只动视野里的段落；减少动态效果时只淡入淡出
 (() => {
   const tools = document.querySelector('.rc-bar .rc-tools');
   if (!tools || !document.querySelector('p[data-fold]')) return;
@@ -1102,7 +1102,11 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
           layer.append(twin);
           const dx = g.rect.left - end.rect.left;
           const dy = g.rect.top - end.rect.top;
-          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) animations.push(twin.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { duration: FLY, easing: spring }));
+          // 展开时读过的要点句会变淡：替身在飞的路上从原来的墨色变到落地后的墨色，落地时不跳色
+          const recolor = g.style.color !== end.style.color;
+          if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || recolor) {
+            animations.push(twin.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'], color: [g.style.color, end.style.color] }, { duration: FLY, easing: spring }));
+          }
         });
         const after = p.getBoundingClientRect().height;
         if (Math.abs(after - height) > 1) animations.push(p.animate({ height: [`${height}px`, `${after}px`] }, { duration: 380, easing: easeOut }));

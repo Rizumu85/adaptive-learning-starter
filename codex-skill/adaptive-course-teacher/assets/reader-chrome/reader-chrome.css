@@ -284,10 +284,12 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-flying .rc-brief,.rc-flying .rc-brief *{color:transparent!important;text-decoration-color:transparent!important;transition:none;background-size:0% 100%}
 .rc-fly{position:absolute;left:0;top:0;width:0;height:0;z-index:40;pointer-events:none}
 .rc-fly span{position:absolute;white-space:pre;will-change:transform}
-.rc-refold{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 .4em;padding:0;border:1px solid var(--rc-line);border-radius:50%;background:var(--rc-paper);color:var(--rc-muted);vertical-align:-.25em;cursor:pointer;transition:color 150ms ease,border-color 150ms ease,transform 160ms var(--rc-ease-out)}
+.rc-refold{display:inline-flex;align-items:center;justify-content:center;width:26px;height:20px;margin:0 0 0 .35em;padding:0;border:0;border-radius:6px;background:color-mix(in srgb,var(--rc-accent) 10%,transparent);color:var(--rc-accent);vertical-align:-.18em;cursor:pointer;animation:rc-refold-in 260ms var(--rc-ease-out) 380ms backwards;transition:background-color 150ms ease,transform 160ms var(--rc-ease-out)}
+.rc-refold svg{display:block}
 .rc-refold:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px}
-@media (hover:hover) and (pointer:fine){.rc-refold:hover{color:var(--rc-accent);border-color:color-mix(in srgb,var(--rc-accent) 60%,transparent)}}
-.rc-refold:active{transform:scale(.92)}
+@media (hover:hover) and (pointer:fine){.rc-refold:hover{background:color-mix(in srgb,var(--rc-accent) 18%,transparent)}}
+.rc-refold:active{transform:scale(.9)}
+@keyframes rc-refold-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
 /* 本节/本章概括（AI 写的）：一张夹在书页里的纸条，右上角折起一角；一句话用正文的字体，主题词像书后索引一样排成一行。
    纸条随页面放下时轻轻落定一次。ⓘ 说明出处 */
 .rc-gist{position:relative;margin:1.1em 0 1.7em;padding:15px 44px 14px 20px;border-radius:4px 2px 4px 4px;background:color-mix(in srgb,var(--rc-paper) 40%,#fff);box-shadow:0 1px 1px color-mix(in srgb,var(--rc-ink) 6%,transparent),0 10px 26px -18px color-mix(in srgb,var(--rc-ink) 40%,transparent);animation:rc-slip-in var(--rc-spring-time) var(--rc-spring) backwards}
@@ -304,62 +306,4 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 .rc-ai:hover::after,.rc-ai:focus::after{opacity:1}
 header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.4em 0 1em;animation:none}
-@media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-brief,.rc-refold{transition:none}.rc-gist{animation:none}}
-/* 目录页导图：每章一棵树。根卡片在左，曲线（SVG）连到各节卡片；一章进入视野时线从根上长出来、卡片依次滑入。
-   指着卡片：它浮起，它的线加深，别的线变淡，下方显示这一节的一句话。窄屏是一叠卡片 */
-.rc-map{display:none}
-.rc-mapview .rc-map{display:block}
-/* 导图比正文栏宽：大屏上向两边展开到 1080px，居中 */
-@media (min-width:761px){.rc-map{width:min(1080px,calc(100vw - 48px));margin-left:calc(50% - min(540px,50vw - 24px))}}
-.rc-mapview [data-rc-list]{display:none}
-.rc-map-chapter{position:relative;display:grid;grid-template-columns:minmax(170px,240px) minmax(0,1fr);column-gap:64px;align-items:center;padding:30px 0}
-.rc-map-chapter+.rc-map-chapter{border-top:1px solid var(--rc-line)}
-.rc-map-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.rc-map-link{fill:none;stroke:color-mix(in srgb,var(--rc-accent) 42%,transparent);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke 150ms ease,stroke-width 150ms ease,opacity 200ms ease}
-.rc-map-dot{fill:var(--rc-accent)}
-.rc-map-chapter.has-hot .rc-map-link{opacity:.35}
-.rc-map-chapter.has-hot .rc-map-link.is-hot{opacity:1;stroke:var(--rc-accent);stroke-width:2.25}
-.rc-map-root{position:relative;z-index:1;padding:16px 18px 15px;border:1px solid color-mix(in srgb,var(--rc-accent) 28%,transparent);border-radius:16px;background:color-mix(in srgb,var(--rc-accent) 9%,var(--rc-paper));box-shadow:0 1px 0 color-mix(in srgb,var(--rc-ink) 4%,transparent)}
-.rc-map-root h2{margin:0;font-size:1.12em;line-height:1.4;color:var(--rc-ink)}
-.rc-map-gist{margin:.5em 0 0;font-family:var(--rc-font);font-size:.8em;line-height:1.65;color:var(--rc-muted)}
-.rc-map-root .rc-topics{display:none}
-.rc-map-branches{position:relative;z-index:1;display:grid;gap:10px;margin:0;padding:0;list-style:none}
-.rc-map-node{position:relative;margin:0;padding:0}
-.rc-map-node:hover,.rc-map-node:focus-within{z-index:5}
-.rc-map-card{position:relative;display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px;max-width:100%;padding:8px 13px;border:1px solid var(--rc-line);border-radius:12px;background:var(--rc-paper);font-family:var(--rc-font);transition:transform 220ms var(--rc-ease-out),border-color 150ms ease,box-shadow 220ms var(--rc-ease-out)}
-.rc-map-title{font-size:.95em;font-weight:600;color:var(--rc-ink);text-decoration:none}
-.rc-map-title::after{content:"";position:absolute;inset:0;border-radius:inherit}
-.rc-map-title:focus-visible{outline:none}
-.rc-map-card:focus-within{border-color:var(--rc-accent)}
-.rc-map-card .rc-topics{margin:0}
-.rc-map-takeaway{position:absolute;z-index:6;left:0;top:calc(100% + 8px);width:max-content;max-width:min(26em,60vw);margin:0;padding:8px 12px;border-radius:9px;background:var(--rc-ink);color:var(--rc-paper);font-size:.8em;line-height:1.6;opacity:0;transform:translateY(-4px);transform-origin:top left;pointer-events:none;transition:opacity 150ms var(--rc-ease-out),transform 180ms var(--rc-ease-out)}
-.rc-map-card:focus-within .rc-map-takeaway{opacity:1;transform:none}
-@media (hover:hover) and (pointer:fine){
-  .rc-map-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--rc-accent) 65%,transparent);box-shadow:0 6px 18px -8px color-mix(in srgb,var(--rc-ink) 35%,transparent)}
-  .rc-map-card:hover .rc-map-takeaway{opacity:1;transform:none}
-}
-/* 生长：线条从根上画出来，卡片依次从左滑入（弹簧曲线）；每章进入视野时放一次 */
-@keyframes rc-map-grow{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
-@keyframes rc-map-in{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
-@keyframes rc-map-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes rc-map-root-in{from{opacity:0;transform:translateX(-8px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes rc-map-fade{from{opacity:0}to{opacity:1}}
-.rc-map.is-revealing .rc-map-chapter:not(.is-shown) :is(.rc-map-root,.rc-map-node,.rc-map-links){opacity:0}
-.rc-map-chapter.is-shown .rc-map-root{animation:rc-map-root-in 320ms var(--rc-ease-out) backwards}
-.rc-map-chapter.is-shown .rc-map-link{animation:rc-map-grow 520ms var(--rc-ease-out) backwards;animation-delay:calc(140ms + var(--i) * 40ms)}
-.rc-map-chapter.is-shown .rc-map-dot{animation:rc-map-fade 200ms ease-out 100ms backwards}
-.rc-map-chapter.is-shown .rc-map-node{animation:rc-map-in var(--rc-spring-time) var(--rc-spring) backwards;animation-delay:calc(220ms + var(--i) * 40ms)}
-@media (max-width:760px){
-  .rc-map-chapter{display:block;padding:22px 0}
-  .rc-map-links{display:none}
-  .rc-map-root .rc-topics{display:flex;margin-top:.6em}
-  .rc-map-branches{margin-top:12px;gap:8px}
-  .rc-map-card{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:11px 13px}
-  .rc-map-takeaway{position:static;width:auto;max-width:none;padding:0;background:none;color:var(--rc-muted);opacity:1;transform:none;font-size:.82em}
-  .rc-map-chapter.is-shown .rc-map-node{animation-name:rc-map-rise;animation-delay:calc(120ms + var(--i) * 40ms)}
-}
-@media (prefers-reduced-motion:reduce){
-  .rc-map-chapter.is-shown :is(.rc-map-root,.rc-map-node,.rc-map-dot,.rc-map-link){animation:rc-map-fade 200ms ease backwards}
-  .rc-map-card,.rc-map-takeaway{transition:border-color 150ms ease,opacity 150ms ease}
-  .rc-map-card:hover,.rc-map-takeaway{transform:none}
-}
+@media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-brief,.rc-refold{transition:none}.rc-gist,.rc-refold{animation:none}}

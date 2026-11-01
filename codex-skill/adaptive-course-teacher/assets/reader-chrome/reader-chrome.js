@@ -1029,6 +1029,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     button.innerHTML = '<svg viewBox="0 0 16 12" aria-hidden="true"><path d="M3 9 8 4l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     return button;
   };
+  // 对照页里一段的原文和译文是一对，一起开合
+  const pair = (p) => [...(p.closest('.bilingual')?.querySelectorAll(':scope > p[data-fold]') || [p])];
   const setOpen = (p, open) => {
     p.classList.toggle('rc-open', open);
     p.querySelector(':scope > .rc-refold')?.remove();
@@ -1156,13 +1158,14 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     if (!root.classList.contains('rc-skim')) return;
     const refold = event.target.closest('.rc-refold');
     if (refold) {
-      const p = refold.closest('p[data-fold]');
-      fold([p], () => setOpen(p, false), false);
+      const both = pair(refold.closest('p[data-fold]'));
+      fold(both, () => both.forEach((p) => setOpen(p, false)), false);
       return;
     }
     if (event.target.closest('a, button, .note-zone')) return;
     const p = event.target.closest('p[data-fold]:not(.rc-open)');
     if (!p || getSelection().toString()) return;
-    fold([p], () => setOpen(p, true), true);
+    const both = pair(p);
+    fold(both, () => both.forEach((one) => setOpen(one, true)), true);
   });
 })();

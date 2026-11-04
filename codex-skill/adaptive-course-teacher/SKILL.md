@@ -54,7 +54,7 @@ Keep these states apart in every record: agent inspected the source, material pr
 - Before publishing AI-written lesson copy, follow `references/learner-facing-copy.md`.
 - For inspectable images in any HTML page, install the offline viewer from `references/image-preview.md`. For a preview-only change, that reference is the whole workflow.
 - When pictures in a reading edition are hard to interpret, cut loose from their text, or too small, or when checking a finished edition's layout against the book, follow `references/layout-review.md`; it is the whole workflow for that task.
-- For multi-page book readers, reuse the navigation in `references/reader-chrome.md`; for original-and-translation pages add `references/bilingual-reader.md`; for one entry point to several books use `references/bookshelf.md`.
+- For multi-page book readers, reuse the navigation in `references/reader-chrome.md`; for original-and-translation pages add `references/bilingual-reader.md`; for one entry point to several books use `references/bookshelf.md`. To add folded reading (key sentences and AI gists) to a book, follow `references/folded-reading.md`.
 - Before hosting lessons that contain local or licensed assets, read `references/private-delivery.md`.
 - Optional visual and typographic presets the learner may have selected are listed in `references/presets.md`.
 - Open finished lessons in the learner's default browser. Use an automated browser only for inspection and checks.

@@ -313,8 +313,8 @@ header>.rc-gist{margin:18px 0 0}
 @media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-refold{transition:none}.rc-gist,.rc-refold{animation:none}}
 
 /* Reviews (读后感): the pocket on the contents page and the card it holds. Paper colours come from the page (the pocket a
-   cool grey shade of it, never a warm brown); the card's red rules and blue-grey date ink are the only colours of their own. */
-.rc-pocket{--rc-slip:#fbf6e9;--rc-slip-edge:#efe6cf;position:relative;display:block;width:118px;height:128px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+   flat light apricot; no muddy brown, no gradient); the card's red rules and blue-grey date ink are the only colours of their own. */
+.rc-pocket{--rc-slip:#fffaf0;--rc-slip-edge:#efe6cf;position:relative;display:block;width:118px;height:128px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rc-pocket.is-floating{position:absolute;z-index:5;top:calc(57px + 32px);right:max(var(--rc-gutter),calc((100vw - var(--rc-width)) / 2 + var(--rc-gutter) + 8px))}
 .rc-pocket-slip{position:absolute;left:16px;right:16px;top:8px;height:70px;border-radius:2px;background:var(--rc-slip);box-shadow:0 1px 2px rgb(24 24 27/.08);transition:transform var(--rc-spring-time) var(--rc-spring)}
 .rc-pocket-slip::after{content:"";position:absolute;top:0;right:0;width:12px;height:12px;background:linear-gradient(225deg,var(--rc-paper) 50%,var(--rc-slip-edge) 50%)}
@@ -323,9 +323,10 @@ header>.rc-gist{margin:18px 0 0}
 .rc-pocket-slip3{left:20px;right:18px;top:13px}
 .rc-pocket-slip3::before{content:"";position:absolute;left:10px;right:24px;top:13px;height:1px;background:#e3d9c1;box-shadow:0 8px 0 #e3d9c1,0 16px 0 #e3d9c1}
 .rc-pocket-sleeve{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding-bottom:14px;border-radius:3px 3px 5px 5px;
-  background:color-mix(in srgb,var(--rc-paper) 86%,#8d949a);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc-paper) 70%,#8d949a),0 10px 20px -16px rgb(24 24 27/.35);
-  font:600 15px/1 var(--rc-font);color:#5f666b}
-.rc-pocket-sleeve::before{content:"";position:absolute;left:34px;right:34px;top:0;height:10px;border-radius:0 0 30px 30px/0 0 10px 10px;background:color-mix(in srgb,var(--rc-paper) 76%,#8d949a)}
+  background:#f9ece2;box-shadow:inset 0 0 0 1px #ecd5c3,0 10px 20px -15px rgb(90 60 20/.3);
+  font:600 15px/1 var(--rc-font);color:#8a6250}
+/* the thumb cut: a light arc, not a filled shape (a dark crescent reads as a stain) */
+.rc-pocket-sleeve::before{content:"";position:absolute;left:34px;right:34px;top:0;height:11px;border:1px solid #e2c4ae;border-top:0;border-radius:0 0 30px 30px/0 0 11px 11px;box-shadow:inset 0 -2px 3px -2px rgb(90 60 20/.15)}
 .rc-pocket-count{color:var(--rc-accent);font-variant-numeric:tabular-nums}
 .rc-pocket-count:empty{display:none}
 @media (hover:hover){
@@ -342,7 +343,7 @@ header>.rc-gist{margin:18px 0 0}
 .rc-pocket.is-compact .rc-pocket-slip3::before,.rc-pocket.is-compact .rc-pocket-slip::after{display:none}
 .rc-pocket.is-compact .rc-pocket-sleeve{position:static;height:auto;padding:0;background:none;box-shadow:none;gap:6px}
 .rc-pocket.is-compact .rc-pocket-sleeve::before{content:"";position:static;flex:none;width:26px;height:17px;margin-top:9px;border-radius:2px 2px 3px 3px;
-  background:color-mix(in srgb,var(--rc-paper) 86%,#8d949a);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc-paper) 70%,#8d949a)}
+  background:#f9ece2;box-shadow:inset 0 0 0 1px #ecd5c3}
 @media (max-width:959px){.rc-pocket.is-compact .rc-pocket-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
 .rc-pocket.is-compact .rc-pocket-count{font-size:14px}
 

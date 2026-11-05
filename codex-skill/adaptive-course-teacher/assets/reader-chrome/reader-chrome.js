@@ -1414,6 +1414,9 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     lastFocus = document.activeElement;
     render();
     document.body.append(scrim, panel);
+    // hiding the page's scroll bar would widen the page and shift the contents: keep its width as padding instead
+    const bar = innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.paddingRight = bar > 0 ? `${bar}px` : '';
     document.documentElement.classList.add('rc-rv-lock');
     requestAnimationFrame(() => requestAnimationFrame(() => {
       scrim.classList.add('is-open');
@@ -1428,10 +1431,11 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     }).catch(() => {});
   };
   const shut = () => {
-    if (!panel.classList.contains('is-open')) return;
+    if (!panel.isConnected) return;
     scrim.classList.remove('is-open');
     panel.classList.remove('is-open');
     document.documentElement.classList.remove('rc-rv-lock');
+    document.documentElement.style.paddingRight = '';
     setTimeout(() => { if (!panel.classList.contains('is-open')) { panel.remove(); scrim.remove(); } }, reduce.matches ? 0 : 480);
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   };

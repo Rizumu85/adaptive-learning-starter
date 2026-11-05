@@ -49,7 +49,7 @@ When the model is used through a web chat in a browser rather than an API:
 
 ## Ingest and check
 
-- Keep only in-range indexes, at most three per language; report each unit's missing paragraphs and section lines, and rerun those units rather than filling them in.
+- Keep only in-range indexes: at most three picked sentences, and up to about eight on the other language's side of an unaligned paragraph, since one sentence may have been split into several there; report each unit's missing paragraphs and section lines, and rerun those units rather than filling them in.
 - Look over lines that run past the length asked for; a few characters over can stay.
 - Rebuild and run the book's text check: folded paragraphs must still render the exact text.
 - In a preview, look at one folded chapter and the contents page before the first publish: the gist slip sits in the text column, both halves of each pair carry `data-fold`, every folded paragraph has a key sentence. A hidden preview pane stalls the fold animation, so the switch can look dead; check the fold state by its classes, or reload with the switch's saved state set.

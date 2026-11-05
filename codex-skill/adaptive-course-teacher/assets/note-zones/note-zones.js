@@ -342,6 +342,14 @@
             const copy = node.cloneNode(true);
             copy.removeAttribute('id');
             copy.querySelectorAll('[id]').forEach((inner) => inner.removeAttribute('id'));
+            // a folded paragraph (folded reading) reads whole in the card: the page's fold mode would otherwise
+            // hide all but its key sentences there, with no way to open it
+            for (const folded of [copy, ...copy.querySelectorAll('[data-fold]')]) {
+                if (!folded.hasAttribute('data-fold'))
+                    continue;
+                folded.removeAttribute('data-fold');
+                folded.classList.remove('rc-open');
+            }
             return copy;
         }));
         for (const same of zonesOf(zone.dataset.note))

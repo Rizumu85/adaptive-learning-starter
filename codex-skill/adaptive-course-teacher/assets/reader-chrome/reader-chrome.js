@@ -1234,13 +1234,20 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   const wide = matchMedia('(min-width: 960px)');
   const place = () => {
     const slot = document.querySelector('[data-rc-reviews]');
-    if (slot) { pocket.className = 'rc-pocket is-placed'; slot.append(pocket); return; }
+    if (slot) { pocket.className = 'rc-pocket is-placed'; pocket.style.left = pocket.style.right = ''; slot.append(pocket); return; }
     let tools = document.querySelector('.rc-bar .rc-tools');
     const inner = document.querySelector('.rc-bar .rc-bar-inner');
     if (!tools && inner) { tools = el('div', 'rc-tools'); inner.append(tools); }
     if (wide.matches || !tools) {
       pocket.className = 'rc-pocket is-floating';
       document.body.append(pocket);
+      // line its right edge up with the page's text column (the contents rules and page numbers), not the wider bar
+      const main = document.querySelector('main') || document.body;
+      const edges = [...main.children].map((child) => child.getBoundingClientRect())
+        .filter((box) => box.width > 200 && box.width < innerWidth - 40).map((box) => box.right);
+      const right = edges.length ? Math.max(...edges) : 0;
+      pocket.style.left = right ? `${Math.round(right + scrollX - pocket.offsetWidth)}px` : '';
+      pocket.style.right = right ? 'auto' : '';
       // over a picture (a full-width title image) it would cover the art: then it goes into the bar as well
       const r = pocket.getBoundingClientRect();
       const covers = [...document.querySelectorAll('img, svg, picture, video, canvas')].some((image) => {
@@ -1251,6 +1258,7 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
       if (!covers || !tools) return;
     }
     pocket.className = 'rc-pocket is-compact';
+    pocket.style.left = pocket.style.right = '';
     tools.append(pocket);
   };
 
@@ -1447,6 +1455,8 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     showCount();
     place();
     wide.addEventListener('change', place);
+    let pending = 0;
+    addEventListener('resize', () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(place); });
     if (document.readyState !== 'complete') addEventListener('load', place, { once: true });
   };
   if (demo) start(state);

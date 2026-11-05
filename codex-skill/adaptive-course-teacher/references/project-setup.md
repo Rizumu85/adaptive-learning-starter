@@ -21,6 +21,6 @@ When the learner points to an earlier project as an example of how they like to 
 A new session reads these files first, so their length is a cost on every session.
 
 - `AGENTS.md`: current rules only, written as rules. When an authorization or rule changes, rewrite the rule in place instead of appending a dated entry beneath the old one.
-- `NOTES.md`: the current checkpoint at the top, then stable preferences for this subject. Move finished unit logs into `learning-records/` (when they carry evidence) or a history file in `reference/`.
+- `NOTES.md`: the current checkpoint at the top, then stable preferences for this subject. Move finished unit logs into `learning-records/` (when they carry evidence) or a history file in `reference/`. Every session reads it first, so keep it to a few screens: when a stage or a round of fixes finishes, move its log out in the same commit and rewrite the checkpoint to what is true now. Do not append dated production logs under the checkpoint.
 - `START-HERE.md` (optional): a short learner-facing entry point with the current unit, where to open it, and what to do next.
 - Hosting details, access lists, and deployment procedures belong in a separate project reference file, not in `AGENTS.md` or `NOTES.md`.

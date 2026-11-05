@@ -1169,3 +1169,286 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     fold(both, () => both.forEach((one) => setOpen(one, true)), true);
   });
 })();
+
+// Reviews (读后感): on a book's contents page, a paper pocket holds the book's card. Opening it slides the card out
+// (a side panel; a bottom sheet on a phone) without leaving the contents. Every signed-in reader may write one entry
+// per book, sign it with a name (remembered by the server for the next book), change or delete it, and reads
+// everyone's entries in date order. Needs /api/reviews/<shelf id> on the signed-in site (GET answers
+// {reviews: [{name, text, at, edited?, mine?}], name}; PUT {name, text}; DELETE). Without it, or opened from a file,
+// nothing appears. A page may place the pocket itself with an element marked data-rc-reviews.
+// ?preview-reviews shows sample entries and keeps changes in the page only.
+(() => {
+  const data = document.getElementById('rc-chapters');
+  if (!data) return;
+  let info;
+  try { info = JSON.parse(data.textContent); } catch { return; }
+  if (info.current || !info.book) return;
+  const demo = new URLSearchParams(location.search).has('preview-reviews');
+  if (!demo && !/^https?:$/.test(location.protocol)) return;
+  const api = `/api/reviews/${encodeURIComponent(info.book)}`;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const title = ((document.querySelector('.rc-bar .rc-here') || {}).textContent || document.title.split('·').pop()).trim();
+  let state = demo ? { name: '', reviews: [
+    { name: '读者甲', text: '第三章的例子让我第一次看懂了这个概念，之后再读前面几章顺了很多。', at: Date.now() - 86400000 * 6 },
+    { name: '读者乙', text: '图很多，配合指着图读会轻松不少。', at: Date.now() - 86400000 * 2 },
+  ] } : null;
+
+  // The pocket: a sleeve with the tops of three slips showing, and the number of entries on it
+  const pocket = el('button', 'rc-pocket');
+  pocket.type = 'button';
+  pocket.setAttribute('aria-haspopup', 'dialog');
+  for (const n of [1, 2, 3]) pocket.append(el('span', `rc-pocket-slip rc-pocket-slip${n}`));
+  const sleeve = el('span', 'rc-pocket-sleeve');
+  const count = el('b', 'rc-pocket-count');
+  sleeve.append(el('span', 'rc-pocket-label', '读后感'), count);
+  pocket.append(sleeve);
+
+  const scrim = el('div', 'rc-rv-scrim');
+  const panel = el('div', 'rc-rv'); // not an aside: books style asides
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
+  panel.setAttribute('aria-labelledby', 'rc-rv-title');
+  panel.tabIndex = -1;
+  const head = el('div', 'rc-rv-head');
+  const heading = el('h2', '', '读后感');
+  heading.id = 'rc-rv-title';
+  const close = el('button', 'rc-rv-close', '收起');
+  close.type = 'button';
+  head.append(heading, close);
+  const body = el('div', 'rc-rv-body');
+  const card = el('div', 'rc-rv-card');
+  const rows = el('div', 'rc-rv-rows');
+  const cols = el('div', 'rc-rv-cols');
+  for (const label of ['日期', '写了什么', '署名']) cols.append(el('span', '', label));
+  card.append(el('div', 'rc-rv-cardhead', title), cols, rows);
+  body.append(card);
+  panel.append(head, body);
+
+  // A wide window keeps the pocket in the page's top right corner; a narrow one puts it, small, in the top bar
+  const wide = matchMedia('(min-width: 960px)');
+  const place = () => {
+    const slot = document.querySelector('[data-rc-reviews]');
+    if (slot) { pocket.className = 'rc-pocket is-placed'; slot.append(pocket); return; }
+    let tools = document.querySelector('.rc-bar .rc-tools');
+    const inner = document.querySelector('.rc-bar .rc-bar-inner');
+    if (!tools && inner) { tools = el('div', 'rc-tools'); inner.append(tools); }
+    if (wide.matches || !tools) {
+      pocket.className = 'rc-pocket is-floating';
+      document.body.append(pocket);
+      // over a picture (a full-width title image) it would cover the art: then it goes into the bar as well
+      const r = pocket.getBoundingClientRect();
+      const covers = [...document.querySelectorAll('img, svg, picture, video, canvas')].some((image) => {
+        if (pocket.contains(image) || image.closest('.rc-bar')) return false;
+        const q = image.getBoundingClientRect();
+        return q.width > 40 && q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom;
+      });
+      if (!covers || !tools) return;
+    }
+    pocket.className = 'rc-pocket is-compact';
+    tools.append(pocket);
+  };
+
+  const day = (at) => {
+    const d = new Date(at);
+    const two = (n) => String(n).padStart(2, '0');
+    const md = `${two(d.getMonth() + 1)}·${two(d.getDate())}`;
+    return d.getFullYear() === new Date().getFullYear() ? md : `${String(d.getFullYear()).slice(2)}·${md}`;
+  };
+  const showCount = () => {
+    const n = state ? state.reviews.length : 0;
+    count.textContent = n ? String(n) : '';
+    pocket.setAttribute('aria-label', n ? `读后感，${n} 条` : '读后感');
+  };
+
+  const request = (method, payload) => {
+    if (demo) {
+      const others = state.reviews.filter((r) => !r.mine);
+      const old = state.reviews.find((r) => r.mine);
+      const now = Date.now();
+      const reviews = method === 'DELETE' ? others
+        : method === 'GET' ? state.reviews
+        : [...others, { ...payload, at: old ? old.at : now, ...(old ? { edited: now } : {}), mine: true }];
+      return Promise.resolve({ reviews, name: payload ? payload.name : state.name });
+    }
+    return fetch(api, { method, cache: 'no-store', headers: payload ? { 'Content-Type': 'application/json' } : {},
+      body: payload ? JSON.stringify(payload) : undefined })
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
+  };
+
+  // Text areas grow line by line on their ruling (30px a line)
+  const grow = (area) => {
+    area.style.height = 'auto';
+    area.style.height = `${Math.max(60, Math.ceil(area.scrollHeight / 30) * 30)}px`;
+  };
+
+  // A row to write in. The date column holds a faint outline where the stamp will land; the stamp-like button at the
+  // row's lower right sends it, and on success today's date is stamped into the outline and the row settles
+  function writeRow(existing) {
+    const row = el('div', 'rc-rv-row is-write');
+    const slot = el('span', 'rc-rv-slot', day(Date.now()));
+    slot.setAttribute('aria-hidden', 'true');
+    const stamp = el('button', 'rc-rv-send');
+    stamp.type = 'button';
+    // a small rubber-stamp glyph before the word
+    stamp.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h3a3 3 0 0 1 3 3v2H4v-2a3 3 0 0 1 3-3h3z"/><path d="M5 18h14M7 21h10"/></svg>';
+    stamp.append(existing ? '改好' : '登记');
+    const area = el('textarea');
+    area.maxLength = 2000;
+    area.placeholder = '写下读完这本书的感受';
+    area.setAttribute('aria-label', '读后感');
+    area.value = existing ? existing.text : '';
+    const name = el('input');
+    name.maxLength = 24;
+    name.placeholder = '署名';
+    name.setAttribute('aria-label', '署名');
+    name.autocomplete = 'nickname';
+    name.value = existing ? existing.name : (state.name || '');
+    const who = el('span', 'rc-rv-who');
+    const send = el('span', 'rc-rv-sendline');
+    if (existing) {
+      const cancel = el('button', 'rc-rv-act', '不改了');
+      cancel.type = 'button';
+      cancel.addEventListener('click', () => render());
+      send.append(cancel);
+    }
+    send.append(stamp);
+    who.append(name, send);
+    const msg = el('p', 'rc-rv-msg');
+    msg.setAttribute('role', 'status');
+    const text = el('div', 'rc-rv-text');
+    text.append(area);
+    const date = el('span', 'rc-rv-date');
+    date.append(slot);
+    row.append(date, text, who, msg);
+    const ready = () => stamp.classList.toggle('is-ready', !!(area.value.trim() && name.value.trim()));
+    area.addEventListener('input', () => { grow(area); ready(); });
+    name.addEventListener('input', ready);
+    const submit = () => {
+      if (stamp.disabled) return;
+      if (!area.value.trim()) { area.focus(); return; }
+      if (!name.value.trim()) { name.focus(); return; }
+      stamp.disabled = true;
+      msg.textContent = '';
+      request('PUT', { name: name.value.trim(), text: area.value.trim() }).then((next) => {
+        state = next;
+        showCount();
+        slot.textContent = day(Date.now());
+        slot.classList.add('is-stamped');
+        setTimeout(() => { render(true); panel.focus({ preventScroll: true }); }, reduce.matches ? 0 : 650);
+      }).catch(() => {
+        stamp.disabled = false;
+        msg.textContent = '没存上，稍后再点一次';
+      });
+    };
+    stamp.addEventListener('click', submit);
+    row.addEventListener('keydown', (event) => { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) submit(); });
+    requestAnimationFrame(() => { grow(area); ready(); });
+    return row;
+  }
+
+  function entryRow(review, fresh) {
+    const row = el('div', `rc-rv-row${fresh ? ' is-new' : ''}`);
+    const date = el('span', 'rc-rv-date', day(review.at));
+    if (review.edited) date.title = `改于 ${new Date(review.edited).toLocaleDateString('zh-CN')}`;
+    const who = el('span', 'rc-rv-who');
+    who.append(el('span', 'rc-rv-name', review.name));
+    row.append(date, el('div', 'rc-rv-text', review.text), who);
+    if (review.mine) {
+      const acts = el('span', 'rc-rv-acts');
+      const edit = el('button', 'rc-rv-act', '改');
+      const remove = el('button', 'rc-rv-act', '删');
+      edit.type = 'button';
+      remove.type = 'button';
+      edit.addEventListener('click', () => {
+        const form = writeRow(review);
+        row.replaceWith(form);
+        form.querySelector('textarea').focus();
+      });
+      // Deleting asks once more on the button itself
+      let armed = 0;
+      remove.addEventListener('click', () => {
+        if (!armed) {
+          remove.textContent = '确定删？';
+          armed = setTimeout(() => { armed = 0; remove.textContent = '删'; }, 4000);
+          return;
+        }
+        clearTimeout(armed);
+        remove.disabled = true;
+        request('DELETE').then((next) => {
+          state = next;
+          showCount();
+          row.classList.add('is-leaving');
+          setTimeout(() => { render(); const area = rows.querySelector('.is-write textarea'); if (area) area.focus(); }, reduce.matches ? 0 : 320);
+        }).catch(() => { remove.disabled = false; remove.textContent = '没删掉，再点一次'; armed = 0; });
+      });
+      acts.append(edit, remove);
+      who.append(acts);
+    }
+    return row;
+  }
+
+  function render(justSaved) {
+    rows.replaceChildren();
+    const list = [...(state ? state.reviews : [])].sort((a, b) => a.at - b.at);
+    list.forEach((review) => rows.append(entryRow(review, justSaved && review.mine)));
+    if (!list.some((r) => r.mine)) rows.append(writeRow());
+    rows.append(el('div', 'rc-rv-blank')); // a few empty ruled lines finish the card
+  }
+
+  let lastFocus = null;
+  const open = () => {
+    lastFocus = document.activeElement;
+    render();
+    document.body.append(scrim, panel);
+    document.documentElement.classList.add('rc-rv-lock');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      scrim.classList.add('is-open');
+      panel.classList.add('is-open');
+      panel.focus({ preventScroll: true });
+    }));
+    // fetch again on opening, so entries written meanwhile show; never while the reader is typing
+    request('GET').then((next) => {
+      state = next;
+      showCount();
+      if (!panel.querySelector('.is-write textarea:focus, .is-write input:focus')) render();
+    }).catch(() => {});
+  };
+  const shut = () => {
+    if (!panel.classList.contains('is-open')) return;
+    scrim.classList.remove('is-open');
+    panel.classList.remove('is-open');
+    document.documentElement.classList.remove('rc-rv-lock');
+    setTimeout(() => { if (!panel.classList.contains('is-open')) { panel.remove(); scrim.remove(); } }, reduce.matches ? 0 : 480);
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  };
+  pocket.addEventListener('click', open);
+  close.addEventListener('click', shut);
+  scrim.addEventListener('click', shut);
+  panel.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { event.preventDefault(); shut(); return; }
+    if (event.key !== 'Tab') return;
+    // keep Tab inside the panel
+    const focusable = [...panel.querySelectorAll('button:not([disabled]),textarea,input')];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === panel)) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
+
+  const start = (loaded) => {
+    state = loaded;
+    showCount();
+    place();
+    wide.addEventListener('change', place);
+    if (document.readyState !== 'complete') addEventListener('load', place, { once: true });
+  };
+  if (demo) start(state);
+  else request('GET').then(start).catch(() => {});
+})();

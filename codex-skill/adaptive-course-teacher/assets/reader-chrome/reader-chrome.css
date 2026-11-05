@@ -311,3 +311,114 @@ a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix
 header>.rc-gist{margin:18px 0 0}
 .toc-chapter .rc-gist{margin:.4em 0 1em;animation:none}
 @media (prefers-reduced-motion:reduce){.rc-ai::after,.rc-refold{transition:none}.rc-gist,.rc-refold{animation:none}}
+
+/* Reviews (读后感): the pocket on the contents page and the card it holds. Paper colours come from the page;
+   the card's red rules and blue-grey date ink are the only colours of their own. */
+.rc-pocket{--rc-slip:#fbf6e9;--rc-slip-edge:#efe6cf;position:relative;display:block;width:118px;height:128px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rc-pocket.is-floating{position:absolute;z-index:5;top:calc(57px + 32px);right:max(var(--rc-gutter),calc((100vw - var(--rc-width)) / 2 + var(--rc-gutter) + 8px))}
+.rc-pocket-slip{position:absolute;left:16px;right:16px;top:8px;height:70px;border-radius:2px;background:var(--rc-slip);box-shadow:0 1px 2px rgb(24 24 27/.08);transition:transform var(--rc-spring-time) var(--rc-spring)}
+.rc-pocket-slip::after{content:"";position:absolute;top:0;right:0;width:12px;height:12px;background:linear-gradient(225deg,var(--rc-paper) 50%,var(--rc-slip-edge) 50%)}
+.rc-pocket-slip1{transform:rotate(-5deg)}
+.rc-pocket-slip2{left:22px;right:12px;top:3px;transform:rotate(3deg)}
+.rc-pocket-slip3{left:20px;right:18px;top:13px}
+.rc-pocket-slip3::before{content:"";position:absolute;left:10px;right:24px;top:13px;height:1px;background:#e3d9c1;box-shadow:0 8px 0 #e3d9c1,0 16px 0 #e3d9c1}
+.rc-pocket-sleeve{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding-bottom:14px;border-radius:3px 3px 5px 5px;
+  background:color-mix(in srgb,var(--rc-paper) 80%,#d9ccad);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc-paper) 62%,#c9b98f),0 10px 20px -16px rgb(24 24 27/.45);
+  font:600 15px/1 var(--rc-font);color:var(--rc-muted)}
+.rc-pocket-sleeve::before{content:"";position:absolute;left:34px;right:34px;top:0;height:10px;border-radius:0 0 30px 30px/0 0 10px 10px;background:color-mix(in srgb,var(--rc-paper) 70%,#cdbf9b)}
+.rc-pocket-count{color:var(--rc-accent);font-variant-numeric:tabular-nums}
+.rc-pocket-count:empty{display:none}
+@media (hover:hover){
+  .rc-pocket:hover .rc-pocket-slip1{transform:translateY(-6px) rotate(-7deg)}
+  .rc-pocket:hover .rc-pocket-slip2{transform:translateY(-9px) rotate(4deg)}
+  .rc-pocket:hover .rc-pocket-slip3{transform:translateY(-4px)}
+}
+.rc-pocket:active .rc-pocket-sleeve{transform:translateY(1px)}
+.rc-pocket:focus-visible{outline:2px solid var(--rc-accent);outline-offset:4px;border-radius:6px}
+/* in the top bar of a narrow window: a small sleeve with one slip, the count beside it */
+.rc-bar .rc-pocket.is-compact{display:inline-flex;align-items:center;gap:6px;width:auto;height:44px;padding:0 2px}
+.rc-pocket.is-compact .rc-pocket-slip1,.rc-pocket.is-compact .rc-pocket-slip2{display:none}
+.rc-pocket.is-compact .rc-pocket-slip3{position:absolute;left:5px;right:auto;top:9px;width:16px;height:14px}
+.rc-pocket.is-compact .rc-pocket-slip3::before,.rc-pocket.is-compact .rc-pocket-slip::after{display:none}
+.rc-pocket.is-compact .rc-pocket-sleeve{position:static;height:auto;padding:0;background:none;box-shadow:none;gap:6px}
+.rc-pocket.is-compact .rc-pocket-sleeve::before{content:"";position:static;flex:none;width:26px;height:17px;margin-top:9px;border-radius:2px 2px 3px 3px;
+  background:color-mix(in srgb,var(--rc-paper) 80%,#d9ccad);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc-paper) 62%,#c9b98f)}
+@media (max-width:959px){.rc-pocket.is-compact .rc-pocket-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}
+.rc-pocket.is-compact .rc-pocket-count{font-size:14px}
+
+/* the panel */
+.rc-rv-lock{overflow:hidden}
+.rc-rv-scrim{position:fixed;inset:0;z-index:60;background:rgb(24 24 27/.07);opacity:0;transition:opacity 300ms ease}
+.rc-rv-scrim.is-open{opacity:1}
+.rc-rv{position:fixed;z-index:61;top:0;right:0;bottom:0;width:min(500px,100vw);margin:0;padding:0;box-sizing:border-box;font-size:16px;display:flex;flex-direction:column;background:var(--rc-paper);border-left:1px solid var(--rc-line);
+  box-shadow:-24px 0 48px -36px rgb(24 24 27/.5);transform:translateX(102%);transition:transform var(--rc-spring-time) var(--rc-spring);outline:0;color:var(--rc-ink)}
+.rc-rv.is-open{transform:none}
+.rc-rv-head{display:flex;align-items:center;justify-content:space-between;flex:none;height:56px;padding:0 28px;border-bottom:1px solid var(--rc-line)}
+.rc-rv-head h2{margin:0;font:900 22px/1.3 ReadingHeading,"朝華標題B",ReadingBody,serif}
+.rc-rv-close{min-height:44px;padding:0;border:0;background:none;font:600 15px var(--rc-font);color:var(--rc-muted);cursor:pointer}
+.rc-rv-close:hover{color:var(--rc-ink)}
+.rc-rv-body{flex:1;overflow:auto;overscroll-behavior:contain;padding:26px 26px 48px}
+/* the card: the book title over a double red rule, column heads over a red line, one block per entry divided by a
+   solid line (text sits free inside), blue-grey typewriter dates, names on the right, a few ruled empty lines below */
+.rc-rv-card{--rc-red:194 91 78;--rc-ink-blue:93 113 134;position:relative;padding-bottom:4px;border-radius:2px;transform:rotate(-.4deg);background:#fcf9f1;
+  box-shadow:0 1px 1px rgb(24 24 27/.06),0 16px 30px -24px rgb(24 24 27/.5)}
+.rc-rv-card::before{content:"";position:absolute;top:0;right:0;width:22px;height:22px;border-bottom-left-radius:4px;background:linear-gradient(225deg,var(--rc-paper) 50%,#efe6cf 50%);box-shadow:-2px 2px 3px -1px rgb(24 24 27/.14)}
+.rc-rv-cardhead{padding:16px 40px 10px 20px;border-bottom:1.5px solid rgb(var(--rc-red));box-shadow:0 3px 0 -1.5px #fcf9f1,0 4px 0 -1.5px rgb(var(--rc-red)/.55);
+  font:900 19px/1.35 ReadingHeading,"朝華標題B",ReadingBody,serif;overflow-wrap:anywhere}
+.rc-rv-cols,.rc-rv-row{display:grid;grid-template-columns:58px 1fr 88px;column-gap:12px;padding:0 20px}
+.rc-rv-cols{margin-top:4px;padding-top:7px;padding-bottom:5px;border-bottom:1px solid rgb(var(--rc-red)/.7);font:600 12px/1.4 var(--rc-font);color:#8a8473}
+.rc-rv-cols span:last-child{text-align:right}
+.rc-rv-row{padding-top:11px;padding-bottom:11px;border-bottom:1px solid #ddd2bb}
+.rc-rv-date{font:400 13px/30px "Courier New",ui-monospace,monospace;color:rgb(var(--rc-ink-blue));font-variant-numeric:tabular-nums;white-space:nowrap}
+.rc-rv-text{min-width:0;font:400 16px/30px ReadingBody,"Noto Serif CJK SC","Songti SC",serif;white-space:pre-line;overflow-wrap:anywhere}
+.rc-rv-who{font:400 15px/30px ReadingBody,"Noto Serif CJK SC","Songti SC",serif;text-align:right;overflow-wrap:anywhere}
+.rc-rv-acts{display:block;line-height:20px}
+.rc-rv-act{padding:2px 0 2px 8px;border:0;background:none;font:600 12px var(--rc-font);color:var(--rc-accent);cursor:pointer}
+.rc-rv-act:hover{text-decoration:underline;text-underline-offset:3px}
+.rc-rv-blank{height:90px;background:linear-gradient(transparent 29px,#e9e1d0 29px) 0 0/100% 30px}
+/* writing: a ruled text area, the name on its line, the stamp button under it */
+.rc-rv-row.is-write{background:#fffdf7}
+.rc-rv-row.is-write textarea{display:block;width:100%;height:60px;margin:0;padding:0;border:0;outline:0;resize:none;overflow:hidden;font:inherit;line-height:30px;color:var(--rc-ink);
+  background:linear-gradient(transparent 29px,#ece4d2 29px) 0 0/100% 30px local}
+.rc-rv-row.is-write input{width:100%;margin:0;padding:0 2px;border:0;border-bottom:1px solid #b9ae94;border-radius:0;outline:0;background:transparent;font:inherit;line-height:26px;text-align:right;color:var(--rc-ink)}
+.rc-rv-row.is-write textarea::placeholder,.rc-rv-row.is-write input::placeholder{color:#aaa290;opacity:1}
+.rc-rv-row.is-write input:focus{border-bottom-color:var(--rc-accent)}
+.rc-rv-slot{display:inline-block;margin-top:3px;padding:0 5px;border:1.5px dashed rgb(var(--rc-ink-blue)/.32);border-radius:4px;transform:rotate(-6deg);line-height:22px;color:rgb(var(--rc-ink-blue)/.38)}
+/* stamped: the outline comes down as a stamp and the date inks in */
+.rc-rv-slot.is-stamped{border-style:solid;border-color:rgb(var(--rc-ink-blue));color:rgb(var(--rc-ink-blue));font-weight:700;animation:rc-stamp 520ms var(--rc-ease-out) both}
+@keyframes rc-stamp{0%{transform:rotate(-14deg) scale(1.55);opacity:.2}55%{transform:rotate(-5deg) scale(.92);opacity:1}100%{transform:rotate(-6deg) scale(1)}}
+.rc-rv-sendline{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:12px}
+.rc-rv-send{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 2px;border:0;background:none;
+  font:600 14px var(--rc-font);letter-spacing:.04em;color:#7d8c99;cursor:pointer;transition:color 200ms}
+.rc-rv-send svg{flex:none;transition:transform 260ms var(--rc-spring)}
+.rc-rv-send.is-ready{color:rgb(var(--rc-ink-blue))}
+.rc-rv-send.is-ready:hover{text-decoration:underline;text-underline-offset:4px}
+.rc-rv-send.is-ready:hover svg{transform:translateY(2px)}
+.rc-rv-send:active svg{transform:translateY(3px) scale(.92)}
+.rc-rv-send:disabled{cursor:default}
+.rc-rv-send:focus-visible{outline:2px solid var(--rc-accent);outline-offset:3px;border-radius:4px}
+.rc-rv-msg{grid-column:2 / -1;margin:6px 0 0;font:600 13px/20px var(--rc-font);color:rgb(var(--rc-red))}
+.rc-rv-msg:empty{display:none}
+.rc-rv-row.is-new{animation:rc-ink-in 600ms ease both}
+@keyframes rc-ink-in{from{color:transparent}}
+.rc-rv-row.is-leaving{transition:opacity 300ms ease,transform 300ms var(--rc-ease-out);opacity:0;transform:translateX(16px)}
+@media (max-width:720px){
+  .rc-rv{top:auto;left:0;width:auto;height:auto;max-height:min(86vh,760px);border-left:0;border-top:1px solid var(--rc-line);border-radius:14px 14px 0 0;transform:translateY(102%);box-shadow:0 -20px 40px -30px rgb(24 24 27/.5)}
+  .rc-rv-scrim{background:rgb(24 24 27/.16)}
+  .rc-rv-head{padding:0 18px}
+  .rc-rv-body{padding:20px 14px 40px}
+  .rc-rv-cardhead{padding-left:14px}
+  .rc-rv-cols,.rc-rv-row{grid-template-columns:44px 1fr;column-gap:8px;padding-left:14px;padding-right:14px}
+  .rc-rv-cols span:last-child{display:none}
+  .rc-rv-row .rc-rv-who{grid-column:2}
+  .rc-rv-acts{display:inline}
+  .rc-rv-row.is-write .rc-rv-who{display:flex;justify-content:flex-end;align-items:center;gap:10px}
+  .rc-rv-row.is-write input{width:8em}
+  .rc-rv-sendline{margin-top:0}
+  .rc-rv-date{font-size:12px}
+  .rc-rv-slot{padding:0 3px}
+}
+@media (prefers-reduced-motion:reduce){
+  .rc-rv,.rc-pocket-slip{transition:none}
+  .rc-rv-slot.is-stamped,.rc-rv-row.is-new{animation:none}
+}

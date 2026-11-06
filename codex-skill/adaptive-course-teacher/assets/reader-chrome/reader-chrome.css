@@ -43,9 +43,11 @@ html{scroll-padding-top:72px}
 .rc-bar .rc-trail{display:flex;align-items:center;gap:8px;min-width:0}
 .rc-bar .rc-trail a{display:inline-flex;align-items:center;min-height:44px;padding:0;text-decoration:none;white-space:nowrap}
 .rc-bar .rc-trail a:hover{text-decoration:underline;text-underline-offset:4px}
-/* the way back to the shelf is the shelf's own mark: RIZUM + 书架 in the display face (as in the shelf's top bar); a short hairline, not a slash */
+/* the way back to the shelf: 书架 in the display face, after the library's own short mark when the library has one
+   (read from the library's catalog, see reader-chrome.js); a short hairline, not a slash */
 .rc-bar .rc-trail .rc-shelf{gap:9px;color:var(--rc-ink);font:900 18px/1 RcHeading,"Songti SC",SimSun,serif;letter-spacing:.12em}
-.rc-bar .rc-trail .rc-shelf::before{content:"RIZUM";font:600 11px/1 var(--rc-font);letter-spacing:.42em}
+.rc-bar .rc-trail .rc-shelf[data-mark]::before{content:attr(data-mark);font:600 11px/1 var(--rc-font);letter-spacing:.42em;animation:rc-mark-in .3s ease-out}
+@keyframes rc-mark-in{from{opacity:0}to{opacity:1}}
 .rc-bar .rc-trail .rc-shelf:hover{text-decoration:none;color:var(--rc-accent)}
 .rc-bar .rc-sep{width:1px;height:16px;margin:0 6px;overflow:hidden;color:transparent;background:#c9ccd2}
 @media (max-width:560px){.rc-bar .rc-trail .rc-shelf::before{display:none}}

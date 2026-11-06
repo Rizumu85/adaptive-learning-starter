@@ -1467,3 +1467,28 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
   if (demo) start(state);
   else request('GET').then(start).catch(() => {});
 })();
+
+// The library's mark before 书架 in the bar (e.g. a name in Latin letters). It is not written into the book pages:
+// the chrome reads it from the library the 书架 link points to — `library.mark` in that library's books.json —
+// so every book shows the same mark and a library without one shows only 书架. Cached for the session; nothing on file:// pages.
+(() => {
+  const link = document.querySelector('.rc-bar .rc-shelf');
+  if (!link || link.dataset.mark || location.protocol === 'file:') return;
+  const show = (mark) => { if (mark) link.dataset.mark = mark; };
+  let catalog;
+  try { catalog = new URL('books.json', new URL(link.getAttribute('href') || '/', location.href)); } catch { return; }
+  if (catalog.origin !== location.origin) return;
+  const key = `rc-shelf-mark:${catalog.pathname}`;
+  try {
+    const cached = sessionStorage.getItem(key);
+    if (cached !== null) { show(cached); return; }
+  } catch { /* storage blocked: just fetch */ }
+  fetch(catalog, { credentials: 'same-origin' })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      const mark = typeof data?.library?.mark === 'string' ? data.library.mark.trim().slice(0, 16) : '';
+      try { sessionStorage.setItem(key, mark); } catch { /* fine */ }
+      show(mark);
+    })
+    .catch(() => {});
+})();

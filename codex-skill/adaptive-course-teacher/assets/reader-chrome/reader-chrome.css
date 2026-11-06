@@ -412,16 +412,17 @@ header>.rc-gist{margin:18px 0 0}
 
 
 /* continue reading: the window's bottom-right corner turned up like a page; under it, the chapter where the reader stopped.
-   Flat paper faces like the shelf's books (no gradient light): the page underneath, the back of the turned corner one step darker,
-   a crisp fold, and one soft shadow from the flap. Hover lifts it further; a click sweeps it across the screen like turning a page */
+   Every tone is the page paper (#f7f5ef) made lighter or darker, no extra yellow: the page underneath a touch lighter,
+   the back of the corner with one calm highlight near the fold, a light shadow on the page along the fold, and a soft neutral shadow
+   around the flap (chosen by the owner from three strengths, 2026-11-05). Hover lifts it further; a click sweeps it across the screen like turning a page */
 @property --rc-peel{syntax:"<length>";inherits:true;initial-value:0px}
 .rc-peel{position:fixed;right:0;bottom:0;z-index:16;display:block;width:var(--rc-peel);height:var(--rc-peel);text-decoration:none;
   transition:--rc-peel .62s var(--rc-spring);-webkit-tap-highlight-color:transparent}
-.rc-peel.is-on{--rc-peel:86px}
-.rc-peel.is-on.is-hint{--rc-peel:116px;transition-duration:.34s}
+.rc-peel.is-on{--rc-peel:104px}
+.rc-peel.is-on.is-hint{--rc-peel:132px;transition-duration:.34s}
 @media (hover:hover){.rc-peel.is-on:hover{--rc-peel:236px}}
 .rc-peel.is-on.is-turning{--rc-peel:260vmax;transition:--rc-peel .7s cubic-bezier(.55,0,.35,1)}
-.rc-peel-under{position:absolute;inset:0;clip-path:polygon(100% 0,100% 100%,0 100%);background:#fffaf0}
+.rc-peel-under{position:absolute;inset:0;clip-path:polygon(100% 0,100% 100%,0 100%);background:linear-gradient(135deg,rgb(60 56 48/.16) 50%,rgb(60 56 48/.04) 55%,rgb(60 56 48/0) 61%),#fbfaf7}
 .rc-peel-text{position:absolute;right:12px;bottom:11px;display:flex;flex-direction:column;align-items:flex-end;text-align:right;white-space:nowrap}
 .rc-peel-text b{display:block;max-width:calc(var(--rc-peel) - 40px);overflow:hidden;text-overflow:ellipsis;font:600 13px/1.25 var(--rc-font);color:var(--rc-ink);transition:font-size .3s var(--rc-ease-out)}
 .rc-peel-text em,.rc-peel-text i{display:block;max-height:0;overflow:hidden;opacity:0;font:600 12px/1.5 var(--rc-font);font-style:normal;transition:max-height .4s var(--rc-ease-out),opacity .25s}
@@ -432,11 +433,10 @@ header>.rc-gist{margin:18px 0 0}
   .rc-peel:hover .rc-peel-text em{max-height:24px;opacity:1;margin-bottom:6px}
   .rc-peel:hover .rc-peel-text i{max-height:24px;opacity:1;margin-top:3px}
 }
-.rc-peel-flap{position:absolute;inset:0;filter:drop-shadow(-4px -3px 5px rgb(45 38 30/.18))}
-.rc-peel-flap::before{content:"";position:absolute;inset:0;clip-path:polygon(0 0,100% 0,0 100%);background:#ebe4d4}
-.rc-peel-flap::after{content:"";position:absolute;inset:0;clip-path:polygon(100% 0,0 100%,0 calc(100% - 1.5px),calc(100% - 1.5px) 0);background:#ddd3bf}
+.rc-peel-flap{position:absolute;inset:0;filter:drop-shadow(-4px -3px 6px rgb(60 56 48/.15))}
+.rc-peel-flap::before{content:"";position:absolute;inset:0;clip-path:polygon(0 0,100% 0,0 100%);background:linear-gradient(135deg,#e6e3da 0%,#eeece5 24%,#f9f8f4 42%,#f1efe9 48%,#dfdbd0 50%)}
 .rc-peel:focus-visible{outline:2px solid var(--rc-accent);outline-offset:-4px}
 .rc-has-peel body{padding-bottom:max(env(safe-area-inset-bottom),72px)}
-@media (max-width:740px){.rc-peel.is-on{--rc-peel:78px}.rc-peel.is-on.is-hint{--rc-peel:104px}.rc-peel-text b{font-size:12.5px;max-width:calc(var(--rc-peel) - 34px)}}
+@media (max-width:740px){.rc-peel.is-on{--rc-peel:90px}.rc-peel.is-on.is-hint{--rc-peel:114px}.rc-peel-text b{font-size:12.5px;max-width:calc(var(--rc-peel) - 36px)}}
 @media (prefers-reduced-motion:reduce){.rc-peel{transition:none}}
 @media print{.rc-peel{display:none}}

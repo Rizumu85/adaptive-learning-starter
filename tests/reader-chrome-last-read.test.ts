@@ -1,5 +1,5 @@
 // The last-read position in reader-chrome.js ("上次读到"): which places are worth saving, a chapter page that saves
-// on section change and on pagehide, and a contents page that shows "继续阅读" and the "上次" mark.
+// on section change and on pagehide, and a contents page that shows the "继续阅读" page corner and the "上次" mark.
 // Part 1 runs the decision helper on its own; part 2 runs the whole script in headless Chrome or Edge against a small
 // local server that fakes /api/position (skipped when no browser is installed).
 import { test } from 'node:test';
@@ -124,13 +124,14 @@ test('whole script in a headless browser: saving on a chapter page, 继续阅读
     assert.ok(puts.every((p) => p.url === '/demo/ch2.html' && p.chapterTitle === '第二章 远方'));
 
     const dom = await run(browsers[0], `${origin}/demo/index.html`, join(dir, 'b'));
-    const line = dom.match(/<a ([^>]*class="rc-continue"[^>]*)>([\s\S]*?)<\/a>/);
-    assert.ok(line, 'no 继续阅读 link');
-    assert.match(line[1], new RegExp(`href="${origin}/demo/ch2.html#a"`));
-    assert.equal(line[2].replace(/<[^>]+>/g, ''), '继续阅读·第二章 远方·甲节');
-    // an action, so it sits first in the top bar's tools, not as another line in the page head
-    assert.match(dom, /class="rc-tools"[^>]*><a [^>]*class="rc-continue"/);
-    assert.doesNotMatch(dom, /<p class="rc-continue">/);
+    const peel = dom.match(/<a ([^>]*class="rc-peel[^"]*"[^>]*)>([\s\S]*?)<\/a>/);
+    assert.ok(peel, 'no 继续阅读 page corner');
+    assert.match(peel[1], new RegExp(`href="${origin}/demo/ch2.html#a"`));
+    assert.match(peel[1], /aria-label="继续阅读 · 第二章 远方 · 甲节"/);
+    assert.equal(peel[2].replace(/<[^>]+>/g, ''), '继续阅读 →第二章 远方甲节');
+    // the turned-up corner lives at the window's bottom right, not in the top bar and not as a line in the page head
+    assert.doesNotMatch(dom, /class="rc-continue"/);
+    assert.match(dom, /<html[^>]*class="[^"]*rc-has-peel/);
     // the 上次 mark sits after the chapter title of the whole-chapter link only, not after the 复习 link
     assert.match(dom, /<span class="row-title">第二章 远方<span class="rc-last">上次<\/span><\/span>/);
     assert.equal((dom.match(/class="rc-last"/g) || []).length, 1);

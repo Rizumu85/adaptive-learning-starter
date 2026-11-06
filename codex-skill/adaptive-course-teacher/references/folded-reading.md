@@ -24,6 +24,7 @@ Put sentence splitting, which blocks fold, the section walk and the gist markup 
 - A paragraph folds only when it has two or more sentences in both languages and rendering each sentence on its own, joined, gives exactly the paragraph's markup. Paragraphs whose markup spans sentences (links, special inline styles, a struck-out figure) stay whole.
 - If a paragraph would need its rendering state reset per sentence (for example "first mention gets a link"), reset it the same way before the whole render and before the sentence-by-sentence render.
 - When `folds.json` names a paragraph whose sentences no longer match (an index out of range, a different render), stop the build with "rerun the data tool" instead of guessing.
+- Anything that changes paragraph markup (new figure or cross-reference links, a different emphasis) also changes which paragraphs can fold: regenerate the prompts for the affected chapters before asking for key sentences, or the answers will name paragraphs that no longer split the same way.
 
 ## What folds
 

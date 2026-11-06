@@ -748,50 +748,51 @@ if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')
     }).catch(() => {});
   }
 
-  // 目录页：顶栏右边的“继续阅读”和章名后的“上次”。position 是这本书的记录，没有或那一章已不在目录里时什么都不显示。
-  // “继续阅读”是一个动作，放在顶栏右边（和顶栏控件同一种字），不占页头的层级；没有顶栏的页面才放在 h1 和紧跟着它的几段文字后面
-  // （书想放在别处时，给那个位置的元素加 data-rc-continue）
+  // 目录页：窗口右下角翻起的页角（继续阅读）和章名后的“上次”。position 是这本书的记录，没有或那一章已不在目录里时什么都不显示。
+  // 页角底下露出上次那一章；指上去掀得更高、露出“继续阅读 →”和节名；点一下页角扫过整屏像翻过一页，再进入那一章。
+  // 不放在顶栏里：顶栏留给书名，手机上也不挤
   function showContinue(position) {
-    document.querySelectorAll('.rc-continue, .rc-last').forEach((node) => node.remove());
+    document.querySelectorAll('.rc-continue, .rc-last, .rc-peel').forEach((node) => node.remove());
+    document.documentElement.classList.remove('rc-has-peel');
     const chapter = position && info.chapters.find((c) => c.id === position.chapter);
     if (!chapter) return;
     tag(chapter, 'rc-last', '上次');
     const url = new URL(chapter.url, location.href);
     if (position.section) url.hash = position.section;
-    const line = document.createElement('p');
-    line.className = 'rc-continue';
-    const link = document.createElement('a');
-    link.href = url.href;
-    const part = (className, text) => link.append(Object.assign(document.createElement('span'), { className, textContent: text }));
-    part('rc-continue-label', '继续阅读');
     // 没有小节目录的章，记下的“小节”就是章名本身，只显示一次
-    for (const text of [chapter.title, position.section && ![chapter.title, position.chapterTitle].includes(position.sectionTitle) ? position.sectionTitle : '']) {
-      if (!text) continue;
-      part('rc-continue-sep', '·');
-      part('rc-continue-where', text);
-    }
-    const inner = document.querySelector('.rc-bar .rc-bar-inner');
-    if (inner && !document.querySelector('[data-rc-continue]')) {
-      let tools = inner.querySelector('.rc-tools');
-      if (!tools) {
-        tools = document.createElement('div');
-        tools.className = 'rc-tools';
-        inner.append(tools);
-      }
-      link.className = 'rc-continue';
-      link.title = link.textContent.replace(/·/g, ' · ');
-      tools.prepend(link);
-      return;
-    }
-    line.append(link);
-    const slot = document.querySelector('[data-rc-continue]');
-    const h1 = [...document.querySelectorAll('h1')].find((el) => !el.closest('.rc-bar'));
-    if (slot) { slot.append(line); return; }
-    if (!h1) return;
-    let after = h1;
-    while (after.nextElementSibling && after.nextElementSibling.matches('p:not(.rc-continue)')) after = after.nextElementSibling;
-    after.after(line);
+    const section = position.section && ![chapter.title, position.chapterTitle].includes(position.sectionTitle) ? position.sectionTitle : '';
+    const peel = document.createElement('a');
+    peel.className = 'rc-peel';
+    peel.href = url.href;
+    peel.setAttribute('aria-label', ['继续阅读', chapter.title, section].filter(Boolean).join(' · '));
+    const under = document.createElement('span');
+    under.className = 'rc-peel-under';
+    const text = document.createElement('span');
+    text.className = 'rc-peel-text';
+    text.append(Object.assign(document.createElement('em'), { textContent: '继续阅读 →' }),
+      Object.assign(document.createElement('b'), { textContent: chapter.title }));
+    if (section) text.append(Object.assign(document.createElement('i'), { textContent: section }));
+    under.append(text);
+    const flap = document.createElement('span');
+    flap.className = 'rc-peel-flap';
+    peel.append(under, flap);
+    document.body.append(peel);
+    document.documentElement.classList.add('rc-has-peel');
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(() => peel.classList.add('is-on'), still ? 0 : 450);
+    // 打开页面后轻轻掀一下，让人看见这里能翻
+    if (!still) setTimeout(() => { peel.classList.add('is-hint'); setTimeout(() => peel.classList.remove('is-hint'), 420); }, 1500);
+    peel.addEventListener('click', (event) => {
+      if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || still) return;
+      event.preventDefault();
+      peel.classList.add('is-turning');
+      setTimeout(() => { location.href = peel.href; }, 700);
+    });
   }
+  // 从章节页按“后退”回来时页面可能还停在翻页那一刻：把页角放回去
+  addEventListener('pageshow', (event) => {
+    if (event.persisted) document.querySelectorAll('.rc-peel.is-turning').forEach((peel) => peel.classList.remove('is-turning'));
+  });
 
   // 要不要把这里（next）记成上次读到的地方。和已记下的（saved）一样就不记；这一次打开页面后还没读到过任何一节（engaged 为假）时，
   // 停在本章开头不覆盖同一章里已记下的某一节：从另一台设备、或从目录点进同一章时页面在顶上，读者看一眼就走也不丢位置。

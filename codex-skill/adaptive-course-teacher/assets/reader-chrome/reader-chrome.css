@@ -2,6 +2,7 @@
    只管操作层；正文版式、字体和配图仍由各书自己的样式决定。
    各书原有样式对 nav、footer、.toc 有通用规则，这里的选择器都多加一层 .rc-bar / .rc-foot 压过它们。 */
 @font-face{font-family:UIOption;src:local("MiSans Demibold"),local("MiSans-Demibold");font-weight:600;font-display:swap}
+@font-face{font-family:RcHeading;src:local("ZhaohuaMinB Black"),local("ZhaohuaMinB-Black"),local("ZhaohuaMinB"),local("朝華標題B");font-weight:900;font-display:swap}
 
 :root{
   --rc-accent:#147d8f;
@@ -42,9 +43,12 @@ html{scroll-padding-top:72px}
 .rc-bar .rc-trail{display:flex;align-items:center;gap:8px;min-width:0}
 .rc-bar .rc-trail a{display:inline-flex;align-items:center;min-height:44px;padding:0;text-decoration:none;white-space:nowrap}
 .rc-bar .rc-trail a:hover{text-decoration:underline;text-underline-offset:4px}
-.rc-bar .rc-trail .rc-shelf{color:var(--rc-muted)}
-.rc-bar .rc-trail .rc-shelf:hover{color:var(--rc-ink)}
-.rc-bar .rc-sep{color:var(--rc-line);font:400 15px/1 var(--rc-font)}
+/* the way back to the shelf is the shelf's own mark: RIZUM + 书架 in the display face (as in the shelf's top bar); a short hairline, not a slash */
+.rc-bar .rc-trail .rc-shelf{gap:9px;color:var(--rc-ink);font:900 18px/1 RcHeading,"Songti SC",SimSun,serif;letter-spacing:.12em}
+.rc-bar .rc-trail .rc-shelf::before{content:"RIZUM";font:600 11px/1 var(--rc-font);letter-spacing:.42em}
+.rc-bar .rc-trail .rc-shelf:hover{text-decoration:none;color:var(--rc-accent)}
+.rc-bar .rc-sep{width:1px;height:16px;margin:0 6px;overflow:hidden;color:transparent;background:#c9ccd2}
+@media (max-width:560px){.rc-bar .rc-trail .rc-shelf::before{display:none}}
 .rc-bar .rc-here{font:600 15px/1.4 var(--rc-font);color:var(--rc-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rc-bar .rc-trail .rc-shelf,.rc-bar .rc-sep{flex:none}
 /* 书名太长时末尾显示省略号：弹性盒里的文字不会省略，所以书名用普通块 */
@@ -118,24 +122,6 @@ a.rc-ref:hover{text-decoration-style:solid}
 /* 上次读到：目录页章名后的“上次”，以及页头下一行“继续阅读 · 章名 · 节名”。像印在纸上的一行小字：没有底色、边框和阴影，
    “继续阅读”用强调色（标出读者所在的地方），章名、节名是墨色，悬停时加一道强调色细下划线。选择器多一层，压过书自己对页头 p、a 的通用规则 */
 .rc-last{margin-left:8px;font:600 12px/1 var(--rc-font);color:var(--rc-accent);letter-spacing:0;vertical-align:.15em;white-space:nowrap}
-/* 目录页的“继续阅读”是一个动作，不是又一层标题：放在顶栏右边，和顶栏的其他控件同一种字。
-   一枚小书签，“继续阅读”用强调色，章节名用正文色、太长时截断；末尾箭头指上去时往前走一点。窄屏只留书签和章节名 */
-.rc-bar .rc-continue{display:inline-flex;align-items:center;gap:0 8px;min-width:0;max-width:min(30em,56vw);min-height:44px;font:600 15px/1.4 var(--rc-font);color:var(--rc-ink);text-decoration:none;white-space:nowrap}
-.rc-bar .rc-continue::before{content:"";flex:none;width:8px;height:11px;background:var(--rc-accent);clip-path:polygon(0 0,100% 0,100% 100%,50% 72%,0 100%)}
-.rc-bar .rc-continue::after{content:"→";flex:none;color:var(--rc-accent);transition:transform 200ms var(--rc-ease-out)}
-.rc-bar .rc-continue-label{flex:none;color:var(--rc-accent)}
-.rc-bar .rc-continue-sep{flex:none;color:var(--rc-muted);font-weight:400}
-.rc-bar .rc-continue-where{min-width:0;overflow:hidden;text-overflow:ellipsis}
-.rc-bar .rc-tools:has(.rc-continue){min-width:0;flex:0 1 auto}
-@media (hover:hover) and (pointer:fine){.rc-bar .rc-continue:hover .rc-continue-where{text-decoration:underline;text-decoration-color:var(--rc-accent);text-decoration-thickness:1px;text-underline-offset:4px}.rc-bar .rc-continue:hover::after{transform:translateX(3px)}}
-.rc-bar .rc-continue:focus-visible{outline:2px solid var(--rc-accent);outline-offset:2px;border-radius:4px}
-@media (max-width:560px){.rc-bar .rc-continue-label,.rc-bar .rc-continue-label+.rc-continue-sep{display:none}.rc-bar .rc-continue{font-size:14px;max-width:52vw}}
-@media (prefers-reduced-motion:reduce){.rc-bar .rc-continue::after{transition:none}}
-/* 没有顶栏的页面：放在页头里的一行 */
-p.rc-continue{margin:12px 0 0;font:600 14px/1.6 var(--rc-font)}
-p.rc-continue a{display:inline-flex;align-items:baseline;gap:0 8px;color:var(--rc-ink);text-decoration:none}
-p.rc-continue .rc-continue-label{color:var(--rc-accent)}
-p.rc-continue .rc-continue-sep{color:var(--rc-muted);font-weight:400}
 /* 要学的名称（rc-key）：学习提示选出的少数名称，在正文里像一道淡淡的马克笔；悬停照样预览原书定义 */
 a.rc-ref.rc-key{color:inherit;text-decoration:none;padding:0 1px;border-radius:2px;-webkit-box-decoration-break:clone;box-decoration-break:clone;background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 30%,transparent) 52% 94%,transparent 94%)}
 a.rc-ref.rc-key:hover{background-image:linear-gradient(transparent 52%,color-mix(in srgb,var(--rc-accent) 45%,transparent) 52% 94%,transparent 94%)}
@@ -423,3 +409,34 @@ header>.rc-gist{margin:18px 0 0}
   .rc-rv,.rc-pocket-slip{transition:none}
   .rc-rv-slot.is-stamped,.rc-rv-row.is-new{animation:none}
 }
+
+
+/* continue reading: the window's bottom-right corner turned up like a page; under it, the chapter where the reader stopped.
+   Flat paper faces like the shelf's books (no gradient light): the page underneath, the back of the turned corner one step darker,
+   a crisp fold, and one soft shadow from the flap. Hover lifts it further; a click sweeps it across the screen like turning a page */
+@property --rc-peel{syntax:"<length>";inherits:true;initial-value:0px}
+.rc-peel{position:fixed;right:0;bottom:0;z-index:16;display:block;width:var(--rc-peel);height:var(--rc-peel);text-decoration:none;
+  transition:--rc-peel .62s var(--rc-spring);-webkit-tap-highlight-color:transparent}
+.rc-peel.is-on{--rc-peel:86px}
+.rc-peel.is-on.is-hint{--rc-peel:116px;transition-duration:.34s}
+@media (hover:hover){.rc-peel.is-on:hover{--rc-peel:236px}}
+.rc-peel.is-on.is-turning{--rc-peel:260vmax;transition:--rc-peel .7s cubic-bezier(.55,0,.35,1)}
+.rc-peel-under{position:absolute;inset:0;clip-path:polygon(100% 0,100% 100%,0 100%);background:#fffaf0}
+.rc-peel-text{position:absolute;right:12px;bottom:11px;display:flex;flex-direction:column;align-items:flex-end;text-align:right;white-space:nowrap}
+.rc-peel-text b{display:block;max-width:calc(var(--rc-peel) - 40px);overflow:hidden;text-overflow:ellipsis;font:600 13px/1.25 var(--rc-font);color:var(--rc-ink);transition:font-size .3s var(--rc-ease-out)}
+.rc-peel-text em,.rc-peel-text i{display:block;max-height:0;overflow:hidden;opacity:0;font:600 12px/1.5 var(--rc-font);font-style:normal;transition:max-height .4s var(--rc-ease-out),opacity .25s}
+.rc-peel-text em{order:-1;color:var(--rc-accent)}
+.rc-peel-text i{color:var(--rc-muted)}
+@media (hover:hover){
+  .rc-peel:hover .rc-peel-text b{font-size:16px}
+  .rc-peel:hover .rc-peel-text em{max-height:24px;opacity:1;margin-bottom:6px}
+  .rc-peel:hover .rc-peel-text i{max-height:24px;opacity:1;margin-top:3px}
+}
+.rc-peel-flap{position:absolute;inset:0;filter:drop-shadow(-4px -3px 5px rgb(45 38 30/.18))}
+.rc-peel-flap::before{content:"";position:absolute;inset:0;clip-path:polygon(0 0,100% 0,0 100%);background:#ebe4d4}
+.rc-peel-flap::after{content:"";position:absolute;inset:0;clip-path:polygon(100% 0,0 100%,0 calc(100% - 1.5px),calc(100% - 1.5px) 0);background:#ddd3bf}
+.rc-peel:focus-visible{outline:2px solid var(--rc-accent);outline-offset:-4px}
+.rc-has-peel body{padding-bottom:max(env(safe-area-inset-bottom),72px)}
+@media (max-width:740px){.rc-peel.is-on{--rc-peel:78px}.rc-peel.is-on.is-hint{--rc-peel:104px}.rc-peel-text b{font-size:12.5px;max-width:calc(var(--rc-peel) - 34px)}}
+@media (prefers-reduced-motion:reduce){.rc-peel{transition:none}}
+@media print{.rc-peel{display:none}}

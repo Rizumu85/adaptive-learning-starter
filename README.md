@@ -93,6 +93,7 @@ adaptive-learning-starter/
 │   ├── references/                        # 教学流程、学习引擎与可选预设
 │   ├── assets/project-template/           # 新学习项目模板（随 skill 安装）
 │   ├── assets/learner-profile-template.md # 个人学习档案空白模板
+│   ├── assets/library-shelf/              # 书架首页模板：3D 书架与大字刊头（读书版的入口，可选）
 │   └── assets/examples/                   # 阅读、交互、对比与读写练习样本
 └── adaptive-learning的安装与使用说明.md     # 可直接转发的完整说明
 ```

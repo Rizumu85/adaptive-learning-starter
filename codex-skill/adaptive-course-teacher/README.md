@@ -7,7 +7,7 @@ A long-term learning workflow for video courses, software follow-alongs, books, 
 - A project template that any installed copy can use to start a new learning project.
 - Subject playbooks (video course, software follow-along, book and reading edition, textbook and exercises) that the agent adapts instead of copying between subjects.
 - A learning engine: mission, resources, learning records, glossary, reference sheets, retrieval and spaced review, and choosing the next unit from evidence.
-- Optional presets you can adopt as they are: paper courseware, stepped interactive labs, book reader navigation, an offline image viewer, and a Chinese reading typography pairing.
+- Optional presets you can adopt as they are: paper courseware, stepped interactive labs, book reader navigation, an offline image viewer, a Chinese reading typography pairing, and a library shelf home page for your reading editions (`assets/library-shelf/`, a 3D bookshelf with a large masthead; see its README).
 - A private learner profile, kept outside this package, so a new project starts from preferences that already worked.
 
 ## Install

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN" style="background:#f7f5ef">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="color-scheme" content="light">
+<title>书架</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/library.css">
+<script>
+// 回到书架时不用浏览器的整页过渡：过渡期间显示的是整页的平面快照，iPhone 上快照里书排的透视不生效，
+// 两侧的书会先是直的、过渡结束才变倾斜。书架自己会等封面到齐再让书排淡入，不需要这层过渡。
+// 要在第一帧之前登记，所以写在这里而不是 library.js 里；从书架去别的页面、以及这一页显示某本书的目录时照常过渡
+addEventListener('pagereveal', (event) => {
+  if (event.viewTransition && !/^#\/book\//.test(location.hash)) event.viewTransition.skipTransition();
+});
+</script>
+<script defer src="assets/library.js"></script>
+</head>
+<body>
+<a class="skip" href="#app">跳到内容</a>
+<main id="app" aria-live="polite"></main>
+<noscript><p class="notice">书架需要启用 JavaScript。</p></noscript>
+</body>
+</html>

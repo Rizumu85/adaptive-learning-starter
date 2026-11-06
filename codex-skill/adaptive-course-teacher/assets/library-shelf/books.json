@@ -1,0 +1,429 @@
+{
+  "library": {
+    "name": "Library · 书架",
+    "mark": "LIBRARY",
+    "searchFrom": 8
+  },
+  "books": [
+    {
+      "id": "color-notes",
+      "title": "色彩笔记",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "绘画",
+      "reader": "books/color-notes/",
+      "size": {
+        "width": 148,
+        "height": 210,
+        "thickness": 14
+      },
+      "cover": {
+        "src": "covers/color-notes.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#c8553d",
+        "ink": "#f7efe2",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "sketch-basics",
+      "title": "速写入门",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "绘画",
+      "reader": "books/sketch-basics/",
+      "size": {
+        "width": 170,
+        "height": 230,
+        "thickness": 16
+      },
+      "cover": {
+        "src": "covers/sketch-basics.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#2f5d62",
+        "ink": "#eef2ec",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "figure-structure",
+      "title": "人体结构",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "绘画",
+      "reader": "books/figure-structure/",
+      "size": {
+        "width": 185,
+        "height": 260,
+        "thickness": 22
+      },
+      "cover": {
+        "src": "covers/figure-structure.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#6b4f3a",
+        "ink": "#f3e9dc",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "light-practice",
+      "title": "光影练习",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "绘画",
+      "reader": "books/light-practice/",
+      "size": {
+        "width": 150,
+        "height": 200,
+        "thickness": 12
+      },
+      "cover": {
+        "src": "covers/light-practice.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#e0b04a",
+        "ink": "#2b2a26",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "plant-atlas",
+      "title": "植物图谱",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "取材",
+      "reader": "books/plant-atlas/",
+      "size": {
+        "width": 200,
+        "height": 270,
+        "thickness": 24
+      },
+      "cover": {
+        "src": "covers/plant-atlas.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#5f7a4a",
+        "ink": "#f1f0e4",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "city-sketching",
+      "title": "城市写生",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "取材",
+      "reader": "books/city-sketching/",
+      "size": {
+        "width": 190,
+        "height": 240,
+        "thickness": 18
+      },
+      "cover": {
+        "src": "covers/city-sketching.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#3d5a80",
+        "ink": "#eef1f5",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "animal-drawing",
+      "title": "动物素描",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "取材",
+      "reader": "books/animal-drawing/",
+      "size": {
+        "width": 160,
+        "height": 220,
+        "thickness": 15
+      },
+      "cover": {
+        "src": "covers/animal-drawing.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#a26769",
+        "ink": "#f6ece8",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "composition",
+      "title": "构图手册",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "设计",
+      "reader": "books/composition/",
+      "size": {
+        "width": 175,
+        "height": 235,
+        "thickness": 13
+      },
+      "cover": {
+        "src": "covers/composition.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#1f1f1f",
+        "ink": "#f2efe6",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "perspective",
+      "title": "建筑透视",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "设计",
+      "reader": "books/perspective/",
+      "size": {
+        "width": 210,
+        "height": 280,
+        "thickness": 20
+      },
+      "cover": {
+        "src": "covers/perspective.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#7b8b99",
+        "ink": "#f4f5f6",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "illustration-tools",
+      "title": "插画工具",
+      "author": "示例作者",
+      "edition": "示例书目 · 占位封面",
+      "category": "设计",
+      "reader": "books/illustration-tools/",
+      "size": {
+        "width": 155,
+        "height": 215,
+        "thickness": 11
+      },
+      "cover": {
+        "src": "covers/illustration-tools.webp",
+        "fit": "cover"
+      },
+      "spine": {
+        "color": "#d98e73",
+        "ink": "#fff8f1",
+        "author": "示例作者"
+      },
+      "chapters": [
+        {
+          "no": "01",
+          "title": "第一章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "02",
+          "title": "第二章",
+          "pages": "示例",
+          "href": "#"
+        },
+        {
+          "no": "03",
+          "title": "第三章",
+          "pages": "",
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}
